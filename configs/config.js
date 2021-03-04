@@ -1,3 +1,11 @@
+require('dotenv').config()
+
+const KEY = process.env.KEY
+const PORT = process.env.PORT
+const MONGODB_URI = process.env.MONGODB_URI
+
 module.exports = {
-  key: "finanservs-cafe-kotowa"
+  MONGODB_URI,
+  PORT,
+  KEY
 }
