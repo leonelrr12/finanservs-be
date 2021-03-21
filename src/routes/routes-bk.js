@@ -104,7 +104,7 @@ appRoutes.get('/laboral_sector', (request, response) => {
     }
   })
 
-
+  
   // return response.json([
   //   { 
   //     id: 8, 
@@ -216,7 +216,7 @@ appRoutes.get('/laboral_sector', (request, response) => {
 })
 
 appRoutes.get('/laboral_status', (request, response) => {
-  const sql = "SELECT name, is_active FROM labolal_status"
+  const sql = "SELECT name, is_active FROM laboral_status"
 
   config.cnn.query(sql, (error, results) => {
     if (error) throw error
