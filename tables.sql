@@ -308,6 +308,7 @@ CREATE TABLE `terms_loan` (
 ) ;
 
 
+
 insert into terms_loan (name, is_active) value ('60', true);
 insert into terms_loan (name, is_active) value ('120', true);
 insert into terms_loan (name, is_active) value ('180', true);
