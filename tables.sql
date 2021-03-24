@@ -1,3 +1,6 @@
+
+-- https://www.pdfconvertonline.com/pdf-to-html-ocr-online.html
+
 -- CREATE DATABASE finanservs
 
 use finanservs;
@@ -206,7 +209,7 @@ DROP TABLE `prospects`;
 CREATE TABLE `prospects` (
   `id` int NOT NULL AUTO_INCREMENT,
   `id_personal` varchar(20) NOT NULL,
-  `idUser` varchar(20) NOT NULL,
+  `idUser` varchar(30) NOT NULL,
   `name` varchar(60) NOT NULL,
   `fname` varchar(60) NOT NULL,
   `fname_2` varchar(60) DEFAULT NULL,
@@ -284,19 +287,21 @@ insert into entities_f (id_ruta, name, contact, phone_number, cellphone, is_acti
 
 
 
-DROP TABLE `type_dcuments`;
-CREATE TABLE `type_dcuments` (
-  `id` int NOT NULL AUTO_INCREMENT,
+DROP TABLE `type_documents`;
+CREATE TABLE `type_documents` (
+  `id` int NOT NULL,
   `name` varchar(30) NOT NULL,
+  `id_name` varchar(15) NOT NULL,
 	`is_active` boolean,
   PRIMARY KEY (`id`)
 ) ;
 
-insert into type_dcuments (name, is_active) value ('Cédula', true);
-insert into type_dcuments (name, is_active) value ('Comprobante de pago', true);
-insert into type_dcuments (name, is_active) value ('Ficha del seguro social', true);
-insert into type_dcuments (name, is_active) value ('Recibo de servicio', true);
-insert into type_dcuments (name, is_active) value ('Carta de Trabajo', true);
+
+insert into type_documents (id, name, id_name, is_active) value (1, 'Cédula', 'idUrl', true);
+insert into type_documents (id, name, id_name, is_active) value (2, 'Comprobante de pago', 'payStubUrl', true);
+insert into type_documents (id, name, id_name, is_active) value (3, 'Ficha del seguro social', 'sSProofUrl', true);
+insert into type_documents (id, name, id_name, is_active) value (4, 'Recibo de servicio', 'pGoodProofUrl', true);
+insert into type_documents (id, name, id_name, is_active) value (5, 'Carta de Trabajo', 'workLetterUrl', true);
 
 
 DROP TABLE `terms_loan`;
@@ -314,3 +319,30 @@ insert into terms_loan (name, is_active) value ('120', true);
 insert into terms_loan (name, is_active) value ('180', true);
 insert into terms_loan (name, is_active) value ('240', true);
 insert into terms_loan (name, is_active) value ('360', true);
+
+
+
+
+DROP TABLE `provinces`;
+CREATE TABLE `provinces` (
+  `id` int NOT NULL,
+  `name` varchar(30) NOT NULL,
+  PRIMARY KEY (`id`)
+) ;
+
+DROP TABLE `districts`;
+CREATE TABLE `districts` (
+  `id` int NOT NULL,
+  `idProv` int NOT NULL,
+  `name` varchar(30) NOT NULL,
+  PRIMARY KEY (`id`)
+) ;
+
+DROP TABLE `counties`;
+CREATE TABLE `counties` (
+  `id` int NOT NULL,
+  `idProv` int NOT NULL,
+  `idDist` int NOT NULL,
+  `name` varchar(35) NOT NULL,
+  PRIMARY KEY (`id`)
+) ;

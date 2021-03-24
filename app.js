@@ -14,6 +14,7 @@ app.set('views', path.join(__dirname, 'views'))
 
 app.use(cors())
 app.use(express.static('build'))
+app.use(express.static('subidas'))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(middleware.requestLogger)

@@ -5,6 +5,14 @@ appRoutes.get('/', (request, response) => {
   response.send('Hola Mundo!!!')
 })
 
+appRoutes.get('/today-is', (request, response) => {
+  const dt1 = new Date()
+  const dt2 = new Intl.DateTimeFormat('es-ES',{dateStyle: 'full'}).format(dt1)
+  response.json({ hoyes: dt2 })
+})
+
+
+
 appRoutes.get('/sectors', (request, response) => {
   const sql = "SELECT * FROM sectors"
 
@@ -69,7 +77,6 @@ appRoutes.get('/planillas_j', (request, response) => {
     }
   })
 })
-
 
 appRoutes.get('/laboral_sector_institution', (request, response) => {
   const sql = "SELECT * FROM institutions"
@@ -181,5 +188,64 @@ appRoutes.get('/marital_status', (request, response) => {
     }
   })
 })
+
+
+
+appRoutes.get('/provinces', (request, response) => {
+  const sql = "SELECT * FROM provinces"
+
+  config.cnn.query(sql, (error, results) => {
+    if (error) throw error
+    if (results.length > 0) {
+      response.json(results)
+    } else {
+      response.send('Not results!')
+    }
+  })
+})
+
+appRoutes.get('/districts', (request, response) => {
+  const sql = "SELECT * FROM districts"
+
+  config.cnn.query(sql, (error, results) => {
+    if (error) throw error
+    if (results.length > 0) {
+      response.json(results)
+    } else {
+      response.send('Not results!')
+    }
+  })
+})
+
+appRoutes.get('/counties', (request, response) => {
+  const sql = "SELECT * FROM counties"
+
+  config.cnn.query(sql, (error, results) => {
+    if (error) throw error
+    if (results.length > 0) {
+      response.json(results)
+    } else {
+      response.send('Not results!')
+    }
+  })
+})
+
+
+appRoutes.get('/type_documents', (request, response) => {
+  const sql = "SELECT id, name, id_name FROM type_documents WHERE is_active = true"
+
+  config.cnn.query(sql, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      response.json(results)
+    } else {
+      response.send('Not results!')
+    }
+  })
+})
+
 
 module.exports = appRoutes

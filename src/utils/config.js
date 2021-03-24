@@ -2,10 +2,13 @@ require('dotenv').config()
 const mysql = require('mysql2')
 
 const PORT = process.env.PORT
-const MONGODB_URI = process.env.MONGODB_URI
+const HOST = process.env.HOST
+const AWS_Access_key_ID = process.env.AWS_Access_key_ID
+const AWS_Secret_access_key = process.env.AWS_Secret_access_key
+
 
 // MySql de James - IS
-const cnn = mysql.createConnection({
+const CNN = mysql.createConnection({
     host: '69.10.63.218',
     database: 'finanservs',
     user: 'AdminFinanservs',
@@ -30,14 +33,16 @@ const cnn = mysql.createConnection({
 
 
 // Check connection
-cnn.connect(error => {
+CNN.connect(error => {
   if (error) throw error;
   console.log('Database server runnuning!');
 })
 
 
 module.exports = {
-  MONGODB_URI,
+  AWS_Access_key_ID,
+  AWS_Secret_access_key,
   PORT,
-  cnn
+  HOST,
+  CNN
 }

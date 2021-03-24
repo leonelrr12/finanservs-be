@@ -110,13 +110,6 @@ def insert_inst(id, name, cnn):
 
 def insert_plan(id, name, cnn):
     try:
-        # cnn = mysql.connector.connect(
-        #     host="bjxexd6ulauq7ap6pqxv-mysql.services.clever-cloud.com",
-        #     database="bjxexd6ulauq7ap6pqxv",
-        #     user="usch2d6auluhu2pz",
-        #     password="2mO43d7a0ih8POFWvyBL"         
-        # )
-
         cursor = cnn.cursor()
         mySql_insert_query = "INSERT INTO planillas_j (id,name) VALUES (%s,%s)"
 
@@ -132,10 +125,59 @@ def insert_plan(id, name, cnn):
             cursor.close()
             print("MySQL connection is closed")
 
-# insert('Caja del Seguro Social')
-# insert('Loteria Nacional de Beneficencia')
+
+def insert_prov(id, name, cnn):
+    try:
+        cursor = cnn.cursor()
+        mySql_insert_query = "INSERT INTO provinces (id,name) VALUES (%s,%s)"
+
+        record = (id,name)
+        cursor.execute(mySql_insert_query, record)
+        # cnn.commit()
+        print("Record inserted!")
+    except mysql.connector.Error as error:
+        print("Failed to insert into MySQL table {}".format(error))
+    
+    finally:
+        if cnn.is_connected():
+            cursor.close()
+            print("MySQL connection is closed")
 
 
+def insert_dist(id, idProv, name, cnn):
+    try:
+        cursor = cnn.cursor()
+        mySql_insert_query = "INSERT INTO districts (id, idProv, name) VALUES (%s,%s,%s)"
+
+        record = (id,idProv,name)
+        cursor.execute(mySql_insert_query, record)
+        # cnn.commit()
+        print("Record inserted!")
+    except mysql.connector.Error as error:
+        print("Failed to insert into MySQL table {}".format(error))
+    
+    finally:
+        if cnn.is_connected():
+            cursor.close()
+            print("MySQL connection is closed")
+
+
+def insert_corr(id, idDist, idProv, name, cnn):
+    try:
+        cursor = cnn.cursor()
+        mySql_insert_query = "INSERT INTO counties (id,  idProv, idDist, name) VALUES (%s,%s,%s,%s)"
+
+        record = (id,idDist,idProv,name)
+        cursor.execute(mySql_insert_query, record)
+        # cnn.commit()
+        print("Record inserted!")
+    except mysql.connector.Error as error:
+        print("Failed to insert into MySQL table {}".format(error))
+    
+    finally:
+        if cnn.is_connected():
+            cursor.close()
+            print("MySQL connection is closed")
 
 
 # # librerias para correos
@@ -161,32 +203,32 @@ import openpyxl
 
 
 
-# No. 1
-fichero = r"D:\Documentos\Desarrollo Web\Finanservs\Profesiones_ACP.xlsx"
+# # No. 1
+# fichero = r"D:\Documentos\Desarrollo Web\Finanservs\Profesiones_ACP.xlsx"
 
-book = openpyxl.load_workbook(fichero, data_only=True)
-hoja = book.active
+# book = openpyxl.load_workbook(fichero, data_only=True)
+# hoja = book.active
 
-celdas = hoja['A2' : 'D750']
+# celdas = hoja['A2' : 'D750']
 
 
 
-# MySql de James - IS
-cnn = mysql.connector.connect(
-    host="69.10.63.218",
-    database="finanservs",
-    user="AdminFinanservs",
-    password="0t_pYv70"     
-)
+# # MySql de James - IS
+# cnn = mysql.connector.connect(
+#     host="69.10.63.218",
+#     database="finanservs",
+#     user="AdminFinanservs",
+#     password="0t_pYv70"     
+# )
 
-for fila in celdas:
-    data = [celda.value for celda in fila]
-    insert_acp(data[0], data[1], data[2], data[3], cnn)
+# for fila in celdas:
+#     data = [celda.value for celda in fila]
+#     insert_acp(data[0], data[1], data[2], data[3], cnn)
 
-cnn.commit()
-if cnn.is_connected():
-    cnn.close()
-    print("MySQL Finish ...")
+# cnn.commit()
+# if cnn.is_connected():
+#     cnn.close()
+#     print("MySQL Finish ...")
 
 
 # # No. 2
@@ -268,3 +310,83 @@ if cnn.is_connected():
 # if cnn.is_connected():
 #     cnn.close()
 #     print("MySQL Finish ...")
+
+
+# # No. 5
+# fichero = r"D:\Documentos\Desarrollo Web\Finanservs\prov-codigo.xlsx"
+
+# book = openpyxl.load_workbook(fichero, data_only=True)
+# hoja = book.active
+
+# celdas = hoja['A2' : 'B11']
+
+# # MySql de James - IS
+# cnn = mysql.connector.connect(
+#     host="69.10.63.218",
+#     database="finanservs",
+#     user="AdminFinanservs",
+#     password="0t_pYv70"     
+# )
+
+# for fila in celdas:
+#     data = [celda.value for celda in fila]
+#     insert_prov(data[0], data[1], cnn)
+
+# cnn.commit()
+# if cnn.is_connected():
+#     cnn.close()
+#     print("MySQL Finish ...")
+
+
+# # No. 6
+# fichero = r"D:\Documentos\Desarrollo Web\Finanservs\dist-codigo.xlsx"
+
+# book = openpyxl.load_workbook(fichero, data_only=True)
+# hoja = book.active
+
+# celdas = hoja['A2' : 'C71']
+
+# # MySql de James - IS
+# cnn = mysql.connector.connect(
+#     host="69.10.63.218",
+#     database="finanservs",
+#     user="AdminFinanservs",
+#     password="0t_pYv70"     
+# )
+
+# for fila in celdas:
+#     data = [celda.value for celda in fila]
+#     # print(data)
+#     insert_dist(data[0], data[1], data[2], cnn)
+
+# cnn.commit()
+# if cnn.is_connected():
+#     cnn.close()
+#     print("MySQL Finish ...")
+
+
+
+# No. 7
+fichero = r"D:\Documentos\Desarrollo Web\Finanservs\corr-codigo.xlsx"
+
+book = openpyxl.load_workbook(fichero, data_only=True)
+hoja = book.active
+
+celdas = hoja['A2' : 'D599']
+
+# MySql de James - IS
+cnn = mysql.connector.connect(
+    host="69.10.63.218",
+    database="finanservs",
+    user="AdminFinanservs",
+    password="0t_pYv70"     
+)
+
+for fila in celdas:
+    data = [celda.value for celda in fila]
+    insert_corr(data[0], data[1], data[2], data[3], cnn)
+
+cnn.commit()
+if cnn.is_connected():
+    cnn.close()
+    print("MySQL Finish ...")

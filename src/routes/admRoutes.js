@@ -44,9 +44,9 @@ admRoutes.post('/prospects', (request, response) => {
   birthDate = birthDate.slice(0,10)
   const params = [id_personal,idUser,name,fname,fname_2,lname,lname_2,entity_f,estado,email,cellPhone,phoneNumber,idUrl,socialSecurityProofUrl,publicGoodProofUrl,workLetterUrl,payStubUrl,origin_idUser,gender,birthDate,contractType,jobSector,occupation,paymentFrecuency,profession,residenceType,civil_status,province,district,salary,quotation,application,sign]
 
-  console.log(request.body);
-  console.log(params);
-  response.send('Ok!')
+  // console.log(request.body);
+  // console.log(params);
+  // response.send('Ok!')
 
   config.cnn.query(sql, params, (error, results, next) => {
     if (error) {
@@ -76,7 +76,7 @@ admRoutes.get('/prospects/:id', (request, response) => {
   })
 })
 
-admRoutes.get('/prospects/aproach/:id', (request, response) => {
+admRoutes.get('/prospects/aproach/:id_personal', (request, response) => {
   let sql = "SELECT a.id, a.name, id_personal, b.name as entity, email, a.cellphone,"
 
   sql += " idUrl as imag_id,"
@@ -91,7 +91,7 @@ admRoutes.get('/prospects/aproach/:id', (request, response) => {
   sql += " INNER JOIN estados_tramite c ON c.id=a.estado"
   sql += " WHERE id_personal = ?;"
 
-  const params = [request.params.id];
+  const params = [request.params.id_personal];
   
   config.cnn.query(sql, params, (error, results) => {
     if (error) {
@@ -106,7 +106,7 @@ admRoutes.get('/prospects/aproach/:id', (request, response) => {
   })
 })
 
-admRoutes.get('/prospects/entity_f/:id', (request, response) => {
+admRoutes.get('/prospects/entity_f/:entity_f', (request, response) => {
   let sql = "SELECT a.id, a.name, id_personal, b.name as entity, email, a.cellphone,"
 
   sql += " idUrl as imag_id,"
@@ -121,7 +121,7 @@ admRoutes.get('/prospects/entity_f/:id', (request, response) => {
   sql += " INNER JOIN estados_tramite c ON c.id=a.estado"
   sql += " WHERE entity_f = ?;"
 
-  const params = [request.params.id];
+  const params = [request.params.entity_f];
  
   config.cnn.query(sql, params, (error, results) => {
     if (error) {
@@ -136,14 +136,31 @@ admRoutes.get('/prospects/entity_f/:id', (request, response) => {
   })
 })
 
-admRoutes.put('/prospects/entity_f/:id', (request, response) => {
-  const id = request.params.id
+admRoutes.get('/prospects/entity_f/:entity_f/:id', (request, response) => {
+  let sql = "SELECT id, estado FROM prospects WHERE id = ?;"
 
+  const params = [request.params.id];
+ 
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      response.json(results[0])
+    } else {
+      response.send('Not results!')
+    }
+  })
+})
+
+admRoutes.put('/prospects/entity_f', (request, response) => {
   const sql = "UPDATE prospects SET estado=?, fupdate=now() WHERE id = ?"
+  
+  const body = request.body
+  const params = [body.estado, body.id]
 
-  const params = request.body
-
-  config.cnn.query(sql, params, (error, results, next) => {
+  config.cnn.query(sql, params, (error, results) => {
     if (error) {
       logger.error('Error SQL:', error.sqlMessage)
       response.status(500)
@@ -910,7 +927,7 @@ admRoutes.delete('/purposes/:id', (request, response) => {
 
 
 admRoutes.get('/payments', (request, response) => {
-  const sql = "SELECT id, name, CASE WHEN is_active THEN 'Si' ELSE 'No' END as is_active FROM payments"
+  const sql = "SELECT id, name FROM payments"
 
   config.cnn.query(sql, (error, results) => {
     if (error) {
@@ -926,7 +943,7 @@ admRoutes.get('/payments', (request, response) => {
 })
 
 admRoutes.get('/payments/:id', (request, response) => {
-  const sql = "SELECT id, name, CASE WHEN is_active THEN 'Si' ELSE 'No' END as is_active FROM payments WHERE id = ?"
+  const sql = "SELECT id, name FROM payments WHERE id = ?"
 
   const params = [request.params.id];
 
@@ -952,10 +969,10 @@ admRoutes.post('/payments', (request, response) => {
     } 
     const { id } = results[0]
 
-    const sql = "INSERT INTO payments (id, name, is_active) VALUES (?, ?, ?)"
+    const sql = "INSERT INTO payments (id, name) VALUES (?, ?)"
 
     const {name, is_active} = request.body
-    const params = [id, name, is_active === 'Si' ? true : false];
+    const params = [id, name];
 
     config.cnn.query(sql, params, (error, results, next) => {
       if (error) {
@@ -968,10 +985,10 @@ admRoutes.post('/payments', (request, response) => {
 })
 
 admRoutes.put('/payments', (request, response) => {
-  const sql = "UPDATE payments SET name=?, is_active=? WHERE id = ?"
+  const sql = "UPDATE payments SET name=? WHERE id = ?"
 
-  const {id, name, is_active} = request.body
-  const params = [name, is_active === 'Si' ? true : false, id];
+  const {id, name} = request.body
+  const params = [name, id];
 
   config.cnn.query(sql, params, (error, results) => {
     if (error) {
@@ -999,6 +1016,259 @@ admRoutes.delete('/payments/:id', (request, response) => {
     }
   })
 })
+
+
+admRoutes.get('/estados_tramite', (request, response) => {
+  const sql = "SELECT id, name, CASE WHEN is_active THEN 'Si' ELSE 'No' END as is_active FROM estados_tramite"
+
+  config.cnn.query(sql, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      response.json(results)
+    } else {
+      response.send('Not results!')
+    }
+  })
+})
+
+admRoutes.get('/estados_tramite/:id', (request, response) => {
+  const sql = "SELECT id, name, CASE WHEN is_active THEN 'Si' ELSE 'No' END as is_active FROM estados_tramite WHERE id = ?"
+
+  const params = [request.params.id];
+
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      response.json(results[0])
+    } else {
+      response.send('Not results!')
+    }
+  })
+}) 
+
+admRoutes.post('/estados_tramite', (request, response) => {
+  const sql = "INSERT INTO estados_tramite (name, is_active) VALUES (?, ?)"
+
+  const {name, is_active} = request.body
+  const params = [id, name, is_active === 'Si' ? true : false];
+
+  console.log(sql);
+  config.cnn.query(sql, params, (error, results, next) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    response.send('Ok!')
+  })
+})
+
+
+admRoutes.put('/estados_tramite', (request, response) => {
+  const sql = "UPDATE estados_tramite SET name=?, is_active=? WHERE id = ?"
+
+  const {id, name, is_active} = request.body
+  const params = [name, is_active === 'Si' ? true : false, id];
+
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    response.send('Ok!')
+  })
+})
+
+admRoutes.delete('/estados_tramite/:id', (request, response) => {
+  const sql = "DELETE FROM estados_tramite WHERE id = ?"
+  const params = [request.params.id]; 
+
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.affectedRows > 0) {
+      response.send('Ok!')
+    } else {
+      logger.error('Error SQL:', 'No existe registro a eliminar!')
+      response.status(500)
+    }
+  })
+})
+
+
+admRoutes.get('/type_documents', (request, response) => {
+  const sql = "SELECT id, name, CASE WHEN is_active THEN 'Si' ELSE 'No' END as is_active FROM type_documents"
+
+  config.cnn.query(sql, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      response.json(results)
+    } else {
+      response.send('Not results!')
+    }
+  })
+})
+
+admRoutes.get('/type_documents/:id', (request, response) => {
+  const sql = "SELECT id, name, CASE WHEN is_active THEN 'Si' ELSE 'No' END as is_active FROM type_documents WHERE id = ?"
+
+  const params = [request.params.id];
+
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      response.json(results[0])
+    } else {
+      response.send('Not results!')
+    }
+  })
+}) 
+
+admRoutes.post('/type_documents', (request, response) => {
+  const sql = "INSERT INTO type_documents (name, is_active) VALUES (?, ?)"
+
+  const {name, is_active} = request.body
+  const params = [id, name, is_active === 'Si' ? true : false];
+
+  config.cnn.query(sql, params, (error, results, next) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    response.send('Ok!')
+  })
+})
+
+
+admRoutes.put('/type_documents', (request, response) => {
+  const sql = "UPDATE type_documents SET name=?, is_active=? WHERE id = ?"
+
+  const {id, name, is_active} = request.body
+  const params = [name, is_active === 'Si' ? true : false, id];
+
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    response.send('Ok!')
+  })
+})
+
+admRoutes.delete('/type_documents/:id', (request, response) => {
+  const sql = "DELETE FROM type_documents WHERE id = ?"
+  const params = [request.params.id]; 
+
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.affectedRows > 0) {
+      response.send('Ok!')
+    } else {
+      logger.error('Error SQL:', 'No existe registro a eliminar!')
+      response.status(500)
+    }
+  })
+})
+
+
+admRoutes.get('/terms_loan', (request, response) => {
+  const sql = "SELECT id, name, CASE WHEN is_active THEN 'Si' ELSE 'No' END as is_active FROM terms_loan"
+
+  config.cnn.query(sql, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      response.json(results)
+    } else {
+      response.send('Not results!')
+    }
+  })
+})
+
+admRoutes.get('/terms_loan/:id', (request, response) => {
+  const sql = "SELECT id, name, CASE WHEN is_active THEN 'Si' ELSE 'No' END as is_active FROM terms_loan WHERE id = ?"
+
+  const params = [request.params.id];
+
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      response.json(results[0])
+    } else {
+      response.send('Not results!')
+    }
+  })
+}) 
+
+admRoutes.post('/terms_loan', (request, response) => {
+    const sql = "INSERT INTO terms_loan (name, is_active) VALUES (?, ?)"
+
+  const {name, is_active} = request.body
+  const params = [id, name, is_active === 'Si' ? true : false];
+
+  config.cnn.query(sql, params, (error, results, next) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    response.send('Ok!')
+  })
+})
+
+admRoutes.put('/terms_loan', (request, response) => {
+  const sql = "UPDATE terms_loan SET name=?, is_active=? WHERE id = ?"
+
+  const {id, name, is_active} = request.body
+  const params = [name, is_active === 'Si' ? true : false, id];
+
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    response.send('Ok!')
+  })
+})
+
+admRoutes.delete('/terms_loan/:id', (request, response) => {
+  const sql = "DELETE FROM terms_loan WHERE id = ?"
+  const params = [request.params.id]; 
+
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.affectedRows > 0) {
+      response.send('Ok!')
+    } else {
+      logger.error('Error SQL:', 'No existe registro a eliminar!')
+      response.status(500)
+    }
+  })
+})
+
 
 
 admRoutes.get('/entities_f', (request, response) => {
@@ -1050,10 +1320,10 @@ admRoutes.post('/entities_f', (request, response) => {
 })
 
 admRoutes.put('/entities_f', (request, response) => {
-  const sql = "UPDATE entities_f SET name=?, id_ruta=?, contact=?, phone_number=?, cellphone=?, is_active=? WHERE id = ?"
+  const sql = "UPDATE entities_f SET estado=? WHERE id = ?"
 
-  const {id, name, id_ruta, contact, phone_number, cellphone, is_active} = request.body
-  const params = [name, id_ruta, contact, phone_number, cellphone, is_active === 'Si' ? true : false, id];
+  const {id, estado} = request.body
+  const params = [estado, id];
 
   config.cnn.query(sql, params, (error, results) => {
     if (error) {
