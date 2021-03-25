@@ -8,7 +8,7 @@ const AWS_Secret_access_key = process.env.AWS_Secret_access_key
 
 
 // MySql de James - IS
-const CNN = mysql.createConnection({
+const cnn = mysql.createConnection({
     host: '69.10.63.218',
     database: 'finanservs',
     user: 'AdminFinanservs',
@@ -33,7 +33,7 @@ const CNN = mysql.createConnection({
 
 
 // Check connection
-CNN.connect(error => {
+cnn.connect(error => {
   if (error) throw error;
   console.log('Database server runnuning!');
 })
@@ -44,5 +44,5 @@ module.exports = {
   AWS_Secret_access_key,
   PORT,
   HOST,
-  CNN
+  cnn
 }

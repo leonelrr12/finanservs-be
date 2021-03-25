@@ -5,45 +5,6 @@
 
 use finanservs;
 
-DROP TABLE `institutions`;
-CREATE TABLE `institutions` (
-  `id` int NOT NULL,
-  `name` varchar(100) NOT NULL,
-  PRIMARY KEY (`id`)
-) ;
-
-select * from institutions;
-
-DROP TABLE `planillas_j`;
-CREATE TABLE `planillas_j` (
-  `id` int NOT NULL,
-  `name` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-);
-
-select * from planillas_j;
-
-DROP TABLE `profesions_lw`;
-CREATE TABLE `profesions_lw` (
-  `id` int NOT NULL,
-  `titulo` varchar(100) NOT NULL,
-  PRIMARY KEY (`id`)
-) ;
-
-select * from profesions_lw;
-
-DROP TABLE `profesions_acp`;
-CREATE TABLE `profesions_acp` (
-  `id` int NOT NULL,
-  `titulo` varchar(60) NOT NULL,
-  `grupo` varchar(45) DEFAULT NULL,
-  `segmento` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-);
-
-select * from profesions_acp;
-
-
 
 DROP TABLE `sectors`;
 CREATE TABLE `sectors` (
@@ -67,12 +28,111 @@ CREATE TABLE `profesions` (
 );
 
 insert into profesions values (1, 'Empresa Privada');
-insert into profesions values (2, 'Medicos/Enfermeras');
+insert into profesions values (2, 'Medicos Enfermeras');
 insert into profesions values (3, 'Educador');
-insert into profesions values (4, 'Administrativo');
+insert into profesions values (4, 'Adminis trativo');
 insert into profesions values (5, 'ACP');
 insert into profesions values (6, 'Seguridad Publica');
 insert into profesions values (7, 'Jubilado');
+
+
+DROP TABLE `sector_profesion`;
+CREATE TABLE `sector_profesion` (
+  `id` int NOT NULL,
+  `id_sector` int NOT NULL,
+  `id_profesion` int NOT NULL,
+  `is_active` boolean,
+  PRIMARY KEY (`id`)
+) ;
+
+insert into sector_profesion  values (4,1,1,true);
+insert into sector_profesion  values (2,1,2,true);
+insert into sector_profesion  values (3,1,3,true);
+insert into sector_profesion  values (5,2,2,true);
+insert into sector_profesion  values (6,2,3,true);
+insert into sector_profesion  values (7,2,4,true);
+insert into sector_profesion  values (8,2,5,true);
+insert into sector_profesion  values (9,2,6,true);
+insert into sector_profesion  values (1,3,7,true);
+
+select a.id as id, short_name as sector, c.name as name, is_active
+from sector_profesion a
+inner join sectors b on b.id=a.id_sector
+inner join profesions c on c.id=a.id_profesion
+where is_active = true;
+  
+
+
+DROP TABLE `institutions`;
+CREATE TABLE `institutions` (
+  `id` int NOT NULL,
+  `name` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
+) ;
+
+select * from institutions;
+
+
+
+DROP TABLE `planillas_j`;
+CREATE TABLE `planillas_j` (
+  `id` int NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+select * from planillas_j;
+
+DROP TABLE `ranges_pol`;
+CREATE TABLE `ranges_pol` (
+  `id` int NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `is_active` boolean,
+  PRIMARY KEY (`id`)
+) ;
+
+select * from ranges_pol;
+
+
+insert into ranges_pol (id, name, is_active) values (1,'RANGOS',true);
+insert into ranges_pol (id, name, is_active) values (2,'CABO 1RO.',true);
+insert into ranges_pol (id, name, is_active) values (3,'CABO 2DO.',true);
+insert into ranges_pol (id, name, is_active) values (4,'CADETE DE POLICIA',true);
+insert into ranges_pol (id, name, is_active) values (5,'CAPELLAN',true);
+insert into ranges_pol (id, name, is_active) values (6,'CAPITAN',true);
+insert into ranges_pol (id, name, is_active) values (7,'COMISIONADO DE POLICIA',true);
+insert into ranges_pol (id, name, is_active) values (8,'DIRECTOR GENERAL',true);
+insert into ranges_pol (id, name, is_active) values (9,'GUARDIA',true);
+insert into ranges_pol (id, name, is_active) values (10,'MAYOR',true);
+insert into ranges_pol (id, name, is_active) values (11,'SARGENTO 1RO.',true);
+insert into ranges_pol (id, name, is_active) values (12,'SARGENTO 2DO.',true);
+insert into ranges_pol (id, name, is_active) values (13,'SUB-COMISIONADO DE POLICIA',true);
+insert into ranges_pol (id, name, is_active) values (14,'SUB-DIRECTOR GENERAL',true);
+insert into ranges_pol (id, name, is_active) values (15,'SUB-TENIENTE',true);
+insert into ranges_pol (id, name, is_active) values (16,'TENIENTE',true);
+
+
+
+DROP TABLE `profesions_lw`;
+CREATE TABLE `profesions_lw` (
+  `id` int NOT NULL,
+  `titulo` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
+) ;
+
+select * from profesions_lw;
+
+DROP TABLE `profesions_acp`;
+CREATE TABLE `profesions_acp` (
+  `id` int NOT NULL,
+  `titulo` varchar(60) NOT NULL,
+  `grupo` varchar(45) DEFAULT NULL,
+  `segmento` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+select * from profesions_acp;
+
 
 
 DROP TABLE `civil_status`;
@@ -147,9 +207,12 @@ insert into housings value (3, 'Casa Hipotecada', true);
 insert into housings value (4, 'Casa Alquilada', true);
 
 
-DROP TABLE `capacidad`;
-CREATE TABLE `capacidad` (
-  `id` int NOT NULL,
+
+DROP TABLE `entity_params`;
+CREATE TABLE `entity_params` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_entity_f` varchar(10) NOT NULL,
+  `id_code` int NOT NULL,
   `id_sector` int NOT NULL,
   `id_profesion` int NOT NULL,
   `descto_chip` float,
@@ -164,36 +227,34 @@ CREATE TABLE `capacidad` (
   PRIMARY KEY (`id`)
 ) ;
 
-
-insert into capacidad values (4,1,1,20,20,50,45,120,11,7,3000,25000);
-insert into capacidad values (2,1,2,20,20,50,45,144,10,6,3000,30000);
-insert into capacidad values (3,1,3,20,20,50,45,144,10,6,3000,30000);
-
-insert into capacidad values (5,2,2,35,35,55,55,360,7.25,9.8,3000,50000);
-insert into capacidad values (6,2,3,35,35,55,55,360,7.25,9.8,3000,50000);
-insert into capacidad values (7,2,4,35,35,55,45,180,11,6.25,3000,35000);
-insert into capacidad values (8,2,5,50,75,50,45,360,9,5.25,0,75000);
-insert into capacidad values (9,2,6,35,35,100,100,180,11,6.25,3000,35000);
-
-insert into capacidad values (1,3,7,35,35,100,100,180,11,6.25,3000,35000);
+insert into entity_params (id_entity_f,id_code,id_sector,id_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',4,1,1,20,20,50,45,120,11,7,3000,25000);
+insert into entity_params (id_entity_f,id_code,id_sector,id_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',2,1,2,20,20,50,45,144,10,6,3000,30000);
+insert into entity_params (id_entity_f,id_code,id_sector,id_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',3,1,3,20,20,50,45,144,10,6,3000,30000);
+insert into entity_params (id_entity_f,id_code,id_sector,id_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',5,2,2,35,35,55,55,360,7.25,9.8,3000,50000);
+insert into entity_params (id_entity_f,id_code,id_sector,id_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',6,2,3,35,35,55,55,360,7.25,9.8,3000,50000);
+insert into entity_params (id_entity_f,id_code,id_sector,id_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',7,2,4,35,35,55,45,180,11,6.25,3000,35000);
+insert into entity_params (id_entity_f,id_code,id_sector,id_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',8,2,5,50,75,50,45,360,9,5.25,0,75000);
+insert into entity_params (id_entity_f,id_code,id_sector,id_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',9,2,6,35,35,100,100,180,11,6.25,3000,35000);
+insert into entity_params (id_entity_f,id_code,id_sector,id_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',1,3,7,35,35,100,100,180,11,6.25,3000,35000);
 
 
-
-select b.name,c.name,a.* from capacidad a
+//select d.name as Banco, a.id_code, b.id, short_name as sector, c.id, c.name as name,
+select 
+  descto_ship as discount_capacity,
+  descto_chip as discount_capacity_mortgage,
+  deuda_ship as debt_capacity,
+  deuda_chip as debt_capacity_mortgage,
+  plazo_max,
+  tasa,
+  comision,
+  mount_min,
+  mount_max
+from entity_params a
+inner join entities_f d on d.id_ruta = id_entity_f
 inner join sectors b on b.id=a.id_sector
 inner join profesions c on c.id=a.id_profesion;
+where a.id_entity_f = 100 and a.id_code = 4 and a.id_profesion = 1;
 
-
-select a.id as id, short_name as sector, c.name as name,
-  '' as professions,
-  0 as discount_capacity,
-  0 as debt_capacity,
-  0 as debt_capacity_mortgage,
-  true as is_active
-  from capacidad a
-inner join sectors b on b.id=a.id_sector
-inner join profesions c on c.id=a.id_profesion;
-  
 
 
 -- // With root
@@ -306,7 +367,7 @@ insert into type_documents (id, name, id_name, is_active) value (5, 'Carta de Tr
 
 DROP TABLE `terms_loan`;
 CREATE TABLE `terms_loan` (
-  `id` int NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL,
   `name` varchar(30) NOT NULL,
 	`is_active` boolean,
   PRIMARY KEY (`id`)
@@ -314,11 +375,11 @@ CREATE TABLE `terms_loan` (
 
 
 
-insert into terms_loan (name, is_active) value ('60', true);
-insert into terms_loan (name, is_active) value ('120', true);
-insert into terms_loan (name, is_active) value ('180', true);
-insert into terms_loan (name, is_active) value ('240', true);
-insert into terms_loan (name, is_active) value ('360', true);
+insert into terms_loan (name, is_active) value ('60', '60', true);
+insert into terms_loan (name, is_active) value ('120', '120', true);
+insert into terms_loan (name, is_active) value ('180', '180', true);
+insert into terms_loan (name, is_active) value ('240', '240', true);
+insert into terms_loan (name, is_active) value ('360', '360', true);
 
 
 

@@ -78,6 +78,19 @@ appRoutes.get('/planillas_j', (request, response) => {
   })
 })
 
+appRoutes.get('/ranges_pol', (request, response) => {
+  const sql = "SELECT id, name FROM ranges_pol WHERE is_active = true"
+
+  config.cnn.query(sql, (error, results) => {
+    if (error) throw error
+    if (results.length > 0) {
+      response.json(results)
+    } else {
+      response.send('Not results!')
+    }
+  })
+})
+
 appRoutes.get('/laboral_sector_institution', (request, response) => {
   const sql = "SELECT * FROM institutions"
 
@@ -92,15 +105,11 @@ appRoutes.get('/laboral_sector_institution', (request, response) => {
 })
 
 appRoutes.get('/laboral_sector', (request, response) => {
-  let sql = "select a.id as id, short_name as sector, c.name as name,"
-  sql += " descto_ship as discount_capacity,"
-  sql += " descto_chip as discount_capacity_mortgage,"
-  sql += " deuda_ship as debt_capacity,"
-  sql += " deuda_chip as debt_capacity_mortgage, plazo_max, tasa, comision, mount_min, mount_max,"
-  sql += " true as is_active"
-  sql += " from capacidad a"
+  let sql = "select a.id_profesion as id, short_name as sector, id_sector, c.name as name"
+  sql += " from sector_profesion a"
   sql += " inner join sectors b on b.id=a.id_sector"
   sql += " inner join profesions c on c.id=a.id_profesion"
+  sql += " where is_active = true;"
   
   config.cnn.query(sql, (error, results) => {
     if (error) throw error
@@ -112,8 +121,38 @@ appRoutes.get('/laboral_sector', (request, response) => {
   })
 })
 
+appRoutes.get('/laboral_sector_entity_f', (request, response) => {
+  // let sql = "select a.id_code, b.id, short_name as sector, c.id, c.name as name,"
+  let sql = "select a.id_entity_f as ruta, id_sector, id_profesion,"
+  sql += " descto_ship as discount_capacity,"
+  sql += " descto_chip as discount_capacity_mortgage,"
+  sql += " deuda_ship as debt_capacity,"
+  sql += " deuda_chip as debt_capacity_mortgage,"
+  sql += " plazo_max,"
+  sql += " tasa,"
+  sql += " comision,"
+  sql += " mount_min,"
+  sql += " mount_max"
+  sql += " from entity_params a"
+  sql += " inner join entities_f d on d.id_ruta = a.id_entity_f"
+  sql += " inner join sectors b on b.id=a.id_sector"
+  sql += " inner join profesions c on c.id=a.id_profesion"
+  // sql += " where a.id_entity_f = ? and a.id_code = ? and a.id_profesion = ?"
+
+  const params = [request.params.id,  request.params.id2, request.params.id3];
+
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) throw error
+    if (results.length > 0) {
+      response.json(results)
+    } else {
+      response.send('Not results!')
+    }
+  })
+})
+
 appRoutes.get('/laboral_status', (request, response) => {
-  const sql = "SELECT name, is_active FROM laboral_status"
+  const sql = "SELECT name, is_active FROM laboral_status  WHERE is_active = true"
 
   config.cnn.query(sql, (error, results) => {
     if (error) throw error
@@ -144,7 +183,7 @@ appRoutes.get('/payment_types', (request, response) => {
 // RENT = '4'
 
 appRoutes.get('/housing_types', (request, response) => {
-  const sql = "SELECT * FROM housings"
+  const sql = "SELECT * FROM housings  WHERE is_active = true"
 
   config.cnn.query(sql, (error, results) => {
     if (error) throw error
@@ -164,7 +203,7 @@ appRoutes.get('/housing_types', (request, response) => {
 // TEENAGE_PARTY = '5'
 
 appRoutes.get('/purpose', (request, response) => {
-  const sql = "SELECT * FROM purposes"
+  const sql = "SELECT * FROM purposes WHERE is_active = true"
 
   config.cnn.query(sql, (error, results) => {
     if (error) throw error
@@ -233,6 +272,23 @@ appRoutes.get('/counties', (request, response) => {
 
 appRoutes.get('/type_documents', (request, response) => {
   const sql = "SELECT id, name, id_name FROM type_documents WHERE is_active = true"
+
+  config.cnn.query(sql, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      response.json(results)
+    } else {
+      response.send('Not results!')
+    }
+  })
+})
+
+
+appRoutes.get('/terms_loan', (request, response) => {
+  const sql = "SELECT id, name FROM terms_loan WHERE is_active = true"
 
   config.cnn.query(sql, (error, results) => {
     if (error) {
