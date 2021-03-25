@@ -1,7 +1,7 @@
 require('dotenv').config()
 const mysql = require('mysql2')
 
-const PORT = process.env.PORT
+const PORT = process.env.PORT || 3001
 const HOST = process.env.HOST
 const AWS_Access_key_ID = process.env.AWS_Access_key_ID
 const AWS_Secret_access_key = process.env.AWS_Secret_access_key
