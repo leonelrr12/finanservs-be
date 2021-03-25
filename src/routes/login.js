@@ -3,6 +3,13 @@ const bcrypt = require('bcryptjs')
 const loginRouter = require('express').Router()
 const User = require('../models/User')
 
+
+loginRouter.get('/', async (request, response) => {
+  response
+    .status(200)
+    .send("Hola desde api/login")
+})
+
 loginRouter.post('/', async (request, response) => {
   const body = request.body
 
@@ -18,7 +25,7 @@ loginRouter.post('/', async (request, response) => {
   // }
 
   const user = new User ({
-    username: 'finanservs',
+    username: 'guasimo01@gmail.com',
     id: 999
   })
 
@@ -42,6 +49,7 @@ loginRouter.post('/token-verify', async (request, response) => {
 
   const body = request.body
 
+  console.log(body);
   // const authorization = request.get('authorization')
   const token = body.token
   const decodedToken = jwt.verify(token, process.env.SECRET)
