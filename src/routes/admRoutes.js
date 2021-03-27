@@ -1,4 +1,5 @@
 const admRoutes = require('express').Router()
+const bcrypt = require('bcryptjs')
 const config = require('../utils/config')
 const logger = require('../utils/logger')
 
@@ -1152,7 +1153,6 @@ admRoutes.post('/type_documents', (request, response) => {
   })
 })
 
-
 admRoutes.put('/type_documents', (request, response) => {
   const sql = "UPDATE type_documents SET name=?, is_active=? WHERE id = ?"
 
@@ -1351,5 +1351,412 @@ admRoutes.delete('/entities_f/:id', (request, response) => {
     }
   })
 })
+
+
+
+admRoutes.get('/sector_profesion', (request, response) => {
+  let sql = "SELECT a.id, b.name as sector, c.name as profesion,"
+  sql += " CASE WHEN is_active THEN 'Si' ELSE 'No' END as is_active"
+  sql += " FROM sector_profesion a"
+  sql += " INNER JOIN sectors b ON b.id = a.id_sector"
+  sql += " INNER JOIN profesions c ON c.id = a.id_profesion"
+  sql += " ORDER BY a.id"
+
+  config.cnn.query(sql, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      response.json(results)
+    } else {
+      response.send('Not results!')
+    }
+  })
+})
+
+admRoutes.get('/sector_profesion/:id', (request, response) => {
+  const sql = "SELECT id, id_sector, id_profesion, CASE WHEN is_active THEN 'Si' ELSE 'No' END as is_active FROM sector_profesion WHERE id = ?"
+
+  const params = [request.params.id];
+
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      response.json(results[0])
+    } else {
+      response.send('Not results!')
+    }
+  })
+}) 
+
+admRoutes.post('/sector_profesion', (request, response) => {
+  const sql = "INSERT INTO sector_profesion (id_sector, id_profesion, is_active) VALUES (?, ?)"
+
+  const {id, id_sector, id_profesion, is_active} = request.body
+  const params = [d_sector, id_profesion, is_active === 'Si' ? true : false, id];
+
+  config.cnn.query(sql, params, (error, results, next) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    response.send('Ok!')
+  })
+})
+
+admRoutes.put('/sector_profesion', (request, response) => {
+  const sql = "UPDATE sector_profesion SET id_sector=?, id_profesion=?, is_active=? WHERE id = ?"
+
+  const {id, id_sector, id_profesion, is_active} = request.body
+  const params = [d_sector, id_profesion, is_active === 'Si' ? true : false, id];
+
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    response.send('Ok!')
+  })
+})
+
+admRoutes.delete('/sector_profesion/:id', (request, response) => {
+  const sql = "DELETE FROM sector_profesion WHERE id = ?"
+  const params = [request.params.id]; 
+
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.affectedRows > 0) {
+      response.send('Ok!')
+    } else {
+      logger.error('Error SQL:', 'No existe registro a eliminar!')
+      response.status(500)
+    }
+  })
+})
+
+
+
+admRoutes.get('/entity_params', (request, response) => {
+  let sql = "SELECT a.id, d.name as entity, concat(c.name, ' - ', e.name) as sector_profesion,"
+  sql += " descto_chip,"
+  sql += " descto_ship,"
+  sql += " deuda_chip,"
+  sql += " deuda_ship,"
+  sql += " mount_min,mount_max,plazo_max,tasa,comision,"
+  sql += " CASE WHEN a.is_active THEN 'Si' ELSE 'No' END as is_active"
+  sql += " FROM entity_params2 a"
+  sql += " INNER JOIN entities_f d on d.id = id_entity_f"
+  sql += " INNER JOIN sector_profesion b on b.id=a.id_sector_profesion"
+  sql += " INNER JOIN sectors c on c.id=b.id_sector"
+  sql += " INNER JOIN profesions e on e.id=b.id_profesion"
+  sql += " ORDER BY a.id"
+
+  config.cnn.query(sql, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      response.json(results)
+    } else {
+      response.send('Not results!')
+    }
+  })
+})
+
+admRoutes.get('/entity_params/:id', (request, response) => {
+  let sql = "SELECT a.id, id_entity_f, id_sector_profesion,"
+  sql += " descto_chip,"
+  sql += " descto_ship,"
+  sql += " deuda_chip,"
+  sql += " deuda_ship,"
+  sql += " mount_min,mount_max,plazo_max,tasa,comision,"
+  sql += " CASE WHEN a.is_active THEN 'Si' ELSE 'No' END as is_active"
+  sql += " FROM entity_params2 a"
+  sql += " INNER JOIN entities_f d on d.id = id_entity_f"
+  sql += " INNER JOIN sector_profesion b on b.id=a.id_sector_profesion"
+  sql += " INNER JOIN sectors c on c.id=b.id_sector"
+  sql += " INNER JOIN profesions e on e.id=b.id_profesion"
+  sql += " WHERE a.id = ?"
+
+  const params = [request.params.id];
+
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      response.json(results[0])
+    } else {
+      response.send('Not results!')
+    }
+  })
+}) 
+
+admRoutes.post('/entity_params', (request, response) => {
+  let sql = "INSERT INTO entity_params2 ("
+  sql += " id_entity_f, id_sector_profesion,"
+  sql += " descto_chip, descto_ship, deuda_chip, deuda_ship,"
+  sql += " plazo_max, tasa, comision, mount_min, mount_max, is_active"
+  sql += " ) VALUE (?,?,?,?,?,?,?,?,?,?,?,?)"
+
+  const {id_entity_f,id_sector_profesion,descto_ship, descto_chip, deuda_chip, deuda_ship,plazo_max,tasa,comision,mount_min,mount_max, is_active} = request.body
+  const params = [id_entity_f,id_sector_profesion,descto_ship, descto_chip, deuda_chip, deuda_ship,plazo_max,tasa,comision,mount_min,mount_max,is_active === 'Si' ? true : false]
+
+  console.log(params, sql);
+  config.cnn.query(sql, params, (error, results, next) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    response.send('Ok!')
+  })
+})
+
+admRoutes.put('/entity_params', (request, response) => {
+  // const sql = "UPDATE sector_profesion SET id_sector=?, id_profesion=?, is_active=? WHERE id = ?"
+  let sql = "UPDATE entity_params2 SET "
+  sql += " id_entity_f=?,id_sector_profesion=?,"
+  sql += " descto_chip=?,"
+  sql += " descto_ship=?,"
+  sql += " deuda_chip=?,"
+  sql += " deuda_ship=?,"
+  sql += " mount_min=?,mount_max=?,plazo_max=?,tasa=?,comision=?"
+  sql += " WHERE id=?"
+
+  const {id,id_entity_f,id_sector_profesion,descto_ship, descto_chip, deuda_chip, deuda_ship,plazo_max,tasa,comision,mount_min,mount_max, is_active} = request.body
+  const params = [id_entity_f,id_sector_profesion,descto_ship, descto_chip, deuda_chip, deuda_ship,plazo_max,tasa,comision,mount_min,mount_max,is_active === 'Si' ? true : false,id]
+
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    response.send('Ok!')
+  })
+})
+
+admRoutes.delete('/entity_params/:id', (request, response) => {
+  const sql = "DELETE FROM entity_params2 WHERE id = ?"
+  const params = [request.params.id]; 
+
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.affectedRows > 0) {
+      response.send('Ok!')
+    } else {
+      logger.error('Error SQL:', 'No existe registro a eliminar!')
+      response.status(500)
+    }
+  })
+})
+
+
+
+admRoutes.get('/users', (request, response) => {
+  let sql = "SELECT a.id,email,a.name,phoneNumber,cellPhone,b.role,"
+  sql += " CASE WHEN a.is_new THEN 'Si' ELSE 'No' END as is_new,"
+  sql += " CASE WHEN a.is_active THEN 'Si' ELSE 'No' END as is_active"
+  sql += " FROM users a"
+  sql += " INNER JOIN roles b on b.id = a.id_role"
+  sql += " ORDER BY a.id"
+
+  config.cnn.query(sql, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      response.json(results)
+    } else {
+      response.send('Not results!')
+    }
+  })
+})
+
+admRoutes.get('/users/:id', (request, response) => {
+  let sql = "SELECT a.id,email,a.name,phoneNumber,cellPhone,"
+  sql += " a.id_role,entity_f,address,"
+  sql += " CASE WHEN a.is_active THEN 'Si' ELSE 'No' END as is_active,"
+  sql += " CASE WHEN a.is_new THEN 'Si' ELSE 'No' END as is_new"
+  sql += " FROM users a"
+  sql += " INNER JOIN roles b on b.id = a.id_role"
+  sql += " WHERE a.id = ?"
+
+  const params = [request.params.id];
+
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      response.json(results[0])
+    } else {
+      response.send('Not results!')
+    }
+  })
+}) 
+
+admRoutes.post('/users', async (request, response) => {
+  let sql = "INSERT INTO users (id_role,email,hash,entity_f,name,"
+  sql += " address,phoneNumber,cellPhone,is_new,is_active)"
+  sql += " value (?,?,?,?,?,?,?,?,true,?)"
+  
+  const {id_role,email,entity_f,name,address,phoneNumber,cellPhone,is_active} = request.body
+  try {
+    const hash = await bcrypt.hash('123456', 10)
+    const params = [id_role,email,hash,entity_f,name,address,phoneNumber,cellPhone,is_active === 'Si' ? true : false]
+
+    config.cnn.query(sql, params, (error, results, next) => {
+      if (error) {
+        logger.error('Error SQL:', error.sqlMessage)
+        response.status(500)
+      } 
+      response.send('Ok!')
+    })
+  } catch (error) {
+    logger.error('Error hash:', error.message)
+  }
+})
+
+admRoutes.put('/users', (request, response) => {
+  let sql = "UPDATE users SET id_role=?,email=?,entity_f=?,name=?,"
+  sql += " address=?,phoneNumber=?,cellPhone=?,is_new=?,is_active=?"
+  sql += " WHERE id=? AND id <> 1"
+
+  const {id,id_role,email,entity_f,name,address,phoneNumber,cellPhone,is_new,is_active} = request.body
+  const params = [id_role,email,entity_f,name,address,phoneNumber,cellPhone,is_new === 'Si' ? true : false,is_active === 'Si' ? true : false, id]
+
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    response.send('Ok!')
+  })
+})
+
+admRoutes.delete('/users/:id', (request, response) => {
+  const sql = "DELETE FROM users WHERE id = ? and id_role <> 1"
+  const params = [request.params.id]; 
+
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.affectedRows > 0) {
+      response.send('Ok!')
+    } else {
+      logger.error('Error SQL:', 'No existe registro a eliminar!')
+      response.status(500)
+    }
+  })
+})
+
+
+
+admRoutes.get('/roles', (request, response) => {
+  let sql = "SELECT id,role,description"
+  sql += " FROM roles"
+  sql += " ORDER BY id"
+
+  config.cnn.query(sql, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      response.json(results)
+    } else {
+      response.send('Not results!')
+    }
+  })
+})
+
+admRoutes.get('/roles/:id', (request, response) => {
+  let sql = "SELECT id,role,description"
+  sql += " FROM roles"
+  sql += " WHERE id = ?"
+
+  const params = [request.params.id];
+
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      response.json(results[0])
+    } else {
+      response.send('Not results!')
+    }
+  })
+}) 
+
+admRoutes.post('/roles', (request, response) => {
+  let sql = "INSERT INTO roles (role,description)"
+  sql += " value (?,?)"
+  
+  const {role,description} = request.body
+  const params = [role,description]
+
+  console.log(params, sql);
+  config.cnn.query(sql, params, (error, results, next) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    response.send('Ok!')
+  })
+})
+
+admRoutes.put('/roles', (request, response) => {
+  let sql = "UPDATE roles SET role=?,description=?"
+  sql += " WHERE id=?"
+
+  const {id,role,description} = request.body
+  const params = [role,description,id]
+
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    response.send('Ok!')
+  })
+})
+
+admRoutes.delete('/roles/:id', (request, response) => {
+  const sql = "DELETE FROM roles WHERE id = ? and role <> 'Admin'"
+  const params = [request.params.id]; 
+
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.affectedRows > 0) {
+      response.send('Ok!')
+    } else {
+      logger.error('Error SQL:', 'No existe registro a eliminar!')
+      response.status(500)
+    }
+  })
+})
+
+
 
 module.exports = admRoutes

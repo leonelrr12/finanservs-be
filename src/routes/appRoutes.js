@@ -269,7 +269,6 @@ appRoutes.get('/counties', (request, response) => {
   })
 })
 
-
 appRoutes.get('/type_documents', (request, response) => {
   const sql = "SELECT id, name, id_name FROM type_documents WHERE is_active = true"
 
@@ -286,9 +285,60 @@ appRoutes.get('/type_documents', (request, response) => {
   })
 })
 
-
 appRoutes.get('/terms_loan', (request, response) => {
   const sql = "SELECT id, name FROM terms_loan WHERE is_active = true"
+
+  config.cnn.query(sql, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      response.json(results)
+    } else {
+      response.send('Not results!')
+    }
+  })
+})
+
+appRoutes.get('/nationality', (request, response) => {
+  const sql = "SELECT id, name FROM nationality WHERE is_active = true"
+
+  config.cnn.query(sql, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      response.json(results)
+    } else {
+      response.send('Not results!')
+    }
+  })
+})
+
+appRoutes.get('/entities_f', (request, response) => {
+  const sql = "SELECT id, name, id_ruta FROM entities_f WHERE is_active = true"
+
+  config.cnn.query(sql, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      response.json(results)
+    } else {
+      response.send('Not results!')
+    }
+  })
+})
+
+appRoutes.get('/sector_profesion', (request, response) => {
+  let sql = "SELECT a.id, concat(b.name, ' - ', c.name) as name"
+  sql += " FROM sector_profesion a"
+  sql += " INNER JOIN sectors b ON b.id = a.id_sector"
+  sql += " INNER JOIN profesions c ON c.id = a.id_profesion"
+  sql += " WHERE is_active = true"
 
   config.cnn.query(sql, (error, results) => {
     if (error) {

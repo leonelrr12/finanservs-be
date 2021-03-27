@@ -185,11 +185,11 @@ CREATE TABLE `payments` (
 );
 
 
-insert into payments value (0, '0 a 30 Días');
-insert into payments value (1, '31 a 60 Días');
-insert into payments value (2, '61 a 90 Días');
-insert into payments value (3, 'Arreglo de Pago');
-insert into payments value (4, 'Demanda Judicial/ Cuenta Contra Reserva');
+insert into payments value (1, '0 a 30 Días');
+insert into payments value (2, '31 a 60 Días');
+insert into payments value (3, '61 a 90 Días');
+insert into payments value (4, 'Arreglo de Pago');
+insert into payments value (5, 'Demanda Judicial/ Cuenta Contra Reserva');
 
 
 DROP TABLE `housings`;
@@ -206,15 +206,13 @@ insert into housings value (2, 'Padres o Familiares', true);
 insert into housings value (3, 'Casa Hipotecada', true);
 insert into housings value (4, 'Casa Alquilada', true);
 
-
-
 DROP TABLE `entity_params`;
-CREATE TABLE `entity_params` (
+
+DROP TABLE `entity_params2`;
+CREATE TABLE `entity_params2` (
   `id` int NOT NULL AUTO_INCREMENT,
   `id_entity_f` varchar(10) NOT NULL,
-  `id_code` int NOT NULL,
-  `id_sector` int NOT NULL,
-  `id_profesion` int NOT NULL,
+  `id_sector_profesion` int NOT NULL,
   `descto_chip` float,
   `descto_ship` float,
   `deuda_chip` float,
@@ -224,18 +222,19 @@ CREATE TABLE `entity_params` (
   `comision` float,
   `mount_min` float,
   `mount_max` float,
+  `is_active` boolean,
   PRIMARY KEY (`id`)
 ) ;
 
-insert into entity_params (id_entity_f,id_code,id_sector,id_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',4,1,1,20,20,50,45,120,11,7,3000,25000);
-insert into entity_params (id_entity_f,id_code,id_sector,id_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',2,1,2,20,20,50,45,144,10,6,3000,30000);
-insert into entity_params (id_entity_f,id_code,id_sector,id_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',3,1,3,20,20,50,45,144,10,6,3000,30000);
-insert into entity_params (id_entity_f,id_code,id_sector,id_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',5,2,2,35,35,55,55,360,7.25,9.8,3000,50000);
-insert into entity_params (id_entity_f,id_code,id_sector,id_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',6,2,3,35,35,55,55,360,7.25,9.8,3000,50000);
-insert into entity_params (id_entity_f,id_code,id_sector,id_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',7,2,4,35,35,55,45,180,11,6.25,3000,35000);
-insert into entity_params (id_entity_f,id_code,id_sector,id_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',8,2,5,50,75,50,45,360,9,5.25,0,75000);
-insert into entity_params (id_entity_f,id_code,id_sector,id_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',9,2,6,35,35,100,100,180,11,6.25,3000,35000);
-insert into entity_params (id_entity_f,id_code,id_sector,id_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',1,3,7,35,35,100,100,180,11,6.25,3000,35000);
+insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',4,1,1,20,20,50,45,120,11,7,3000,25000);
+insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',2,1,2,20,20,50,45,144,10,6,3000,30000);
+insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',3,1,3,20,20,50,45,144,10,6,3000,30000);
+insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',5,2,2,35,35,55,55,360,7.25,9.8,3000,50000);
+insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',6,2,3,35,35,55,55,360,7.25,9.8,3000,50000);
+insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',7,2,4,35,35,55,45,180,11,6.25,3000,35000);
+insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',8,2,5,50,75,50,45,360,9,5.25,0,75000);
+insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',9,2,6,35,35,100,100,180,11,6.25,3000,35000);
+insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',1,3,7,35,35,100,100,180,11,6.25,3000,35000);
 
 
 //select d.name as Banco, a.id_code, b.id, short_name as sector, c.id, c.name as name,
@@ -321,10 +320,10 @@ CREATE TABLE `estados_tramite` (
   PRIMARY KEY (`id`)
 ) ;
 
-insert into estados_tramite (name) value ('Nuevo');
-insert into estados_tramite (name) value ('Proceso');
-insert into estados_tramite (name) value ('Aprobado');
-insert into estados_tramite (name) value ('Rechazado');
+insert into estados_tramite (name, is_active) value ('Nuevo', true);
+insert into estados_tramite (name, is_active) value ('Proceso', true);
+insert into estados_tramite (name, is_active) value ('Aprobado', true);
+insert into estados_tramite (name, is_active) value ('Rechazado', true);
     
 
 DROP TABLE `entities_f`;
@@ -407,3 +406,67 @@ CREATE TABLE `counties` (
   `name` varchar(35) NOT NULL,
   PRIMARY KEY (`id`)
 ) ;
+
+
+
+DROP TABLE `nationality`;
+CREATE TABLE `nationality` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(30) NOT NULL,
+	`is_active` boolean,
+  PRIMARY KEY (`id`)
+) ;
+
+
+insert into nationality (name, is_active) value ('Panameña', true);
+insert into nationality (name, is_active) value ('Venezolano', true);
+insert into nationality (name, is_active) value ('Colombiano', true);
+insert into nationality (name, is_active) value ('Monagrillero', true);
+    
+
+
+
+DROP TABLE `users`;
+CREATE TABLE `users` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_role`  int NOT NULL,
+  `email` varchar(50) NOT NULL,
+  `hash` varchar(100) NOT NULL,
+  `entity_f` INT,
+  `name` varchar(50) NOT NULL,
+  `address` varchar(100) NOT NULL,
+  `phoneNumber` varchar(15) NOT NULL,
+  `cellPhone` varchar(15) NOT NULL,
+  `is_new` boolean,
+  `is_active` boolean,
+  `dateCreated` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `dateUpdated` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email_UNIQUE` (`email`),
+  FOREIGN KEY (id_role) REFERENCES roles(id)
+);
+
+ALTER TABLE `finanservs`.`users` 
+DROP FOREIGN KEY `users_ibfk_1`;
+ALTER TABLE `finanservs`.`users` 
+DROP INDEX `id_role` ;
+
+123456
+insert into users (id_role,email,hash,entity_f,name,address,phoneNumber,cellPhone,is_new,is_active) 
+value (1,'guasimo01@gmail.com','$2a$10$SKNf4sjGXFmG1/q6Gt3vSuscXeNA0ujCKL0XtF8V7mD6xiqC.99h6',0,'Leonel Rodriguez','New York, 5h Av.','390-0000','6645-0000',false,true)
+
+
+DROP TABLE `roles`;
+CREATE TABLE `roles` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(10) NOT NULL,
+  `description` varchar(50) NOT NULL,
+  `dateCreated` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `dateUpdated` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  UNIQUE KEY `name_UNIQUE` (`name`),
+  PRIMARY KEY (`id`)
+)
+
+insert into roles (name) value ('Admin','Administrador del Sistema');
+
+
