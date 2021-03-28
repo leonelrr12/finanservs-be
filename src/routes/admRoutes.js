@@ -9,6 +9,7 @@ admRoutes.get('/', (request, response) => {
 })
 
 
+
 admRoutes.get('/prospects', (request, response) => {
   let sql = "SELECT a.id, a.name, id_personal, b.name as entity, email, a.cellphone,"
 
@@ -171,6 +172,7 @@ admRoutes.put('/prospects/entity_f', (request, response) => {
 })
  
 
+
 admRoutes.get('/sectors', (request, response) => {
   const sql = "SELECT * FROM sectors"
 
@@ -261,6 +263,7 @@ admRoutes.delete('/sectors/:id', (request, response) => {
     }
   })
 })
+
 
 
 admRoutes.get('/civilstatus', (request, response) => {
@@ -355,6 +358,7 @@ admRoutes.delete('/civilstatus/:id', (request, response) => {
 })
 
 
+
 admRoutes.get('/profesions', (request, response) => {
   const sql = "SELECT * FROM profesions"
 
@@ -445,6 +449,7 @@ admRoutes.delete('/profesions/:id', (request, response) => {
     }
   })
 })
+
 
 
 admRoutes.get('/profesions_lw', (request, response) => {
@@ -559,6 +564,7 @@ admRoutes.delete('/profesions_lw/:id', (request, response) => {
 })
 
 
+
 admRoutes.get('/institutions', (request, response) => {
   const sql = "SELECT * FROM institutions"
 
@@ -649,6 +655,7 @@ admRoutes.delete('/institutions/:id', (request, response) => {
     }
   })
 })
+
 
 
 admRoutes.get('/planillas_j', (request, response) => {
@@ -743,6 +750,7 @@ admRoutes.delete('/planillas_j/:id', (request, response) => {
 })
 
 
+
 admRoutes.get('/housings', (request, response) => {
   const sql = "SELECT id, name, CASE WHEN is_active THEN 'Si' ELSE 'No' END as is_active FROM housings"
 
@@ -833,6 +841,7 @@ admRoutes.delete('/housings/:id', (request, response) => {
     }
   })
 })
+
 
 
 admRoutes.get('/purposes', (request, response) => {
@@ -927,6 +936,7 @@ admRoutes.delete('/purposes/:id', (request, response) => {
 })
 
 
+
 admRoutes.get('/payments', (request, response) => {
   const sql = "SELECT id, name FROM payments"
 
@@ -1019,6 +1029,7 @@ admRoutes.delete('/payments/:id', (request, response) => {
 })
 
 
+
 admRoutes.get('/estados_tramite', (request, response) => {
   const sql = "SELECT id, name, CASE WHEN is_active THEN 'Si' ELSE 'No' END as is_active FROM estados_tramite"
 
@@ -1069,7 +1080,6 @@ admRoutes.post('/estados_tramite', (request, response) => {
   })
 })
 
-
 admRoutes.put('/estados_tramite', (request, response) => {
   const sql = "UPDATE estados_tramite SET name=?, is_active=? WHERE id = ?"
 
@@ -1102,6 +1112,7 @@ admRoutes.delete('/estados_tramite/:id', (request, response) => {
     }
   })
 })
+
 
 
 admRoutes.get('/type_documents', (request, response) => {
@@ -1185,6 +1196,7 @@ admRoutes.delete('/type_documents/:id', (request, response) => {
     }
   })
 })
+
 
 
 admRoutes.get('/terms_loan', (request, response) => {

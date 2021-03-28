@@ -10,6 +10,26 @@ loginRouter.get('/', async (request, response) => {
     .send("Hola desde api/login")
 })
 
+loginRouter.get('/users', (request, response) => {
+  let sql = "SELECT a.id,email,a.name,phoneNumber,cellPhone,b.role,"
+  sql += " CASE WHEN a.is_new THEN 'Si' ELSE 'No' END as is_new,"
+  sql += " CASE WHEN a.is_active THEN 'Si' ELSE 'No' END as is_active"
+  sql += " FROM users a"
+  sql += " INNER JOIN roles b on b.id = a.id_role"
+  sql += " ORDER BY a.id"
+
+  config.cnn.query(sql, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      response.json(results)
+    } else {
+      response.send('Not results!')
+    }
+  })
+})
 
 loginRouter.get('/new-user/:email',  (request, response) => {
  let sql = "SELECT is_new"
@@ -39,9 +59,11 @@ loginRouter.get('/:email/:password',  (request, response) => {
    sql += " WHERE email=?"
    sql += " AND (is_active = true OR id_role = 1)"
  
+   console.log('HOLA 1111111111111');
    const {email, password} = request.params
    const params = [email]
  
+   console.log('HOLA 2222',params);
    config.cnn.query(sql, params, async (error, rows, fields) => {
      if (error) {
        logger.error('Error SQL:', error.sqlMessage)
@@ -59,7 +81,9 @@ loginRouter.get('/:email/:password',  (request, response) => {
            username: name,
            id: id
          }
+         console.log('HOLA 3333');
          const token = jwt.sign(userForToken, process.env.SECRET)
+         console.log('HOLA 4444', token);
          response.status(200).json({userName: name, token})
        } else {
          // const hash = await bcrypt.hash('123456', 10)
