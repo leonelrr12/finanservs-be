@@ -123,7 +123,7 @@ appRoutes.get('/laboral_sector', (request, response) => {
 
 appRoutes.get('/laboral_sector_entity_f', (request, response) => {
   // let sql = "select a.id_code, b.id, short_name as sector, c.id, c.name as name,"
-  let sql = "select a.id_entity_f as ruta, id_sector, id_profesion,"
+  let sql = "select id_ruta as ruta, id_sector, id_profesion,"
   sql += " descto_ship as discount_capacity,"
   sql += " descto_chip as discount_capacity_mortgage,"
   sql += " deuda_ship as debt_capacity,"
@@ -134,13 +134,13 @@ appRoutes.get('/laboral_sector_entity_f', (request, response) => {
   sql += " mount_min,"
   sql += " mount_max"
   sql += " from entity_params a"
-  sql += " inner join entities_f d on d.id_ruta = a.id_entity_f"
-  sql += " inner join sectors b on b.id=a.id_sector"
-  sql += " inner join profesions c on c.id=a.id_profesion"
+  sql += " inner join entities_f d on d.id = a.id_entity_f"
+  sql += " inner join sector_profesion b on b.id=a.id_sector_profesion"
   // sql += " where a.id_entity_f = ? and a.id_code = ? and a.id_profesion = ?"
 
   const params = [request.params.id,  request.params.id2, request.params.id3];
 
+  console.log(sql);
   config.cnn.query(sql, params, (error, results) => {
     if (error) throw error
     if (results.length > 0) {

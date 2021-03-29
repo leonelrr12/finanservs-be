@@ -200,59 +200,92 @@ CREATE TABLE `housings` (
   PRIMARY KEY (`id`)
 ) ;
 
-
 insert into housings value (1, 'Casa Propia', true);
 insert into housings value (2, 'Padres o Familiares', true);
 insert into housings value (3, 'Casa Hipotecada', true);
 insert into housings value (4, 'Casa Alquilada', true);
 
+select * from housings;
+SELECT id, name, CASE WHEN is_active THEN 'Si' ELSE 'No' END as is_active FROM housings;
+
 DROP TABLE `entity_params`;
-
-DROP TABLE `entity_params2`;
-CREATE TABLE `entity_params2` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `id_entity_f` varchar(10) NOT NULL,
-  `id_sector_profesion` int NOT NULL,
-  `descto_chip` float,
-  `descto_ship` float,
-  `deuda_chip` float,
-  `deuda_ship` float,
-  `plazo_max` int,
-  `tasa` float,
-  `comision` float,
-  `mount_min` float,
-  `mount_max` float,
-  `is_active` boolean,
+CREATE TABLE `entity_params` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_entity_f` int(11) NOT NULL,
+  `id_sector_profesion` int(11) NOT NULL,
+  `descto_chip` float DEFAULT NULL,
+  `descto_ship` float DEFAULT NULL,
+  `deuda_chip` float DEFAULT NULL,
+  `deuda_ship` float DEFAULT NULL,
+  `plazo_max` int(11) DEFAULT NULL,
+  `tasa` float DEFAULT NULL,
+  `comision` float DEFAULT NULL,
+  `mount_min` float DEFAULT NULL,
+  `mount_max` float DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ;
-
-insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',4,1,1,20,20,50,45,120,11,7,3000,25000);
-insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',2,1,2,20,20,50,45,144,10,6,3000,30000);
-insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',3,1,3,20,20,50,45,144,10,6,3000,30000);
-insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',5,2,2,35,35,55,55,360,7.25,9.8,3000,50000);
-insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',6,2,3,35,35,55,55,360,7.25,9.8,3000,50000);
-insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',7,2,4,35,35,55,45,180,11,6.25,3000,35000);
-insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',8,2,5,50,75,50,45,360,9,5.25,0,75000);
-insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',9,2,6,35,35,100,100,180,11,6.25,3000,35000);
-insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max) values ('100',1,3,7,35,35,100,100,180,11,6.25,3000,35000);
+);
 
 
-//select d.name as Banco, a.id_code, b.id, short_name as sector, c.id, c.name as name,
-select 
-  descto_ship as discount_capacity,
-  descto_chip as discount_capacity_mortgage,
-  deuda_ship as debt_capacity,
-  deuda_chip as debt_capacity_mortgage,
-  plazo_max,
-  tasa,
-  comision,
-  mount_min,
-  mount_max
-from entity_params a
-inner join entities_f d on d.id_ruta = id_entity_f
-inner join sectors b on b.id=a.id_sector
-inner join profesions c on c.id=a.id_profesion;
-where a.id_entity_f = 100 and a.id_code = 4 and a.id_profesion = 1;
+select * from entity_params;
+truncate table entity_params;
+
+insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max,is_active)
+select 1,	4	,	20,	20,	50,	45,	120,	11,	7,	3000,	25000,1 union all
+select 1,	2	,	20,	20,	50,	45,	144,	10,	6,	3000,	30000,1 union all
+select 1,	3	,	20,	20,	50,	45,	144,	10,	6,	3000,	30000,1 union all
+select 1,	5	,	35,	35,	55,	55,	360,	7.25,	9.8,	3000,	50000,1 union all
+select 1,	6	,	35,	35,	55,	55,	360,	7.25,	9.8,	3000,	50000,1 union all
+select 1,	7	,	35,	35,	55,	45,	180,	11,	6.25,	3000,	35000,1 union all
+select 1,	8	,	50,	75,	50,	45,	360,	9,	5.25,	0,	75000,1 union all
+select 1,	9	,	35,	35,	100,100,180,	11,	6.25,	3000,	35000,1 union all
+select 1,	1	,	35,	35,	100,100,180,	11,	6.25,	3000,	35000,1;
+
+insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max,is_active)
+select 2,	4	,	20,	20,	50,	45,	120,	11,	7,	3000,	25000,1 union all
+select 2,	2	,	20,	20,	50,	45,	144,	10,	6,	3000,	30000,1 union all
+select 2,	3	,	20,	20,	50,	45,	144,	10,	6,	3000,	30000,1 union all
+select 2,	5	,	25,	25,	40,	40,	360,	7.25,	9.8,	3000,	50000,1 union all
+select 2,	6	,	35,	35,	55,	55,	360,	7.25,	9.8,	3000,	50000,1 union all
+select 2,	7	,	35,	35,	55,	45,	180,	11,	6.25,	3000,	35000,1 union all
+select 2,	8	,	50,	75,	50,	45,	360,	9,	5.25,	0,	75000,1 union all
+select 2,	9	,	35,	35,	100,100,180,	11,	6.25,	3000,	35000,1 union all
+select 2,	1	,	35,	35,	100,100,180,	11,	6.25,	3000,	35000,1;
+
+insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max,is_active)
+select 3,	4	,	20,	20,	50,	45,	120,	11,	7,	3000,	25000,1 union all
+select 3,	2	,	20,	20,	50,	45,	144,	10,	6,	3000,	30000,1 union all
+select 3,	3	,	20,	20,	50,	45,	144,	10,	6,	3000,	30000,1 union all
+select 3,	5	,	27,	27,	43,	43,	360,	7.25,	9.8,	3000,	50000,1 union all
+select 3,	6	,	35,	35,	55,	55,	360,	7.25,	9.8,	3000,	50000,1 union all
+select 3,	7	,	35,	35,	55,	45,	180,	11,	6.25,	3000,	35000,1 union all
+select 3,	8	,	50,	75,	50,	45,	360,	9,	5.25,	0,	75000,1 union all
+select 3,	9	,	35,	35,	100,100,180,	11,	6.25,	3000,	35000,1 union all
+select 3,	1	,	35,	35,	100,100,180,	11,	6.25,	3000,	35000,1;
+
+insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max,is_active)
+select 4,	4	,	20,	20,	50,	45,	120,	11,	7,	3000,	25000,1 union all
+select 4,	2	,	20,	20,	50,	45,	144,	10,	6,	3000,	30000,1 union all
+select 4,	3	,	20,	20,	50,	45,	144,	10,	6,	3000,	30000,1 union all
+select 4,	5	,	23,	23,	37,	37,	360,	7.25,	9.8,	3000,	50000,1 union all
+select 4,	6	,	35,	35,	55,	55,	360,	7.25,	9.8,	3000,	50000,1 union all
+select 4,	7	,	35,	35,	55,	45,	180,	11,	6.25,	3000,	35000,1 union all
+select 4,	8	,	50,	75,	50,	45,	360,	9,	5.25,	0,	75000,1 union all
+select 4,	9	,	35,	35,	100,100,180,	11,	6.25,	3000,	35000,1 union all
+select 4,	1	,	35,	35,	100,100,180,	11,	6.25,	3000,	35000,1;
+
+insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max,is_active)
+select 5,	4	,	20,	20,	50,	45,	120,	11,	7,	3000,	25000,1 union all
+select 5,	2	,	20,	20,	50,	45,	144,	10,	6,	3000,	30000,1 union all
+select 5,	3	,	20,	20,	50,	45,	144,	10,	6,	3000,	30000,1 union all
+select 5,	5	,	15,	15,	30,	30,	360,	7.25,	9.8,	3000,	50000,1 union all
+select 5,	6	,	35,	35,	55,	55,	360,	7.25,	9.8,	3000,	50000,1 union all
+select 5,	7	,	35,	35,	55,	45,	180,	11,	6.25,	3000,	35000,1 union all
+select 5,	8	,	50,	75,	50,	45,	360,	9,	5.25,	0,	75000,1 union all
+select 5,	9	,	35,	35,	100,100,180,	11,	6.25,	3000,	35000,1 union all
+select 5,	1	,	35,	35,	100,100,180,	11,	6.25,	3000,	35000,1;
+
+select * from entity_params;
 
 
 
@@ -266,8 +299,9 @@ where a.id_entity_f = 100 and a.id_code = 4 and a.id_profesion = 1;
 
 
 DROP TABLE `prospects`;
+
 CREATE TABLE `prospects` (
-  `id` int NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `id_personal` varchar(20) NOT NULL,
   `idUser` varchar(30) NOT NULL,
   `name` varchar(60) NOT NULL,
@@ -276,7 +310,7 @@ CREATE TABLE `prospects` (
   `lname` varchar(60) NOT NULL,
   `lname_2` varchar(60) DEFAULT NULL,
   `entity_f` varchar(15) NOT NULL,
-  `estado` int NOT NULL,
+  `estado` int(11) NOT NULL,
   `email` varchar(30) NOT NULL,
   `cellphone` varchar(15) NOT NULL,
   `phoneNumber` varchar(15) NOT NULL,
@@ -286,29 +320,27 @@ CREATE TABLE `prospects` (
   `workLetterUrl` varchar(60) DEFAULT NULL,
   `payStubUrl` varchar(60) DEFAULT NULL,
   `origin_idUser` varchar(10) NOT NULL,
-  `gender` varchar(10) NULL,
-  `birthDate` date NULL,
-  `contractType` int NULL,
-  `jobSector` int NULL,
-  `occupation` int NULL,
-  `paymentFrecuency` int NULL,
-  `profession` int NULL,
-  `residenceType` int NULL,
-  `civil_status` int NULL,
-  `province` int NULL,
-  `district` int NULL,
-  `salary` decimal(10,2) NULL,
-  `fcreate` timestamp NOT NULL,
-  `fupdate` timestamp NOT NULL,
+  `gender` varchar(10) DEFAULT NULL,
+  `birthDate` date DEFAULT NULL,
+  `contractType` int(11) DEFAULT NULL,
+  `jobSector` int(11) DEFAULT NULL,
+  `occupation` int(11) DEFAULT NULL,
+  `paymentFrecuency` int(11) DEFAULT NULL,
+  `profession` int(11) DEFAULT NULL,
+  `residenceType` int(11) DEFAULT NULL,
+  `civil_status` int(11) DEFAULT NULL,
+  `province` int(11) DEFAULT NULL,
+  `district` int(11) DEFAULT NULL,
+  `salary` decimal(10,2) DEFAULT NULL,
+  `fcreate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `fupdate` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `quotation` text NOT NULL,
   `application` text NOT NULL,
-  `sign` blob NULL,
-  PRIMARY KEY (`id`)
+  `sign` blob DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `id_personal` (`id_personal`),
+  KEY `entity_f` (`entity_f`)
 ) ;
-  -- UNIQUE KEY `id_personal_UNIQUE` (`id_personal`),
-  -- UNIQUE KEY `idUser_UNIQUE` (`idUser`)
-ALTER TABLE `finanservs`.`prospects` ADD INDEX `id_personal` (`id_personal` ASC);
-ALTER TABLE `finanservs`.`prospects` ADD INDEX `entity_f` (`entity_f` ASC);
 
 
 
@@ -340,10 +372,11 @@ UNIQUE KEY `id_ruta_UNIQUE` (`id_ruta`)
 ) ;
 
 
-insert into entities_f (id_ruta, name, contact, phone_number, cellphone, is_active) value ('100', 'Global Bank', 'Pedro de la Toña', '527898989', '6689-8989', true);
-insert into entities_f (id_ruta, name, contact, phone_number, cellphone, is_active) value ('200', 'BAC', 'Pedro de la Toña', '527898989', '6689-8989', true);
-insert into entities_f (id_ruta, name, contact, phone_number, cellphone, is_active) value ('300', 'Multibank', 'Pedro de la Toña', '527898989', '6689-8989', true);
-insert into entities_f (id_ruta, name, contact, phone_number, cellphone, is_active) value ('400', 'St. George', 'Pedro de la Toña', '527898989', '6689-8989', true);
+insert into entities_f (id_ruta, name, contact, phone_number, cellphone, is_active) value ('100', 'Tarifa y Comisión Base', 'Uso Interno', '507-0000', '6000-0000', true);
+insert into entities_f (id_ruta, name, contact, phone_number, cellphone, is_active) value ('500', 'Global Bank', 'Oficial de Cuenta', '507-0000', '6000-0000', true);
+insert into entities_f (id_ruta, name, contact, phone_number, cellphone, is_active) value ('200', 'BAC', 'Oficial de Cuenta', '507-0000', '6000-0000', true);
+insert into entities_f (id_ruta, name, contact, phone_number, cellphone, is_active) value ('300', 'Multibank', 'Oficial de Cuenta', '507-0000', '6000-0000', true);
+insert into entities_f (id_ruta, name, contact, phone_number, cellphone, is_active) value ('400', 'St. George', 'Oficial de Cuenta', '507-0000', '6000-0000', true);
 
 
 
@@ -372,15 +405,13 @@ CREATE TABLE `terms_loan` (
   PRIMARY KEY (`id`)
 ) ;
 
+insert into terms_loan (id, name, is_active) value (60, '60', true);
+insert into terms_loan (id, name, is_active) value (120, '120', true);
+insert into terms_loan (id, name, is_active) value (180, '180', true);
+insert into terms_loan (id, name, is_active) value (240, '240', true);
+insert into terms_loan (id, name, is_active) value (360, '360', true);
 
-
-insert into terms_loan (name, is_active) value ('60', '60', true);
-insert into terms_loan (name, is_active) value ('120', '120', true);
-insert into terms_loan (name, is_active) value ('180', '180', true);
-insert into terms_loan (name, is_active) value ('240', '240', true);
-insert into terms_loan (name, is_active) value ('360', '360', true);
-
-
+select * from terms_loan;
 
 
 DROP TABLE `provinces`;
@@ -428,45 +459,41 @@ insert into nationality (name, is_active) value ('Monagrillero', true);
 
 DROP TABLE `users`;
 CREATE TABLE `users` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `id_role`  int NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_role` int(11) NOT NULL,
   `email` varchar(50) NOT NULL,
   `hash` varchar(100) NOT NULL,
-  `entity_f` INT,
+  `entity_f` int(11) DEFAULT NULL,
   `name` varchar(50) NOT NULL,
   `address` varchar(100) NOT NULL,
   `phoneNumber` varchar(15) NOT NULL,
   `cellPhone` varchar(15) NOT NULL,
-  `is_new` boolean,
-  `is_active` boolean,
+  `is_new` tinyint(1) DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT NULL,
   `dateCreated` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `dateUpdated` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `email_UNIQUE` (`email`),
-  FOREIGN KEY (id_role) REFERENCES roles(id)
-);
+  KEY `id_role` (`id_role`),
+  CONSTRAINT `users_ibfk_1` FOREIGN KEY (`id_role`) REFERENCES `roles` (`id`)
+) ;
 
-ALTER TABLE `finanservs`.`users` 
-DROP FOREIGN KEY `users_ibfk_1`;
-ALTER TABLE `finanservs`.`users` 
-DROP INDEX `id_role` ;
 
-123456
+#123456
 insert into users (id_role,email,hash,entity_f,name,address,phoneNumber,cellPhone,is_new,is_active) 
-value (1,'guasimo01@gmail.com','$2a$10$SKNf4sjGXFmG1/q6Gt3vSuscXeNA0ujCKL0XtF8V7mD6xiqC.99h6',0,'Leonel Rodriguez','New York, 5h Av.','390-0000','6645-0000',false,true)
+value (1,'guasimo01@gmail.com','$2a$10$SKNf4sjGXFmG1/q6Gt3vSuscXeNA0ujCKL0XtF8V7mD6xiqC.99h6',0,'Leonel Rodriguez','New York, 5h Av.','390-0000','6645-0000',false,true);
 
 
 DROP TABLE `roles`;
 CREATE TABLE `roles` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(10) NOT NULL,
+  `role` varchar(10) NOT NULL,
   `description` varchar(50) NOT NULL,
   `dateCreated` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `dateUpdated` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  UNIQUE KEY `name_UNIQUE` (`name`),
+  UNIQUE KEY `role_UNIQUE` (`role`),
   PRIMARY KEY (`id`)
-)
+);
 
-insert into roles (name) value ('Admin','Administrador del Sistema');
-
-
+insert into roles (role, description) value ('Admin','Administrador del Sistema');
+select * from roles;

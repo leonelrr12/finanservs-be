@@ -6,14 +6,21 @@ const HOST = process.env.HOST
 const AWS_Access_key_ID = process.env.AWS_Access_key_ID
 const AWS_Secret_access_key = process.env.AWS_Secret_access_key
 
-
-// MySql de James - IS
+// MySql DIgital Ocean
 const cnn = mysql.createConnection({
-    host: '69.10.63.218',
-    database: 'finanservs',
-    user: 'AdminFinanservs',
-    password: '0t_pYv70'
+    host: process.env.DB_HOST,
+    database: process.env.DATABASE,
+    user: process.env.DB_USER,
+    password: process.env.DB_PWD
 })
+
+// // MySql de James - IS
+// const cnn = mysql.createConnection({
+//     host: '69.10.63.218',
+//     database: 'finanservs',
+//     user: 'AdminFinanservs',
+//     password: '0t_pYv70'
+// })
 
 // // MySql -->  Dockert
 // const cnn = mysql.createConnection({

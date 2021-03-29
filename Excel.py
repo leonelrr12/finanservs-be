@@ -27,18 +27,20 @@ database = "finanservs"
 # df = xls.parse('Original')
 # print(df)
 
+# # MySql de James - IS
+# cnn = mysql.connector.connect(
+#     host="69.10.63.218",
+#     database="finanservs",
+#     user="AdminFinanservs",
+#     password="0t_pYv70"     
+# )
+
+
 
 import mysql.connector
 
 def insert_acp(id, titulo, grupo, segmento, cnn):
     try:
-        # cnn = mysql.connector.connect(
-        #     host="bjxexd6ulauq7ap6pqxv-mysql.services.clever-cloud.com",
-        #     database="bjxexd6ulauq7ap6pqxv",
-        #     user="usch2d6auluhu2pz",
-        #     password="2mO43d7a0ih8POFWvyBL"     
-        # )
-
         cursor = cnn.cursor()
         mySql_insert_query = "INSERT INTO profesions_acp (id,titulo,grupo,segmento) VALUES (%s,%s,%s,%s)"
 
@@ -58,13 +60,6 @@ def insert_acp(id, titulo, grupo, segmento, cnn):
 
 def insert_lw(id, titulo, cnn):
     try:
-        # cnn = mysql.connector.connect(
-        #     host="bjxexd6ulauq7ap6pqxv-mysql.services.clever-cloud.com",
-        #     database="bjxexd6ulauq7ap6pqxv",
-        #     user="usch2d6auluhu2pz",
-        #     password="2mO43d7a0ih8POFWvyBL"     
-        # )
-
         cursor = cnn.cursor()
         mySql_insert_query = "INSERT INTO profesions_lw (id,titulo) VALUES (%s,%s)"
 
@@ -84,13 +79,6 @@ def insert_lw(id, titulo, cnn):
 
 def insert_inst(id, name, cnn):
     try:
-        # cnn = mysql.connector.connect(
-        #     host="bjxexd6ulauq7ap6pqxv-mysql.services.clever-cloud.com",
-        #     database="bjxexd6ulauq7ap6pqxv",
-        #     user="usch2d6auluhu2pz",
-        #     password="2mO43d7a0ih8POFWvyBL"     
-        # )
-
         cursor = cnn.cursor()
         mySql_insert_query = "INSERT INTO institutions (id,name) VALUES (%s,%s)"
 
@@ -203,32 +191,30 @@ import openpyxl
 
 
 
-# # No. 1
-# fichero = r"D:\Documentos\Desarrollo Web\Finanservs\Profesiones_ACP.xlsx"
+# No. 1
+fichero = r"D:\Documentos\Desarrollo Web\Finanservs\Profesiones_ACP.xlsx"
 
-# book = openpyxl.load_workbook(fichero, data_only=True)
-# hoja = book.active
+book = openpyxl.load_workbook(fichero, data_only=True)
+hoja = book.active
 
-# celdas = hoja['A2' : 'D750']
+celdas = hoja['A2' : 'D751']
 
+# MySql de Digital Ocean
+cnn = mysql.connector.connect(
+    host="134.122.114.209",
+    database="finanservs",
+    user="dbkotowa",
+    password="Hunter2$"   
+)
 
+for fila in celdas:
+    data = [celda.value for celda in fila]
+    insert_acp(data[0], data[1], data[2], data[3], cnn)
 
-# # MySql de James - IS
-# cnn = mysql.connector.connect(
-#     host="69.10.63.218",
-#     database="finanservs",
-#     user="AdminFinanservs",
-#     password="0t_pYv70"     
-# )
-
-# for fila in celdas:
-#     data = [celda.value for celda in fila]
-#     insert_acp(data[0], data[1], data[2], data[3], cnn)
-
-# cnn.commit()
-# if cnn.is_connected():
-#     cnn.close()
-#     print("MySQL Finish ...")
+cnn.commit()
+if cnn.is_connected():
+    cnn.close()
+    print("MySQL Finish ...")
 
 
 # # No. 2
@@ -239,12 +225,12 @@ import openpyxl
 
 # celdas = hoja['A5' : 'B105']
 
-# # MySql de James - IS
+# # MySql de Digital Ocean
 # cnn = mysql.connector.connect(
-#     host="69.10.63.218",
+#     host="134.122.114.209",
 #     database="finanservs",
-#     user="AdminFinanservs",
-#     password="0t_pYv70"     
+#     user="dbkotowa",
+#     password="Hunter2$"   
 # )
 
 
@@ -267,12 +253,12 @@ import openpyxl
 
 # celdas = hoja['A3' : 'B27']
 
-# # MySql de James - IS
+# # MySql de Digital Ocean
 # cnn = mysql.connector.connect(
-#     host="69.10.63.218",
+#     host="134.122.114.209",
 #     database="finanservs",
-#     user="AdminFinanservs",
-#     password="0t_pYv70"     
+#     user="dbkotowa",
+#     password="Hunter2$"   
 # )
 
 # for fila in celdas:
@@ -294,12 +280,12 @@ import openpyxl
 
 # celdas = hoja['A3' : 'B15']
 
-# # MySql de James - IS
+# # MySql de Digital Ocean
 # cnn = mysql.connector.connect(
-#     host="69.10.63.218",
+#     host="134.122.114.209",
 #     database="finanservs",
-#     user="AdminFinanservs",
-#     password="0t_pYv70"     
+#     user="dbkotowa",
+#     password="Hunter2$"   
 # )
 
 # for fila in celdas:
@@ -320,12 +306,12 @@ import openpyxl
 
 # celdas = hoja['A2' : 'B11']
 
-# # MySql de James - IS
+# # MySql de Digital Ocean
 # cnn = mysql.connector.connect(
-#     host="69.10.63.218",
+#     host="134.122.114.209",
 #     database="finanservs",
-#     user="AdminFinanservs",
-#     password="0t_pYv70"     
+#     user="dbkotowa",
+#     password="Hunter2$"   
 # )
 
 # for fila in celdas:
@@ -346,12 +332,12 @@ import openpyxl
 
 # celdas = hoja['A2' : 'C71']
 
-# # MySql de James - IS
+# # MySql de Digital Ocean
 # cnn = mysql.connector.connect(
-#     host="69.10.63.218",
+#     host="134.122.114.209",
 #     database="finanservs",
-#     user="AdminFinanservs",
-#     password="0t_pYv70"     
+#     user="dbkotowa",
+#     password="Hunter2$"   
 # )
 
 # for fila in celdas:
@@ -366,27 +352,27 @@ import openpyxl
 
 
 
-# No. 7
-fichero = r"D:\Documentos\Desarrollo Web\Finanservs\corr-codigo.xlsx"
+# # No. 7
+# fichero = r"D:\Documentos\Desarrollo Web\Finanservs\corr-codigo.xlsx"
 
-book = openpyxl.load_workbook(fichero, data_only=True)
-hoja = book.active
+# book = openpyxl.load_workbook(fichero, data_only=True)
+# hoja = book.active
 
-celdas = hoja['A2' : 'D599']
+# celdas = hoja['A2' : 'D599']
 
-# MySql de James - IS
-cnn = mysql.connector.connect(
-    host="69.10.63.218",
-    database="finanservs",
-    user="AdminFinanservs",
-    password="0t_pYv70"     
-)
+# # MySql de Digital Ocean
+# cnn = mysql.connector.connect(
+#     host="134.122.114.209",
+#     database="finanservs",
+#     user="dbkotowa",
+#     password="Hunter2$"   
+# )
 
-for fila in celdas:
-    data = [celda.value for celda in fila]
-    insert_corr(data[0], data[1], data[2], data[3], cnn)
+# for fila in celdas:
+#     data = [celda.value for celda in fila]
+#     insert_corr(data[0], data[1], data[2], data[3], cnn)
 
-cnn.commit()
-if cnn.is_connected():
-    cnn.close()
-    print("MySQL Finish ...")
+# cnn.commit()
+# if cnn.is_connected():
+#     cnn.close()
+#     print("MySQL Finish ...")

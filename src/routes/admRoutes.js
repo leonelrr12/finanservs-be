@@ -1332,10 +1332,10 @@ admRoutes.post('/entities_f', (request, response) => {
 })
 
 admRoutes.put('/entities_f', (request, response) => {
-  const sql = "UPDATE entities_f SET estado=? WHERE id = ?"
+  const sql = "UPDATE entities_f SET name=?, id_ruta=?, contact=?, phone_number=?, cellphone=?, is_active=? WHERE id = ?"
 
-  const {id, estado} = request.body
-  const params = [estado, id];
+  const {id, name, id_ruta, contact, phone_number, cellphone, is_active} = request.body
+  const params = [name, id_ruta, contact, phone_number, cellphone, is_active === 'Si' ? true : false, id];
 
   config.cnn.query(sql, params, (error, results) => {
     if (error) {
@@ -1463,7 +1463,7 @@ admRoutes.get('/entity_params', (request, response) => {
   sql += " deuda_ship,"
   sql += " mount_min,mount_max,plazo_max,tasa,comision,"
   sql += " CASE WHEN a.is_active THEN 'Si' ELSE 'No' END as is_active"
-  sql += " FROM entity_params2 a"
+  sql += " FROM entity_params a"
   sql += " INNER JOIN entities_f d on d.id = id_entity_f"
   sql += " INNER JOIN sector_profesion b on b.id=a.id_sector_profesion"
   sql += " INNER JOIN sectors c on c.id=b.id_sector"
@@ -1491,7 +1491,7 @@ admRoutes.get('/entity_params/:id', (request, response) => {
   sql += " deuda_ship,"
   sql += " mount_min,mount_max,plazo_max,tasa,comision,"
   sql += " CASE WHEN a.is_active THEN 'Si' ELSE 'No' END as is_active"
-  sql += " FROM entity_params2 a"
+  sql += " FROM entity_params a"
   sql += " INNER JOIN entities_f d on d.id = id_entity_f"
   sql += " INNER JOIN sector_profesion b on b.id=a.id_sector_profesion"
   sql += " INNER JOIN sectors c on c.id=b.id_sector"
@@ -1514,7 +1514,7 @@ admRoutes.get('/entity_params/:id', (request, response) => {
 }) 
 
 admRoutes.post('/entity_params', (request, response) => {
-  let sql = "INSERT INTO entity_params2 ("
+  let sql = "INSERT INTO entity_params ("
   sql += " id_entity_f, id_sector_profesion,"
   sql += " descto_chip, descto_ship, deuda_chip, deuda_ship,"
   sql += " plazo_max, tasa, comision, mount_min, mount_max, is_active"
@@ -1535,7 +1535,7 @@ admRoutes.post('/entity_params', (request, response) => {
 
 admRoutes.put('/entity_params', (request, response) => {
   // const sql = "UPDATE sector_profesion SET id_sector=?, id_profesion=?, is_active=? WHERE id = ?"
-  let sql = "UPDATE entity_params2 SET "
+  let sql = "UPDATE entity_params SET "
   sql += " id_entity_f=?,id_sector_profesion=?,"
   sql += " descto_chip=?,"
   sql += " descto_ship=?,"
@@ -1557,7 +1557,7 @@ admRoutes.put('/entity_params', (request, response) => {
 })
 
 admRoutes.delete('/entity_params/:id', (request, response) => {
-  const sql = "DELETE FROM entity_params2 WHERE id = ?"
+  const sql = "DELETE FROM entity_params WHERE id = ?"
   const params = [request.params.id]; 
 
   config.cnn.query(sql, params, (error, results) => {
