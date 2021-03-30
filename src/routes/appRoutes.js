@@ -11,8 +11,6 @@ appRoutes.get('/today-is', (request, response) => {
   response.json({ hoyes: dt2 })
 })
 
-
-
 appRoutes.get('/sectors', (request, response) => {
   const sql = "SELECT * FROM sectors"
 
