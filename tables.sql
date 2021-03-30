@@ -1,5 +1,7 @@
 
 -- https://www.pdfconvertonline.com/pdf-to-html-ocr-online.html
+-- Para confirgurar nginx
+-- https://youtu.be/6qR_EpxadMo
 
 -- CREATE DATABASE finanservs
 
