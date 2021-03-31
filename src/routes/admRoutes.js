@@ -11,18 +11,28 @@ admRoutes.get('/', (request, response) => {
 
 
 admRoutes.get('/prospects', (request, response) => {
-  let sql = "SELECT a.id, a.name, id_personal, b.name as entity, email, a.cellphone,"
-
-  sql += " idUrl as imag_id,"
-  sql += " socialSecurityProofUrl as imag_fss,"
-  sql += " publicGoodProofUrl as imag_rs,"
-  sql += " workLetterUrl as imag_lw,"
-  sql += " payStubUrl as imag_cp,"
-
-  sql += " c.name as estado, fcreate, datediff(now(), fcreate) as dias"
+  sql  = " SELECT a.id as 'ID', c.name as Estado, datediff(now(), fcreate) as 'Dias Antiguedad' ,id_personal as 'Cédula Id', a.name as Nombre,"
+  sql += " e.name as 'Sector',f.name as Profesión, CASE WHEN profession=5 THEN m.titulo  ELSE n.titulo END as 'Ocupación',"
+  sql += " salary as Salario, d.name as 'Contrato Trabajo', email as Email,"
+  sql += " a.cellphone as Celular, phoneNumber as Telefono, b.name as Entidad, "
+  sql += " CASE WHEN gender='female' THEN 'Mujer' ELSE 'Hombre' END as Genero, birthDate as 'Fecha Nacimiento',"
+  sql += " l.name as 'Fecuencia Pago', g.name as 'Tipo Residencia',"
+  sql += " k.name as 'Estado Civil', h.name as Provincia, i.name as Distrito, '' as Corregimiento,"
+  sql += " fcreate as 'Creado el'"
   sql += " FROM prospects a"
   sql += " INNER JOIN entities_f b ON b.id_ruta=a.entity_f"
-  sql += " INNER JOIN estados_tramite c ON c.id=a.estado;"
+  sql += " INNER JOIN estados_tramite c ON c.id=a.estado"
+  sql += " LEFT JOIN profesions_acp m ON m.id=a.occupation"
+  sql += " LEFT JOIN profesions_lw n ON n.id=a.occupation"
+  sql += " LEFT JOIN laboral_status d ON d.id=a.contractType"
+  sql += " LEFT JOIN sectors e ON e.id=a.jobSector"
+  sql += " LEFT JOIN profesions f ON f.id=a.profession"
+  sql += " LEFT JOIN housings g ON g.id=a.residenceType"
+  sql += " LEFT JOIN provinces h ON h.id=a.province"
+  sql += " LEFT JOIN districts i ON i.id=a.district"
+  // sql += "LEFT JOIN counties j ON j.id=a.residenceType"
+  sql += " LEFT JOIN civil_status k ON k.id=a.civil_status"
+  sql += " LEFT JOIN payments l ON l.id=a.paymentFrecuency"
 
   config.cnn.query(sql, (error, results) => {
     if (error) {
@@ -79,19 +89,19 @@ admRoutes.get('/prospects/:id', (request, response) => {
 })
 
 admRoutes.get('/prospects/aproach/:id_personal', (request, response) => {
-  let sql = "SELECT a.id, a.name, id_personal, b.name as entity, email, a.cellphone,"
-
-  sql += " idUrl as imag_id,"
-  sql += " socialSecurityProofUrl as imag_fss,"
-  sql += " publicGoodProofUrl as imag_rs,"
-  sql += " workLetterUrl as imag_lw,"
-  sql += " payStubUrl as imag_cp,"
-
-  sql += " c.name as estado, fcreate, datediff(now(), fcreate) as dias"
+  let sql = "id,	id_personal,	idUser,	name,	fname,	fname_2,	lname,	"
+  sql += " lname_2,	b.name as entity,	email,	cellphone,	phoneNumber,	"
+  sql += " idUrl as imag_id,	socialSecurityProofUrl as 'Ficha Seguro Social',"
+  sql += " publicGoodProofUrl as 'Recibo Entidad Publica',	workLetterUrl as 'Carta de Trabajo',"
+  sql += " payStubUrl as 'Comprobante de Pago',	origin_idUser,	gender,	birthDate,	contractType,	"
+  sql += " jobSector,	occupation,	paymentFrecuency,	profession,	residenceType,"
+  sql += " civil_status,	province,	district,	salary,	fcreate,	fupdate,"
+  sql += " c.name as estado, fcreate, datediff(now(), fcreate) as dias,"
+  sql += " quotation,	application,	sign"
   sql += " FROM prospects a"
   sql += " INNER JOIN entities_f b ON b.id_ruta=a.entity_f"
   sql += " INNER JOIN estados_tramite c ON c.id=a.estado"
-  sql += " WHERE id_personal = ?;"
+  sql += " WHERE id_personal = ?"
 
   const params = [request.params.id_personal];
   
@@ -109,22 +119,36 @@ admRoutes.get('/prospects/aproach/:id_personal', (request, response) => {
 })
 
 admRoutes.get('/prospects/entity_f/:entity_f', (request, response) => {
-  let sql = "SELECT a.id, a.name, id_personal, b.name as entity, email, a.cellphone,"
+  // sql += " idUrl as imag_id,	socialSecurityProofUrl as 'Ficha Seguro Social', payStubUrl as 'Comprobante de Pago',"
+  // sql += " publicGoodProofUrl as 'Recibo Entidad Publica',	workLetterUrl as 'Carta de Trabajo',"
+  // sql += " quotation,	application,	sign"
 
-  sql += " idUrl as imag_id,"
-  sql += " socialSecurityProofUrl as imag_fss,"
-  sql += " publicGoodProofUrl as imag_rs,"
-  sql += " workLetterUrl as imag_lw,"
-  sql += " payStubUrl as imag_cp,"
-
-  sql += " c.name as estado, fcreate, datediff(now(), fcreate) as dias"
+  sql  = " SELECT a.id as 'ID', c.name as Estado, datediff(now(), fcreate) as 'Dias Antiguedad' ,id_personal as 'Cédula Id', a.name as Nombre,"
+  sql += " e.name as 'Sector',f.name as Profesión, CASE WHEN profession=5 THEN m.titulo  ELSE n.titulo END as 'Ocupación',"
+  sql += " salary as Salario, d.name as 'Contrato Trabajo', email as Email,"
+  sql += " a.cellphone as Celular, phoneNumber as Telefono, b.name as Entidad, "
+  sql += " CASE WHEN gender='female' THEN 'Mujer' ELSE 'Hombre' END as Genero, birthDate as 'Fecha Nacimiento',"
+  sql += " l.name as 'Fecuencia Pago', g.name as 'Tipo Residencia',"
+  sql += " k.name as 'Estado Civil', h.name as Provincia, i.name as Distrito, '' as Corregimiento,"
+  sql += " fcreate as 'Creado el'"
   sql += " FROM prospects a"
   sql += " INNER JOIN entities_f b ON b.id_ruta=a.entity_f"
   sql += " INNER JOIN estados_tramite c ON c.id=a.estado"
+  sql += " LEFT JOIN profesions_acp m ON m.id=a.occupation"
+  sql += " LEFT JOIN profesions_lw n ON n.id=a.occupation"
+  sql += " LEFT JOIN laboral_status d ON d.id=a.contractType"
+  sql += " LEFT JOIN sectors e ON e.id=a.jobSector"
+  sql += " LEFT JOIN profesions f ON f.id=a.profession"
+  sql += " LEFT JOIN housings g ON g.id=a.residenceType"
+  sql += " LEFT JOIN provinces h ON h.id=a.province"
+  sql += " LEFT JOIN districts i ON i.id=a.district"
+  // sql += "LEFT JOIN counties j ON j.id=a.residenceType"
+  sql += " LEFT JOIN civil_status k ON k.id=a.civil_status"
+  sql += " LEFT JOIN payments l ON l.id=a.paymentFrecuency"
   sql += " WHERE entity_f = ?;"
 
   const params = [request.params.entity_f];
- 
+
   config.cnn.query(sql, params, (error, results) => {
     if (error) {
       logger.error('Error SQL:', error.sqlMessage)
@@ -1300,7 +1324,9 @@ admRoutes.get('/entities_f', (request, response) => {
 })
 
 admRoutes.get('/entities_f/:id', (request, response) => {
-  const sql = "SELECT id, name, id_ruta, contact, phone_number, cellphone, CASE WHEN is_active THEN 'Si' ELSE 'No' END as is_active FROM entities_f WHERE id = ?"
+  let sql = "SELECT id, name, id_ruta, contact, phone_number, cellphone,"
+  sql += " CASE WHEN is_active THEN 'Si' ELSE 'No' END as is_active"
+  sql += " FROM entities_f WHERE id = ?"
 
   const params = [request.params.id];
 
@@ -1460,7 +1486,7 @@ admRoutes.get('/entity_params', (request, response) => {
   sql += " descto_chip,"
   sql += " descto_ship,"
   sql += " deuda_chip,"
-  sql += " deuda_ship,"
+  sql += " deuda_ship, id_entity_f as id_entity,"
   sql += " mount_min,mount_max,plazo_max,tasa,comision,"
   sql += " CASE WHEN a.is_active THEN 'Si' ELSE 'No' END as is_active"
   sql += " FROM entity_params a"
@@ -1541,11 +1567,11 @@ admRoutes.put('/entity_params', (request, response) => {
   sql += " descto_ship=?,"
   sql += " deuda_chip=?,"
   sql += " deuda_ship=?,"
-  sql += " mount_min=?,mount_max=?,plazo_max=?,tasa=?,comision=?"
+  sql += " mount_min=?,mount_max=?,plazo_max=?,tasa=?,comision=?,is_active=?"
   sql += " WHERE id=?"
 
   const {id,id_entity_f,id_sector_profesion,descto_ship, descto_chip, deuda_chip, deuda_ship,plazo_max,tasa,comision,mount_min,mount_max, is_active} = request.body
-  const params = [id_entity_f,id_sector_profesion,descto_ship, descto_chip, deuda_chip, deuda_ship,plazo_max,tasa,comision,mount_min,mount_max,is_active === 'Si' ? true : false,id]
+  const params = [id_entity_f,id_sector_profesion,descto_chip, descto_ship, deuda_chip, deuda_ship,mount_min,mount_max,plazo_max,tasa,comision,is_active === 'Si' ? true : false,id]
 
   config.cnn.query(sql, params, (error, results) => {
     if (error) {

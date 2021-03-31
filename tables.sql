@@ -3,6 +3,8 @@
 -- Para confirgurar nginx
 -- https://youtu.be/6qR_EpxadMo
 
+-- MTERIAL-UI Personalizar los colores
+-- https://www.youtube.com/watch?v=_Nl1RU_VybY&list=PLPl81lqbj-4Kn-PRUvHuzh_591Euc3688&index=7
 -- CREATE DATABASE finanservs
 
 use finanservs;
