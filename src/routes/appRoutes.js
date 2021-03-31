@@ -138,7 +138,6 @@ appRoutes.get('/laboral_sector_entity_f', (request, response) => {
 
   const params = [request.params.id,  request.params.id2, request.params.id3];
 
-  console.log(sql);
   config.cnn.query(sql, params, (error, results) => {
     if (error) throw error
     if (results.length > 0) {
