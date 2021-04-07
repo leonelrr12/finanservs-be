@@ -1353,7 +1353,8 @@ admRoutes.post('/entities_f', (request, response) => {
       logger.error('Error SQL:', error.sqlMessage)
       response.status(500)
     } 
-    response.send('Ok!')
+    // response.send('Ok!')
+    response.json(results)
   })
 })
 
@@ -1376,6 +1377,7 @@ admRoutes.delete('/entities_f/:id', (request, response) => {
   const sql = "DELETE FROM entities_f WHERE id = ?"
   const params = [request.params.id]; 
 
+  console.log(sql, params);
   config.cnn.query(sql, params, (error, results) => {
     if (error) {
       logger.error('Error SQL:', error.sqlMessage)
