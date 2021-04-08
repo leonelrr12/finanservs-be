@@ -348,6 +348,7 @@ CREATE TABLE `prospects` (
 
 
 
+
 DROP TABLE `estados_tramite`;
 CREATE TABLE `estados_tramite` (
   `id` int NOT NULL AUTO_INCREMENT,
