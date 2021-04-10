@@ -395,11 +395,11 @@ CREATE TABLE `type_documents` (
 ) ;
 
 
-insert into type_documents (id, name, id_name, is_active) value (1, 'Cédula', 'idUrl', true);
-insert into type_documents (id, name, id_name, is_active) value (2, 'Comprobante de pago', 'payStubUrl', true);
-insert into type_documents (id, name, id_name, is_active) value (3, 'Ficha del seguro social', 'sSProofUrl', true);
-insert into type_documents (id, name, id_name, is_active) value (4, 'Recibo de servicio', 'pGoodProofUrl', true);
-insert into type_documents (id, name, id_name, is_active) value (5, 'Carta de Trabajo', 'workLetterUrl', true);
+insert into type_documents (id, name, id_name, is_active) value (1, 'Cédula', 'CEDULA', true);
+insert into type_documents (id, name, id_name, is_active) value (2, 'Comprobante de pago', 'COMP-PAGO', true);
+insert into type_documents (id, name, id_name, is_active) value (3, 'Ficha del seguro social', 'FICHA-SS', true);
+insert into type_documents (id, name, id_name, is_active) value (4, 'Recibo de servicio', 'SERV-PUBLICO', true);
+insert into type_documents (id, name, id_name, is_active) value (5, 'Carta de Trabajo', 'CARTA-TRABAJO', true);
 
 
 DROP TABLE `terms_loan`;
