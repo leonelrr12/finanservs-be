@@ -11,10 +11,6 @@ const s3 = new aws.S3({
   secretAccessKey: config.AWS_Secret_access_key
 })
 
-fileRoutes.get('/file', (request, response) => {
-  response.sendFile(__dirname + "/upload.html")
-})
-
 let storage = multer.diskStorage({
   destination: path.join(__dirname, '../../uploads'),
   filename:(req, file, cb) => {
@@ -55,5 +51,76 @@ const uploadS3 = (request) => {
   fs.unlinkSync(filePath)
 }
 
+fileRoutes.get('/list', async (request, response) => {
+  const { bucket, entity_f } = request.query
+  console.log(bucket, entity_f);
+
+  const params = {
+    Bucket: bucket
+  }
+
+  s3.listObjectsV2(params, (err, data) => {
+    if(err) throw err
+    const newD = []
+    data.Contents.map(item=>{
+      const x = item.Key.split('/')
+      if(x.length > 1) {
+        if(x[1] === entity_f) {
+          newD.push(item)
+        }
+      }
+    })
+    // console.log(newD)
+    response.status(200).json(newD)
+  })
+})
+
+
+fileRoutes.get('/file', async (request, response) => {
+  let { bucket, key, name } = request.query
+
+  // name = 'prospects.cs'
+  console.log('name', name, 'key', key);
+  const params = {
+    Bucket: bucket,
+    Key: key
+  }
+
+  // response.attachment(name)
+  // const file = s3.getObject(params).createReadStream()
+  // file.pipe(response)
+
+  s3.getObject(params, (err, data) => {
+    if (err) throw err;
+
+    fs.writeFile(__dirname + '../../../public/' + name, data.Body, 'binary', (err) => {
+      if(err) throw err
+      console.log(`Imagen deacargada al disco\n${__dirname}'/public/'`)
+
+      response.send('Ok')
+      // response.download(__dirname + '../../../public/' + name, name, function(err){
+      //   if (err) {
+      //     response.status(500).end()
+      //     console.log(err);
+      //   } else {
+      //     response.status(201).end()
+      //     console.log("ok");
+      //   }
+      // })
+
+      // const file = fs.readFileSync(name); 
+      // let base64data = file.toString('base64');
+      // response.write(base64data); 
+      // response.end();
+
+      // const file = fs.readFileSync(__dirname + '../../../public/' + name, 'binary'); 
+      // response.setHeader('Content-Length', file.length); 
+      // response.write(file, 'binary'); 
+      // response.end();
+    })
+  })
+
+  return 
+})
 
 module.exports = fileRoutes
