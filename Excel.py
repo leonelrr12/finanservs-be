@@ -190,31 +190,34 @@ import openpyxl
 #     server.sendmail(username, destino, mensaje)
 
 
-
-# No. 1
-fichero = r"D:\Documentos\Desarrollo Web\Finanservs\Profesiones_ACP.xlsx"
-
-book = openpyxl.load_workbook(fichero, data_only=True)
-hoja = book.active
-
-celdas = hoja['A2' : 'D751']
-
-# MySql de Digital Ocean
-cnn = mysql.connector.connect(
+def fcnn():
+    return mysql.connector.connect(
     host="134.122.114.209",
     database="finanservs",
     user="dbkotowa",
-    password="Hunter2$"   
+    password="Hunter2$$#P",
+    port="3306"
 )
 
-for fila in celdas:
-    data = [celda.value for celda in fila]
-    insert_acp(data[0], data[1], data[2], data[3], cnn)
+# # No. 1
+# fichero = r"D:\Documentos\Desarrollo Web\Finanservs\Profesiones_ACP.xlsx"
 
-cnn.commit()
-if cnn.is_connected():
-    cnn.close()
-    print("MySQL Finish ...")
+# book = openpyxl.load_workbook(fichero, data_only=True)
+# hoja = book.active
+
+# celdas = hoja['A2' : 'D751']
+
+# # MySql de Digital Ocean
+# cnn = fcnn()
+
+# for fila in celdas:
+#     data = [celda.value for celda in fila]
+#     insert_acp(data[0], data[1], data[2], data[3], cnn)
+
+# cnn.commit()
+# if cnn.is_connected():
+#     cnn.close()
+#     print("MySQL Finish ...")
 
 
 # # No. 2
@@ -224,15 +227,7 @@ if cnn.is_connected():
 # hoja = book.active
 
 # celdas = hoja['A5' : 'B105']
-
-# # MySql de Digital Ocean
-# cnn = mysql.connector.connect(
-#     host="134.122.114.209",
-#     database="finanservs",
-#     user="dbkotowa",
-#     password="Hunter2$"   
-# )
-
+# cnn = fcnn()
 
 # for fila in celdas:
 #     data = [celda.value for celda in fila]
@@ -253,13 +248,7 @@ if cnn.is_connected():
 
 # celdas = hoja['A3' : 'B27']
 
-# # MySql de Digital Ocean
-# cnn = mysql.connector.connect(
-#     host="134.122.114.209",
-#     database="finanservs",
-#     user="dbkotowa",
-#     password="Hunter2$"   
-# )
+# cnn = fcnn()
 
 # for fila in celdas:
 #     data = [celda.value for celda in fila]
@@ -280,13 +269,7 @@ if cnn.is_connected():
 
 # celdas = hoja['A3' : 'B15']
 
-# # MySql de Digital Ocean
-# cnn = mysql.connector.connect(
-#     host="134.122.114.209",
-#     database="finanservs",
-#     user="dbkotowa",
-#     password="Hunter2$"   
-# )
+# cnn = fcnn()
 
 # for fila in celdas:
 #     data = [celda.value for celda in fila]
@@ -298,6 +281,7 @@ if cnn.is_connected():
 #     print("MySQL Finish ...")
 
 
+
 # # No. 5
 # fichero = r"D:\Documentos\Desarrollo Web\Finanservs\prov-codigo.xlsx"
 
@@ -306,13 +290,7 @@ if cnn.is_connected():
 
 # celdas = hoja['A2' : 'B11']
 
-# # MySql de Digital Ocean
-# cnn = mysql.connector.connect(
-#     host="134.122.114.209",
-#     database="finanservs",
-#     user="dbkotowa",
-#     password="Hunter2$"   
-# )
+# cnn = fcnn()
 
 # for fila in celdas:
 #     data = [celda.value for celda in fila]
@@ -324,6 +302,7 @@ if cnn.is_connected():
 #     print("MySQL Finish ...")
 
 
+
 # # No. 6
 # fichero = r"D:\Documentos\Desarrollo Web\Finanservs\dist-codigo.xlsx"
 
@@ -332,13 +311,7 @@ if cnn.is_connected():
 
 # celdas = hoja['A2' : 'C71']
 
-# # MySql de Digital Ocean
-# cnn = mysql.connector.connect(
-#     host="134.122.114.209",
-#     database="finanservs",
-#     user="dbkotowa",
-#     password="Hunter2$"   
-# )
+# cnn = fcnn()
 
 # for fila in celdas:
 #     data = [celda.value for celda in fila]
@@ -360,13 +333,7 @@ if cnn.is_connected():
 
 # celdas = hoja['A2' : 'D599']
 
-# # MySql de Digital Ocean
-# cnn = mysql.connector.connect(
-#     host="134.122.114.209",
-#     database="finanservs",
-#     user="dbkotowa",
-#     password="Hunter2$"   
-# )
+# cnn = fcnn()
 
 # for fila in celdas:
 #     data = [celda.value for celda in fila]

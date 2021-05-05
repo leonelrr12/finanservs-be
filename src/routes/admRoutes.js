@@ -89,22 +89,21 @@ admRoutes.get('/prospects/:id', (request, response) => {
 })
 
 admRoutes.get('/prospects/aproach/:id_personal', (request, response) => {
-  let sql = "id,	id_personal,	idUser,	name,	fname,	fname_2,	lname,	"
-  sql += " lname_2,	b.name as entity,	email,	cellphone,	phoneNumber,	"
-  sql += " idUrl as imag_id,	socialSecurityProofUrl as 'Ficha Seguro Social',"
-  sql += " publicGoodProofUrl as 'Recibo Entidad Publica',	workLetterUrl as 'Carta de Trabajo',"
-  sql += " payStubUrl as 'Comprobante de Pago',	origin_idUser,	gender,	birthDate,	contractType,	"
+  let sql = "select a.id,	id_personal, idUser, a.name, fname, fname_2, lname,"
+  sql += " lname_2, b.name as entity, email ,a.cellphone,	phoneNumber,"
+  sql += " idUrl as imag_id, socialSecurityProofUrl as 'Ficha Seguro Social',"
+  sql += " publicGoodProofUrl as 'Recibo Entidad Publica', workLetterUrl as 'Carta de Trabajo',"
+  sql += " payStubUrl as 'Comprobante de Pago',	origin_idUser, gender, birthDate, contractType,	"
   sql += " jobSector,	occupation,	paymentFrecuency,	profession,	residenceType,"
-  sql += " civil_status,	province,	district,	salary,	fcreate,	fupdate,"
+  sql += " civil_status, province, district, salary, fcreate, fupdate,"
   sql += " c.name as estado, fcreate, datediff(now(), fcreate) as dias,"
-  sql += " quotation,	application,	sign"
+  sql += " quotation,	application, sign"
   sql += " FROM prospects a"
   sql += " INNER JOIN entities_f b ON b.id_ruta=a.entity_f"
   sql += " INNER JOIN estados_tramite c ON c.id=a.estado"
   sql += " WHERE id_personal = ?"
 
   const params = [request.params.id_personal];
-  
   config.cnn.query(sql, params, (error, results) => {
     if (error) {
       logger.error('Error SQL:', error.sqlMessage)
