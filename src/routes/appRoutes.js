@@ -41,7 +41,7 @@ appRoutes.get('/APC-BK', (request, response) => {
       formaPago: "DESCUENTO DIRECTO",
       diasAtraso: "0",
       contometro: "1".repeat(24),
-      montoAplicado: 0
+      score: 0
     },
     {
       institucion: "BANISTMO",
@@ -52,7 +52,7 @@ appRoutes.get('/APC-BK', (request, response) => {
       formaPago: "DESCUENTO DIRECTO",
       diasAtraso: "0",
       contometro: "1".repeat(20)+"2233",
-      montoAplicado: 0
+      score: 0
     },
     {
       institucion: "BANISI",
@@ -63,7 +63,7 @@ appRoutes.get('/APC-BK', (request, response) => {
       formaPago: "DESCUENTO DIRECTO",
       diasAtraso: "0",
       contometro: "1".repeat(20)+"3333",
-      montoAplicado: 0
+      score: 0
     },
     {
       institucion: "GENERAL",
@@ -74,7 +74,7 @@ appRoutes.get('/APC-BK', (request, response) => {
       formaPago: "PAGOS VOLUNTARIOS",
       diasAtraso: "0",
       contometro: "1".repeat(24),
-      montoAplicado: 0
+      score: 0
     },
     {
       institucion: "BANISI",
@@ -85,7 +85,7 @@ appRoutes.get('/APC-BK', (request, response) => {
       formaPago: "DESCUENTO DIRECTO",
       diasAtraso: "0",
       contometro: "1".repeat(24),
-      montoAplicado: 0
+      score: 0
     },
 ])
 })
