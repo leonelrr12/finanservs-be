@@ -34,7 +34,10 @@ const uploadS3 = (request) => {
   const filePath = request.file.path
   const {entity_f, prospect, nameImage} = request.body
   const ext = fileName.split('.')[1]
-
+  
+  // Quitar cuando se coloquen Claves validas de AWS
+  return
+  
   fs.readFile(filePath, (err, data) => {
     if(err) throw err
     const paramsPut = {
@@ -54,6 +57,9 @@ const uploadS3 = (request) => {
 fileRoutes.get('/list', async (request, response) => {
   const { bucket, entity_f } = request.query
   console.log(bucket, entity_f);
+
+  // Quitar cuando se coloquen Claves validas de AWS
+  return response.status(200).json([])
 
   const params = {
     Bucket: bucket
@@ -78,6 +84,9 @@ fileRoutes.get('/list', async (request, response) => {
 
 fileRoutes.get('/file', async (request, response) => {
   let { bucket, key, name } = request.query
+
+  // Quitar cuando se coloquen Claves validas de AWS
+  return response.send('Ok')
 
   // name = 'prospects.cs'
   console.log('name', name, 'key', key);

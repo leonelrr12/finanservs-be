@@ -48,13 +48,13 @@ admRoutes.get('/prospects', (request, response) => {
 })
 
 admRoutes.post('/prospects', (request, response) => {
-  const sql = "INSERT INTO prospects (id_personal,idUser,name,fname,fname_2,lname,lname_2,entity_f,estado,email,cellphone,phoneNumber,idUrl,socialSecurityProofUrl,publicGoodProofUrl,workLetterUrl,payStubUrl,origin_idUser,gender,birthDate,contractType,jobSector,occupation,paymentFrecuency,profession,residenceType,civil_status,province,district,salary,fcreate,fupdate,quotation,application,sign) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,now(),now(),?,?,?)"
+  const sql = "INSERT INTO prospects (id_personal,idUser,name,fname,fname_2,lname,lname_2,entity_f,estado,email,cellphone,phoneNumber,idUrl,socialSecurityProofUrl,publicGoodProofUrl,workLetterUrl,payStubUrl,origin_idUser,gender,birthDate,contractType,jobSector,occupation,paymentFrecuency,profession,residenceType,civil_status,province,district,salary,fcreate,fupdate,quotation,application,sign,loanPP,loanAuto,loanTC,loanHip,cashOnHand,plazo) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,now(),now(),?,?,?,?,?,?,?,?,?)"
 
-  let {id_personal,idUser,name,fname,fname_2,lname,lname_2,entity_f,estado,email,cellPhone,phoneNumber,idUrl,socialSecurityProofUrl,publicGoodProofUrl,workLetterUrl,payStubUrl,origin_idUser,gender,birthDate,contractType,jobSector,occupation,paymentFrecuency,profession,residenceType,civil_status,province,district,salary,quotation,application,sign} = request.body
+  let {id_personal,idUser,name,fname,fname_2,lname,lname_2,entity_f,estado,email,cellPhone,phoneNumber,idUrl,socialSecurityProofUrl,publicGoodProofUrl,workLetterUrl,payStubUrl,origin_idUser,gender,birthDate,contractType,jobSector,occupation,paymentFrecuency,profession,residenceType,civil_status,province,district,salary,quotation,application,sign,loanPP,loanAuto,loanTC,loanHip,cashOnHand,plazo} = request.body
 
   estado = 1 // Nuevo registro queda con estatus de nuevo
   birthDate = birthDate.slice(0,10)
-  const params = [id_personal,idUser,name,fname,fname_2,lname,lname_2,entity_f,estado,email,cellPhone,phoneNumber,idUrl,socialSecurityProofUrl,publicGoodProofUrl,workLetterUrl,payStubUrl,origin_idUser,gender,birthDate,contractType,jobSector,occupation,paymentFrecuency,profession,residenceType,civil_status,province,district,salary,quotation,application,sign]
+  const params = [id_personal,idUser,name,fname,fname_2,lname,lname_2,entity_f,estado,email,cellPhone,phoneNumber,idUrl,socialSecurityProofUrl,publicGoodProofUrl,workLetterUrl,payStubUrl,origin_idUser,gender,birthDate,contractType,jobSector,occupation,paymentFrecuency,profession,residenceType,civil_status,province,district,salary,quotation,application,sign,loanPP,loanAuto,loanTC,loanHip,cashOnHand,plazo]
 
   // console.log(request.body);
   // console.log(params);
@@ -88,6 +88,26 @@ admRoutes.get('/prospects/:id', (request, response) => {
   })
 })
 
+admRoutes.get('/prospects_sign/:id', (request, response) => {
+
+  const sql = "SELECT sign FROM prospects WHERE id = ?;"
+
+  const params = [request.params.id];
+
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      response.json(results)
+    } else {
+      response.send('Not results!')
+    }
+  })
+})
+
+
 admRoutes.get('/prospects/aproach/:id_personal', (request, response) => {
   let sql = "select a.id,	id_personal, idUser, a.name, fname, fname_2, lname,"
   sql += " lname_2, b.name as entity, email ,a.cellphone,	phoneNumber,"
@@ -97,7 +117,7 @@ admRoutes.get('/prospects/aproach/:id_personal', (request, response) => {
   sql += " jobSector,	occupation,	paymentFrecuency,	profession,	residenceType,"
   sql += " civil_status, province, district, salary, fcreate, fupdate,"
   sql += " c.name as estado, fcreate, datediff(now(), fcreate) as dias,"
-  sql += " quotation,	application, sign"
+  sql += " quotation,	application, sign ,loanPP, loanAuto, loanTC, loanHip, cashOnHand,plazo"
   sql += " FROM prospects a"
   sql += " INNER JOIN entities_f b ON b.id_ruta=a.entity_f"
   sql += " INNER JOIN estados_tramite c ON c.id=a.estado"
@@ -124,11 +144,12 @@ admRoutes.get('/prospects/entity_f/:entity_f', (request, response) => {
 
   sql  = " SELECT a.id as 'ID', c.name as Estado, datediff(now(), fcreate) as 'Dias Antiguedad' ,id_personal as 'Cédula Id', a.name as Nombre,"
   sql += " e.name as 'Sector',f.name as Profesión, CASE WHEN profession=5 THEN m.titulo  ELSE n.titulo END as 'Ocupación',"
-  sql += " salary as Salario, d.name as 'Contrato Trabajo', email as Email,"
-  sql += " a.cellphone as Celular, phoneNumber as Telefono, b.name as Entidad, "
+  sql += " salary as Salario, loanPP as 'Préstamo Personal', cashOnHand as 'Efectivo en Mano', plazo as Plazo,  loanAuto as 'Préstamo Automóvil', loanTC as 'Préstamo TC', loanHip as 'Préstamo Hipoteca',"
+  sql += " d.name as 'Contrato Trabajo', email as Email,"
+  sql += " a.cellphone as Celular, phoneNumber as 'Télefono', b.name as Entidad, "
   sql += " CASE WHEN gender='female' THEN 'Mujer' ELSE 'Hombre' END as Genero, birthDate as 'Fecha Nacimiento',"
   sql += " l.name as 'Fecuencia Pago', g.name as 'Tipo Residencia',"
-  sql += " k.name as 'Estado Civil', h.name as Provincia, i.name as Distrito, '' as Corregimiento,"
+  sql += " k.name as 'Estado Civil', h.name as Provincia, i.name as Distrito, j.name as Corregimiento,"
   sql += " fcreate as 'Creado el'"
   sql += " FROM prospects a"
   sql += " INNER JOIN entities_f b ON b.id_ruta=a.entity_f"
@@ -141,7 +162,7 @@ admRoutes.get('/prospects/entity_f/:entity_f', (request, response) => {
   sql += " LEFT JOIN housings g ON g.id=a.residenceType"
   sql += " LEFT JOIN provinces h ON h.id=a.province"
   sql += " LEFT JOIN districts i ON i.id=a.district"
-  // sql += "LEFT JOIN counties j ON j.id=a.residenceType"
+  sql += " LEFT JOIN counties j ON j.id=a.residenceType"
   sql += " LEFT JOIN civil_status k ON k.id=a.civil_status"
   sql += " LEFT JOIN payments l ON l.id=a.paymentFrecuency"
   sql += " WHERE entity_f = ?;"

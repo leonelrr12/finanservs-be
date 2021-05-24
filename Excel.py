@@ -191,12 +191,19 @@ import openpyxl
 
 
 def fcnn():
+    # return mysql.connector.connect(
+    # host="134.122.114.209",
+    # database="finanservs",
+    # user="dbkotowa",
+    # password="lr1wapia8dem9cla",
+    # port="3306"
+
     return mysql.connector.connect(
-    host="134.122.114.209",
-    database="finanservs",
+    host="db-mysql-nyc3-86722-do-user-7220305-0.b.db.ondigitalocean.com",
     user="dbkotowa",
-    password="Hunter2$$#P",
-    port="3306"
+    password="lr1wapia8dem9cla",
+    database="finanservs",
+    port="25060"
 )
 
 # # No. 1
@@ -220,6 +227,7 @@ def fcnn():
 #     print("MySQL Finish ...")
 
 
+
 # # No. 2
 # fichero = r"D:\Documentos\Desarrollo Web\Finanservs\Profesiones_Linea_Blanca.xlsx"
 
@@ -240,24 +248,24 @@ def fcnn():
 
 
 
-# # No. 3
-# fichero = r"D:\Documentos\Desarrollo Web\Finanservs\Instituciones.xlsx"
+# No. 3
+fichero = r"D:\Documentos\Desarrollo Web\Finanservs\Instituciones.xlsx"
 
-# book = openpyxl.load_workbook(fichero, data_only=True)
-# hoja = book.active
+book = openpyxl.load_workbook(fichero, data_only=True)
+hoja = book.active
 
-# celdas = hoja['A3' : 'B27']
+celdas = hoja['A3' : 'B27']
 
-# cnn = fcnn()
+cnn = fcnn()
 
-# for fila in celdas:
-#     data = [celda.value for celda in fila]
-#     insert_inst(data[0], data[1], cnn)
+for fila in celdas:
+    data = [celda.value for celda in fila]
+    insert_inst(data[0], data[1], cnn)
 
-# cnn.commit()
-# if cnn.is_connected():
-#     cnn.close()
-#     print("MySQL Finish ...")
+cnn.commit()
+if cnn.is_connected():
+    cnn.close()
+    print("MySQL Finish ...")
 
 
 
