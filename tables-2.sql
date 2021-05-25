@@ -1,16 +1,5 @@
-
--- https://www.pdfconvertonline.com/pdf-to-html-ocr-online.html
--- Para confirgurar nginx
--- https://youtu.be/6qR_EpxadMo
-
--- MTERIAL-UI Personalizar los colores
--- https://www.youtube.com/watch?v=_Nl1RU_VybY&list=PLPl81lqbj-4Kn-PRUvHuzh_591Euc3688&index=7
--- CREATE DATABASE finanservs
-
 use finanservs;
 
-
-DROP TABLE `sectors`;
 CREATE TABLE `sectors` (
   `id` int NOT NULL,
   `name` varchar(60) NOT NULL,
@@ -24,7 +13,6 @@ insert into sectors values (2, 'Publico', 'Pb');
 insert into sectors values (3, 'Jubilado', 'J');
 
 
-DROP TABLE `profesions`;
 CREATE TABLE `profesions` (
   `id` int NOT NULL,
   `name` varchar(60) NOT NULL,
@@ -40,7 +28,6 @@ insert into profesions values (6, 'Seguridad Publica');
 insert into profesions values (7, 'Jubilado');
 
 
-DROP TABLE `sector_profesion`;
 CREATE TABLE `sector_profesion` (
   `id` int NOT NULL,
   `id_sector` int NOT NULL,
@@ -59,43 +46,27 @@ insert into sector_profesion  values (8,2,5,true);
 insert into sector_profesion  values (9,2,6,true);
 insert into sector_profesion  values (1,3,7,true);
 
-select a.id as id, short_name as sector, c.name as name, is_active
-from sector_profesion a
-inner join sectors b on b.id=a.id_sector
-inner join profesions c on c.id=a.id_profesion
-where is_active = true;
-  
 
-
-DROP TABLE `institutions`;
 CREATE TABLE `institutions` (
   `id` int NOT NULL,
   `name` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
 ) ;
 
-select * from institutions;
 
-
-
-DROP TABLE `planillas_j`;
 CREATE TABLE `planillas_j` (
   `id` int NOT NULL,
   `name` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
 );
 
-select * from planillas_j;
 
-DROP TABLE `ranges_pol`;
 CREATE TABLE `ranges_pol` (
   `id` int NOT NULL,
   `name` varchar(50) NOT NULL,
   `is_active` boolean,
   PRIMARY KEY (`id`)
 ) ;
-
-select * from ranges_pol;
 
 
 insert into ranges_pol (id, name, is_active) values (1,'RANGOS',true);
@@ -117,16 +88,13 @@ insert into ranges_pol (id, name, is_active) values (16,'TENIENTE',true);
 
 
 
-DROP TABLE `profesions_lw`;
 CREATE TABLE `profesions_lw` (
   `id` int NOT NULL,
   `titulo` varchar(100) NOT NULL,
   PRIMARY KEY (`id`)
 ) ;
 
-select * from profesions_lw;
 
-DROP TABLE `profesions_acp`;
 CREATE TABLE `profesions_acp` (
   `id` int NOT NULL,
   `titulo` varchar(60) NOT NULL,
@@ -135,11 +103,7 @@ CREATE TABLE `profesions_acp` (
   PRIMARY KEY (`id`)
 );
 
-select * from profesions_acp;
 
-
-
-DROP TABLE `civil_status`;
 CREATE TABLE `civil_status` (
   `id` int NOT NULL,
   `name` varchar(60) NOT NULL,
@@ -152,7 +116,7 @@ insert into civil_status values (3, 'Unido');
 insert into civil_status values (4, 'Divorciado');
 insert into civil_status values (5, 'Viudo');
 
-DROP TABLE `purposes`;
+
 CREATE TABLE `purposes` (
   `id` int NOT NULL,
   `name` varchar(60) NOT NULL,
@@ -168,7 +132,6 @@ insert into purposes value (4, 'Viaje', true);
 insert into purposes value (5, 'Quince años', true);
 
 
-DROP TABLE `laboral_status`;
 CREATE TABLE `laboral_status` (
   `id` int NOT NULL,
   `name` varchar(60) NOT NULL,
@@ -181,7 +144,6 @@ insert into laboral_status value (1, 'Permanente', true);
 insert into laboral_status value (2, 'Serv. Profesional', true);
 
 
-DROP TABLE `payments`;
 CREATE TABLE `payments` (
   `id` int NOT NULL,
   `name` varchar(60) NOT NULL,
@@ -196,7 +158,6 @@ insert into payments value (4, 'Arreglo de Pago');
 insert into payments value (5, 'Demanda Judicial/ Cuenta Contra Reserva');
 
 
-DROP TABLE `housings`;
 CREATE TABLE `housings` (
   `id` int NOT NULL,
   `name` varchar(60) NOT NULL,
@@ -209,10 +170,7 @@ insert into housings value (2, 'Padres o Familiares', true);
 insert into housings value (3, 'Casa Hipotecada', true);
 insert into housings value (4, 'Casa Alquilada', true);
 
-select * from housings;
-SELECT id, name, CASE WHEN is_active THEN 'Si' ELSE 'No' END as is_active FROM housings;
 
-DROP TABLE `entity_params`;
 CREATE TABLE `entity_params` (
   `id`   int NOT NULL AUTO_INCREMENT,
   `id_entity_f`   int NOT NULL,
@@ -229,10 +187,6 @@ CREATE TABLE `entity_params` (
   `is_active` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`id`)
 );
-
-
-select * from entity_params;
-truncate table entity_params;
 
 insert into entity_params (id_entity_f,id_sector_profesion,descto_chip, descto_ship,deuda_chip,deuda_ship,plazo_max,tasa,comision,mount_min,mount_max,is_active)
 select 1,	4	,	20,	20,	50,	45,	120,	11,	7,	3000,	25000,1 union all
@@ -289,20 +243,6 @@ select 5,	8	,	50,	75,	50,	45,	360,	9,	5.25,	0,	75000,1 union all
 select 5,	9	,	35,	35,	100,100,180,	11,	6.25,	3000,	35000,1 union all
 select 5,	1	,	35,	35,	100,100,180,	11,	6.25,	3000,	35000,1;
 
-select * from entity_params;
-
-
-
--- // With root
--- ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'YourRootPassword';
--- -- or
--- CREATE USER 'foo'@'%' IDENTIFIED WITH mysql_native_password BY 'bar';
--- -- then
--- FLUSH PRIVILEGES;
-
-
-
-DROP TABLE `prospects`;
 
 CREATE TABLE `prospects` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -354,8 +294,6 @@ CREATE TABLE `prospects` (
 
 
 
-
-DROP TABLE `estados_tramite`;
 CREATE TABLE `estados_tramite` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(10) NOT NULL,
@@ -369,7 +307,6 @@ insert into estados_tramite (name, is_active) value ('Aprobado', true);
 insert into estados_tramite (name, is_active) value ('Rechazado', true);
     
 
-DROP TABLE `entities_f`;
 CREATE TABLE `entities_f` (
 `id` int NOT NULL AUTO_INCREMENT,
 `id_ruta` varchar(10) NOT NULL,
@@ -390,8 +327,6 @@ insert into entities_f (id_ruta, name, contact, phone_number, cellphone, is_acti
 insert into entities_f (id_ruta, name, contact, phone_number, cellphone, is_active) value ('400', 'St. George', 'Oficial de Cuenta', '507-0000', '6000-0000', true);
 
 
-
-DROP TABLE `type_documents`;
 CREATE TABLE `type_documents` (
   `id` int NOT NULL,
   `name` varchar(30) NOT NULL,
@@ -408,7 +343,6 @@ insert into type_documents (id, name, id_name, is_active) value (4, 'Recibo de s
 insert into type_documents (id, name, id_name, is_active) value (5, 'Carta de Trabajo', 'CARTA-TRABAJO', true);
 
 
-DROP TABLE `terms_loan`;
 CREATE TABLE `terms_loan` (
   `id` int NOT NULL,
   `name` varchar(30) NOT NULL,
@@ -422,17 +356,14 @@ insert into terms_loan (id, name, is_active) value (180, '180', true);
 insert into terms_loan (id, name, is_active) value (240, '240', true);
 insert into terms_loan (id, name, is_active) value (360, '360', true);
 
-select * from terms_loan;
 
-
-DROP TABLE `provinces`;
 CREATE TABLE `provinces` (
   `id` int NOT NULL,
   `name` varchar(30) NOT NULL,
   PRIMARY KEY (`id`)
 ) ;
 
-DROP TABLE `districts`;
+
 CREATE TABLE `districts` (
   `id` int NOT NULL,
   `idProv` int NOT NULL,
@@ -440,7 +371,7 @@ CREATE TABLE `districts` (
   PRIMARY KEY (`id`)
 ) ;
 
-DROP TABLE `counties`;
+
 CREATE TABLE `counties` (
   `id` int NOT NULL,
   `idProv` int NOT NULL,
@@ -451,7 +382,6 @@ CREATE TABLE `counties` (
 
 
 
-DROP TABLE `nationality`;
 CREATE TABLE `nationality` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(30) NOT NULL,
@@ -466,9 +396,19 @@ insert into nationality (name, is_active) value ('Colombiano', true);
 insert into nationality (name, is_active) value ('Monagrillero', true);
     
 
+CREATE TABLE `roles` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `role` varchar(10) NOT NULL,
+  `description` varchar(50) NOT NULL,
+  `dateCreated` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `dateUpdated` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  UNIQUE KEY `role_UNIQUE` (`role`),
+  PRIMARY KEY (`id`)
+);
 
+insert into roles (role, description) value ('Admin','Administrador del Sistema');
 
-DROP TABLE `users`;
+    
 CREATE TABLE `users` (
   `id`   int NOT NULL AUTO_INCREMENT,
   `id_role`   int NOT NULL,
@@ -495,16 +435,3 @@ insert into users (id_role,email,hash,entity_f,name,address,phoneNumber,cellPhon
 value (1,'guasimo01@gmail.com','$2a$10$SKNf4sjGXFmG1/q6Gt3vSuscXeNA0ujCKL0XtF8V7mD6xiqC.99h6',0,'Leonel Rodriguez','New York, 5h Av.','390-0000','6645-0000',false,true);
 
 
-DROP TABLE `roles`;
-CREATE TABLE `roles` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `role` varchar(10) NOT NULL,
-  `description` varchar(50) NOT NULL,
-  `dateCreated` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `dateUpdated` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  UNIQUE KEY `role_UNIQUE` (`role`),
-  PRIMARY KEY (`id`)
-);
-
-insert into roles (role, description) value ('Admin','Administrador del Sistema');
-select * from roles;

@@ -14,7 +14,7 @@ app.set('views', path.join(__dirname, 'views'))
 
 app.use(cors())
 app.use(express.static('build'))
-app.use('/public',express.static(__dirname + '/public'))
+app.use('/public', express.static(__dirname + '/public'))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(middleware.requestLogger)
