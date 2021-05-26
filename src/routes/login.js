@@ -73,7 +73,7 @@ loginRouter.get('/:email/:password',  (request, response) => {
          logger.error('Error Status:', 'Usuario Bloqueado.')
          return response.json({message: 'Usuario Bloqueado.  Llame al Administrador!', token: ''})
        }
-       const validPass = true //await bcrypt.compare(password, hash)
+       const validPass = await bcrypt.compare(password, hash)
        if(validPass){
          const userForToken = {
            username: name,
@@ -106,8 +106,7 @@ loginRouter.post('/token-verify', async (request, response) => {
     }
   } catch (error) {
     logger.error('Error Seguridad:', 'token missing or invalid')
-    response
-    .status(401).json({ error: 'token missing or invalid' })
+    response.status(401).json({ error: 'token missing or invalid' })
   }
 })
 
