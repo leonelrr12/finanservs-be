@@ -499,4 +499,28 @@ appRoutes.get('/sector_profesion', (request, response) => {
 })
 
 
+//**********************************************//
+//**********************************************//
+//** Extraccion de tasas para Financomer */
+//** 2021-08-04 LLRR */
+//**********************************************//
+//**********************************************//
+
+appRoutes.get('/subgrupo_institution', (request, response) => {
+  const sql = "SELECT id, name, tasa_mes_menor, tasa_mes_mayor, anios, plazo_maximo FROM subgrupo_inst"
+
+  config.cnn.query(sql, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      response.json(results)
+    } else {
+      response.send('Not results!')
+    }
+  })
+})
+
+
 module.exports = appRoutes

@@ -508,3 +508,23 @@ CREATE TABLE `roles` (
 
 insert into roles (role, description) value ('Admin','Administrador del Sistema');
 select * from roles;
+
+
+drop table subgrupo_inst;
+CREATE TABLE `subgrupo_inst` (
+  `id` int NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `tasa_mes_menos_5` decimal(5,2) NOT NULL,
+  `tasa_mes_mas_5` decimal(5,2) NOT NULL,
+  PRIMARY KEY (`id`)
+) ;
+
+insert into subgrupo_inst values (1, 'Sub Grupo 1', 1.6, 1.12);
+insert into subgrupo_inst values (2, 'Sub Grupo 2', 1.8, 1.3);
+
+
+select * from subgrupo_inst;
+
+
+
+
