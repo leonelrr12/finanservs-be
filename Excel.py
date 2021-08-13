@@ -77,12 +77,12 @@ def insert_lw(id, titulo, cnn):
             print("MySQL connection is closed")
 
 
-def insert_inst(id, name, cnn):
+def insert_inst(id, name, subgrupo, cnn):
     try:
         cursor = cnn.cursor()
-        mySql_insert_query = "INSERT INTO institutions (id,name) VALUES (%s,%s)"
+        mySql_insert_query = "INSERT INTO institutions (id,name,subgrupo) VALUES (%s,%s,%s)"
 
-        record = (id,name)
+        record = (id,name,subgrupo)
         cursor.execute(mySql_insert_query, record)
         # cnn.commit()
         # print("Record inserted!")
@@ -255,14 +255,14 @@ def inst():
     book = openpyxl.load_workbook(fichero, data_only=True)
     hoja = book.active
 
-    celdas = hoja['A3' : 'B27']
+    celdas = hoja['A3' : 'C70']
 
     cnn = fcnn()
 
     print("Instituciones ...")
     for fila in celdas:
         data = [celda.value for celda in fila]
-        insert_inst(data[0], data[1], cnn)
+        insert_inst(data[0], data[1], data[2], cnn)
 
     cnn.commit()
     if cnn.is_connected():
@@ -356,10 +356,10 @@ def corr():
 
 
 
-acp()
-lw()
+#acp()
+#lw()
 inst()
-plan()
-prov()
-dist()
-corr()
+#plan()
+#prov()
+#dist()
+#corr()
