@@ -119,14 +119,20 @@ appRoutes.post('/APC', (request, response) => {
       xmlns:xsd="http://www.w3.org/2001/XMLSchema">
       <soap:Body>
       <GetScore xmlns="https://www.apc.com.pa/Webservices">
-      <usuarioconsulta>${usuario}</usuarioconsulta>
-      <claveConsulta>${clave}</claveConsulta>
-      <IdentCliente>${cliente}</IdentCliente>
-      <TipoCliente>${tipo}</TipoCliente>
-      <Producto>${producto}</Producto>
+      <usuarioconsulta>gqLsRkqcLZ8WIKtb1fbNNZ6YictUK2EmdyS1mmcUSug=</usuarioconsulta>
+      <claveConsulta>VyOYMUfghtBURqELQID62jTc2rXfV4AKVMVWtqkM+o0=</claveConsulta>
+      <IdentCliente>UtKlvoo4Ol1+waKDs7KIyT4jtT7LqLe0igjWDs8SVzM=</IdentCliente>
+      <TipoCliente>ogwSP8hRHcW41Wy/wbfuNw==</TipoCliente>
+      <Producto>ogwSP8hRHcW41Wy/wbfuNw==</Producto>     
       </GetScore>
       </soap:Body>
       </soap:Envelope>`
+
+      // <usuarioconsulta>${usuario}</usuarioconsulta>
+      // <claveConsulta>${clave}</claveConsulta>
+      // <IdentCliente>${cliente}</IdentCliente>
+      // <TipoCliente>${tipo}</TipoCliente>
+      // <Producto>${producto}</Producto>
 
     let xmlhttp = new XMLHttpRequest()
     xmlhttp.open('post',"https://www.apc.com.pa/Webservices", true )
@@ -142,6 +148,9 @@ appRoutes.post('/APC', (request, response) => {
     console.log('Paso 4');
     // 4. Esto se llamará después de que la respuesta se reciba
     xmlhttp.onload = function() {
+      console.log('Paso 5');
+
+    // 4. Esto se llamará despué
       console.log('xmlhttp.status',xmlhttp.status);
       if (xmlhttp.status != 200) { // analiza el estado HTTP de la respuesta
         console.log(`Error ${xmlhttp.status}: ${xmlhttp.statusText}`); // ej. 404: No encontrado
