@@ -23,10 +23,11 @@ namespace GetScoreAPC
 
         protected void UsingXMLDocument()
         {
-
-            string usuarioconsulta = APCEncrypt.ScorePlusEncrypt.EncryptString("uprueba001");
-            string claveConsulta = APCEncrypt.ScorePlusEncrypt.EncryptString("password01*");
+            //0-509-1938 y 0-509-1939
+            string usuarioconsulta = APCEncrypt.ScorePlusEncrypt.EncryptString("WSACSORAT001");
+            string claveConsulta = APCEncrypt.ScorePlusEncrypt.EncryptString("Rqh&s7E&jN");
             string IdentCliente = APCEncrypt.ScorePlusEncrypt.EncryptString("0-509-1938");
+            //string IdentCliente = APCEncrypt.ScorePlusEncrypt.EncryptString("0-509-1939");
             string TipoCliente = APCEncrypt.ScorePlusEncrypt.EncryptString("1");
             string Producto = APCEncrypt.ScorePlusEncrypt.EncryptString("1");
 
@@ -34,218 +35,258 @@ namespace GetScoreAPC
             ServiceReferenceAPC.apcscoreSoapClient ws = new ServiceReferenceAPC.apcscoreSoapClient();
             string ServiceResult = ws.ApcScore(usuarioconsulta, claveConsulta, IdentCliente, TipoCliente, Producto);
 
+            //ServiceReferenceRealAPC.classicScorePlusServiceSoapClient ws = new ServiceReferenceRealAPC.classicScorePlusServiceSoapClient();
+            //string ServiceResult = ws.GetScore(usuarioconsulta, claveConsulta, IdentCliente, TipoCliente, Producto);
 
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.LoadXml(ServiceResult);
-   
-            foreach (XmlNode xmlNode in xmlDoc.DocumentElement.ChildNodes[0].ChildNodes)
+
+         
+            XmlNodeList ItemNodes = xmlDoc.SelectNodes("//Resultado");
+
+            // Validacion
+            foreach (XmlNode ItemNode in ItemNodes)
             {
-                foreach (XmlNode xmlNode2 in xmlNode.ChildNodes)
+                //TextBox1.Text = ItemNode.Name + " " + ItemNode.InnerXml;
+                foreach (XmlNode Item in ItemNode.SelectSingleNode("Validacion"))
                 {
-                    foreach (XmlNode xmlNode3 in xmlNode2.ChildNodes[0].ChildNodes)
-                    {
-
-                        // Validacion
-                        if (xmlNode3.Name == "Validacion")
-                        {
-                            foreach (XmlNode xmlNode4 in xmlNode3.ChildNodes)
-                            {
-                                TextBox1.Text += "\n->> " + xmlNode4.Name;
-                                foreach (XmlNode xmlNode5 in xmlNode4.ChildNodes)
-                                {
-                                    if (xmlNode5.InnerText.Length > 0)
-                                        TextBox1.Text += "\n" + xmlNode5.Name + ": " + xmlNode5.InnerText;
-                                    else
-                                        TextBox1.Text += "\n" + xmlNode5.Name + ": ";
-                                }
-                            }
-                        }
-
-
-                        // Estatus
-                        if (xmlNode3.Name == "Estatus")
-                        {
-                            foreach (XmlNode xmlNode4 in xmlNode3.ChildNodes)
-                            {
-                                TextBox1.Text += "\n->> " + xmlNode4.Name;
-                                foreach (XmlNode xmlNode5 in xmlNode4.ChildNodes)
-                                {
-                                    if (xmlNode5.InnerText.Length > 0)
-                                        TextBox1.Text += "\n" + xmlNode5.Name + ": " + xmlNode5.InnerText;
-                                    else
-                                        TextBox1.Text += "\n" + xmlNode5.Name + ": ";
-                                }
-                            }
-                        }
-
-                        // Generales
-                        if (xmlNode3.Name == "Generales")
-                        {
-                            foreach (XmlNode xmlNode4 in xmlNode3.ChildNodes)
-                            {
-                                TextBox1.Text += "\n->> " + xmlNode4.Name;
-                                foreach (XmlNode xmlNode5 in xmlNode4.ChildNodes)
-                                {
-                                    if (xmlNode5.InnerText.Length > 0)
-                                        TextBox1.Text += "\n" + xmlNode5.Name + ": " + APCEncrypt.ScorePlusEncrypt.DecryptString(xmlNode5.InnerText);
-                                    else
-                                        TextBox1.Text += "\n" + xmlNode5.Name + ": ";
-                                }
-                            }
-                        }
-
-                        // Resumen
-                        if (xmlNode3.Name == "Resumen")
-                        {
-                            foreach (XmlNode xmlNode4 in xmlNode3.ChildNodes)
-                            {
-                                TextBox1.Text += "\n->> " + xmlNode4.Name;
-                                foreach (XmlNode xmlNode5 in xmlNode4.ChildNodes)
-                                {
-                                    if (xmlNode5.InnerText.Length > 0)
-                                        TextBox1.Text += "\n" + xmlNode5.Name + ": " + APCEncrypt.ScorePlusEncrypt.DecryptString(xmlNode5.InnerText);
-                                    else
-                                        TextBox1.Text += "\n" + xmlNode5.Name + ": ";
-                                }
-                            }
-                        }
-
-                        // Detalle
-                        if (xmlNode3.Name == "Detalle")
-                        {
-                            foreach (XmlNode xmlNode4 in xmlNode3.ChildNodes)
-                            {
-                                TextBox1.Text += "\n->> " + xmlNode4.Name;
-                                foreach (XmlNode xmlNode5 in xmlNode4.ChildNodes)
-                                {
-                                    if (xmlNode5.InnerText.Length > 0)
-                                        TextBox1.Text += "\n" + xmlNode5.Name + ": " + APCEncrypt.ScorePlusEncrypt.DecryptString(xmlNode5.InnerText);
-                                    else
-                                        TextBox1.Text += "\n" + xmlNode5.Name + ": ";
-                                }
-                            }
-                        }
-
-                        // ReferenciasCanceladas
-                        if (xmlNode3.Name == "ReferenciasCanceladas")
-                        {
-                            foreach (XmlNode xmlNode4 in xmlNode3.ChildNodes)
-                            {
-                                TextBox1.Text += "\n->> " + xmlNode4.Name;
-                                foreach (XmlNode xmlNode5 in xmlNode4.ChildNodes)
-                                {
-                                    if(xmlNode5.InnerText.Length > 0)
-                                        TextBox1.Text += "\n" + xmlNode5.Name + ": " + APCEncrypt.ScorePlusEncrypt.DecryptString(xmlNode5.InnerText);
-                                    else
-                                        TextBox1.Text += "\n" + xmlNode5.Name + ": ";
-                                }
-                            }
-                        }
-
-                        // Movimientos
-                        if (xmlNode3.Name == "Movimientos")
-                        {
-                            foreach (XmlNode xmlNode4 in xmlNode3.ChildNodes)
-                            {
-                                TextBox1.Text += "\n->> " + xmlNode4.Name;
-                                foreach (XmlNode xmlNode5 in xmlNode4.ChildNodes)
-                                {
-                                    if (xmlNode5.InnerText.Length > 0)
-                                        TextBox1.Text += "\n" + xmlNode5.Name + ": " + APCEncrypt.ScorePlusEncrypt.DecryptString(xmlNode5.InnerText);
-                                    else
-                                        TextBox1.Text += "\n" + xmlNode5.Name + ": ";
-                                }
-                            }
-                        }
-
-                        // Score
-                        if (xmlNode3.Name == "Score")
-                        {
-                            foreach (XmlNode xmlNode4 in xmlNode3.ChildNodes)
-                            {
-                                TextBox1.Text += "\n->> " + xmlNode4.Name;
-                                foreach (XmlNode xmlNode5 in xmlNode4.ChildNodes)
-                                {
-                                    if (xmlNode5.InnerText.Length > 0)
-                                        TextBox1.Text += "\n" + xmlNode5.Name + ": " + APCEncrypt.ScorePlusEncrypt.DecryptString(xmlNode5.InnerText);
-                                    else
-                                        TextBox1.Text += "\n" + xmlNode5.Name + ": ";
-                                }
-                            }
-                        }
-                    }
+                    TextBox1.Text += "\n" + Item.Name + ": " + Item.InnerText;
                 }
-                
             }
 
-            
+            // Estatus
+            foreach (XmlNode ItemNode in ItemNodes)
+            {
+                //TextBox1.Text = ItemNode.Name + " " + ItemNode.InnerXml;
+                foreach (XmlNode Item in ItemNode.SelectSingleNode("Estatus"))
+                {
+                    TextBox1.Text += "\n" + Item.ParentNode.Name + ": " + Item.InnerText;
+                }
+            }
 
-            //XmlNodeList ItemNodes = xmlDoc.SelectNodes("//Resultado");
-            
-            //// Validacion
-            //foreach (XmlNode ItemNode in ItemNodes)
-            //{
-            //    //TextBox1.Text = ItemNode.Name + " " + ItemNode.InnerXml;
-            //    foreach (XmlNode Item in ItemNode.SelectSingleNode("Validacion"))
-            //    {
-            //        TextBox1.Text += "\n" + Item.Name + ": " + Item.InnerText;
-            //    }
-            //}
+            // Generales
+            foreach (XmlNode ItemNode in ItemNodes)
+            {
+                //TextBox1.Text = ItemNode.Name + " " + ItemNode.InnerXml;
+                foreach (XmlNode Item in ItemNode.SelectSingleNode("Generales"))
+                {
+                    TextBox1.Text += "\n\n" + Item.Name;
+                    foreach (XmlNode Item2 in Item)
+                    {
+                        if (Item2.InnerText.Length > 0)
+                            TextBox1.Text += "\n\t" + Item2.Name + ": " + APCEncrypt.ScorePlusEncrypt.DecryptString(Item2.InnerText);
+                        else
+                            TextBox1.Text += "\n\t" + Item2.Name + ": ";
+                    }
+                }
+            }
 
-            //// Estatus
-            //foreach (XmlNode ItemNode in ItemNodes)
-            //{
-            //    //TextBox1.Text = ItemNode.Name + " " + ItemNode.InnerXml;
-            //    foreach (XmlNode Item in ItemNode.SelectSingleNode("Estatus"))
-            //    {
-            //        TextBox1.Text += "\n" + Item.ParentNode.Name + ": " + Item.InnerText;
-            //    }
-            //}
+            // Resumen
+            foreach (XmlNode ItemNode in ItemNodes)
+            {
+                //TextBox1.Text = ItemNode.Name + " " + ItemNode.InnerXml;
+                foreach (XmlNode Item in ItemNode.SelectSingleNode("Resumen"))
+                {
+                    TextBox1.Text += "\n\n" + Item.Name;
+                    foreach (XmlNode Item2 in Item)
+                    {
+                        TextBox1.Text += "\n\t" + Item2.Name + ": " + APCEncrypt.ScorePlusEncrypt.DecryptString(Item2.InnerText);
+                    }
+                }
+            }
 
-            //// Generales
-            //foreach (XmlNode ItemNode in ItemNodes)
+            // Detalle
+            foreach (XmlNode ItemNode in ItemNodes)
+            {
+                //TextBox1.Text = ItemNode.Name + " " + ItemNode.InnerXml;
+                foreach (XmlNode Item in ItemNode.SelectSingleNode("Detalle"))
+                {
+                    TextBox1.Text += "\n\n" + Item.Name;
+                    foreach (XmlNode Item2 in Item)
+                    {
+                        if (Item2.InnerText.Length > 0)
+                            TextBox1.Text += "\n\t" + Item2.Name + ": " + APCEncrypt.ScorePlusEncrypt.DecryptString(Item2.InnerText);
+                        else
+                            TextBox1.Text += "\n\t" + Item2.Name + ": ";
+                    }
+                }
+            }
+
+            // ReferenciasCanceladas
+            foreach (XmlNode ItemNode in ItemNodes)
+            {
+                //TextBox1.Text = ItemNode.Name + " " + ItemNode.InnerXml;
+                foreach (XmlNode Item in ItemNode.SelectSingleNode("ReferenciasCanceladas"))
+                {
+                    TextBox1.Text += "\n\n" + Item.Name;
+                    foreach (XmlNode Item2 in Item)
+                    {
+                        if (Item2.InnerText.Length > 0)
+                            TextBox1.Text += "\n\t" + Item2.Name + ": " + APCEncrypt.ScorePlusEncrypt.DecryptString(Item2.InnerText);
+                        else
+                            TextBox1.Text += "\n\t" + Item2.Name + ": ";
+                    }
+                }
+            }
+
+
+            // Movimientos
+            foreach (XmlNode ItemNode in ItemNodes)
+            {
+                //TextBox1.Text = ItemNode.Name + " " + ItemNode.InnerXml;
+                foreach (XmlNode Item in ItemNode.SelectSingleNode("Movimientos"))
+                {
+                    TextBox1.Text += "\n\n" + Item.Name;
+                    foreach (XmlNode Item2 in Item)
+                    {
+                        TextBox1.Text += "\n\t" + Item2.Name + ": " + APCEncrypt.ScorePlusEncrypt.DecryptString(Item2.InnerText);
+                    }
+                }
+            }
+
+            // Score
+            foreach (XmlNode ItemNode in ItemNodes)
+            {
+                //TextBox1.Text = ItemNode.Name + " " + ItemNode.InnerXml;
+                foreach (XmlNode Item in ItemNode.SelectSingleNode("Score"))
+                {
+                    TextBox1.Text += "\n\n" + Item.Name;
+                    foreach (XmlNode Item2 in Item)
+                    {
+                        TextBox1.Text += "\n\t" + Item2.Name + ": " + APCEncrypt.ScorePlusEncrypt.DecryptString(Item2.InnerText);
+                    }
+                }
+            }
+
+
+
+            //foreach (XmlNode xmlNode in xmlDoc.DocumentElement.ChildNodes[0].ChildNodes)
             //{
-            //    //TextBox1.Text = ItemNode.Name + " " + ItemNode.InnerXml;
-            //    foreach (XmlNode Item in ItemNode.SelectSingleNode("Generales"))
+            //    foreach (XmlNode xmlNode2 in xmlNode.ChildNodes)
             //    {
-            //        TextBox1.Text += "\n\n" + Item.Name;
-            //        foreach (XmlNode Item2 in Item)
+            //        foreach (XmlNode xmlNode3 in xmlNode2.ChildNodes[0].ChildNodes)
             //        {
-            //            if (Item2.InnerText.Length > 0)
-            //                TextBox1.Text += "\n" + Item2.Name + ": " + APCEncrypt.ScorePlusEncrypt.DecryptString(Item2.InnerText);
-            //            else
-            //                TextBox1.Text += "\n" + Item2.Name + ": ";
+            //            // Validacion
+            //            if (xmlNode3.Name == "Validacion")
+            //            {
+            //                foreach (XmlNode xmlNode4 in xmlNode3.ChildNodes)
+            //                {
+            //                    TextBox1.Text += "\n->> " + xmlNode4.ParentNode.Name;
+            //                    TextBox1.Text += "\n\t" + xmlNode4.InnerText;
+            //                }
+            //            }
+
+
+            //            // Estatus
+            //            if (xmlNode3.Name == "Estatus")
+            //            {
+            //                foreach (XmlNode xmlNode4 in xmlNode3.ChildNodes)
+            //                {
+            //                    TextBox1.Text += "\n->> " + xmlNode4.ParentNode.Name;
+            //                    TextBox1.Text += "\n\t" + xmlNode4.InnerText;
+            //                }
+            //            }
+
+            //            // Generales
+            //            if (xmlNode3.Name == "Generales")
+            //            {
+            //                foreach (XmlNode xmlNode4 in xmlNode3.ChildNodes)
+            //                {
+            //                    TextBox1.Text += "\n->> " + xmlNode4.Name;
+            //                    foreach (XmlNode xmlNode5 in xmlNode4.ChildNodes)
+            //                    {
+            //                        if (xmlNode5.InnerText.Length > 0)
+            //                            TextBox1.Text += "\n\t" + xmlNode5.Name + ": " + APCEncrypt.ScorePlusEncrypt.DecryptString(xmlNode5.InnerText);
+            //                        else
+            //                            TextBox1.Text += "\n\t" + xmlNode5.Name + ": ";
+            //                    }
+            //                }
+            //            }
+
+            //            // Resumen
+            //            if (xmlNode3.Name == "Resumen")
+            //            {
+            //                foreach (XmlNode xmlNode4 in xmlNode3.ChildNodes)
+            //                {
+            //                    TextBox1.Text += "\n->> " + xmlNode4.Name;
+            //                    foreach (XmlNode xmlNode5 in xmlNode4.ChildNodes)
+            //                    {
+            //                        if (xmlNode5.InnerText.Length > 0)
+            //                            TextBox1.Text += "\n\t" + xmlNode5.Name + ": " + APCEncrypt.ScorePlusEncrypt.DecryptString(xmlNode5.InnerText);
+            //                        else
+            //                            TextBox1.Text += "\n\t" + xmlNode5.Name + ": ";
+            //                    }
+            //                }
+            //            }
+
+            //            // Detalle
+            //            if (xmlNode3.Name == "Detalle")
+            //            {
+            //                foreach (XmlNode xmlNode4 in xmlNode3.ChildNodes)
+            //                {
+            //                    TextBox1.Text += "\n->> " + xmlNode4.Name;
+            //                    foreach (XmlNode xmlNode5 in xmlNode4.ChildNodes)
+            //                    {
+            //                        if (xmlNode5.InnerText.Length > 0)
+            //                            TextBox1.Text += "\n\t" + xmlNode5.Name + ": " + APCEncrypt.ScorePlusEncrypt.DecryptString(xmlNode5.InnerText);
+            //                        else
+            //                            TextBox1.Text += "\n\t" + xmlNode5.Name + ": ";
+            //                    }
+            //                }
+            //            }
+
+            //            // ReferenciasCanceladas
+            //            if (xmlNode3.Name == "ReferenciasCanceladas")
+            //            {
+            //                foreach (XmlNode xmlNode4 in xmlNode3.ChildNodes)
+            //                {
+            //                    TextBox1.Text += "\n->> " + xmlNode4.Name;
+            //                    foreach (XmlNode xmlNode5 in xmlNode4.ChildNodes)
+            //                    {
+            //                        if (xmlNode5.InnerText.Length > 0)
+            //                            TextBox1.Text += "\n\t" + xmlNode5.Name + ": " + APCEncrypt.ScorePlusEncrypt.DecryptString(xmlNode5.InnerText);
+            //                        else
+            //                            TextBox1.Text += "\n\t" + xmlNode5.Name + ": ";
+            //                    }
+            //                }
+            //            }
+
+            //            // Movimientos
+            //            if (xmlNode3.Name == "Movimientos")
+            //            {
+            //                foreach (XmlNode xmlNode4 in xmlNode3.ChildNodes)
+            //                {
+            //                    TextBox1.Text += "\n->> " + xmlNode4.Name;
+            //                    foreach (XmlNode xmlNode5 in xmlNode4.ChildNodes)
+            //                    {
+            //                        if (xmlNode5.InnerText.Length > 0)
+            //                            TextBox1.Text += "\n\t" + xmlNode5.Name + ": " + APCEncrypt.ScorePlusEncrypt.DecryptString(xmlNode5.InnerText);
+            //                        else
+            //                            TextBox1.Text += "\n\t" + xmlNode5.Name + ": ";
+            //                    }
+            //                }
+            //            }
+
+            //            // Score
+            //            if (xmlNode3.Name == "Score")
+            //            {
+            //                foreach (XmlNode xmlNode4 in xmlNode3.ChildNodes)
+            //                {
+            //                    TextBox1.Text += "\n->> " + xmlNode4.Name;
+            //                    foreach (XmlNode xmlNode5 in xmlNode4.ChildNodes)
+            //                    {
+            //                        if (xmlNode5.InnerText.Length > 0)
+            //                            TextBox1.Text += "\n\t" + xmlNode5.Name + ": " + APCEncrypt.ScorePlusEncrypt.DecryptString(xmlNode5.InnerText);
+            //                        else
+            //                            TextBox1.Text += "\n\t" + xmlNode5.Name + ": ";
+            //                    }
+            //                }
+            //            }
             //        }
             //    }
+
             //}
 
-            //// Resumen
-            //foreach (XmlNode ItemNode in ItemNodes)
-            //{
-            //    //TextBox1.Text = ItemNode.Name + " " + ItemNode.InnerXml;
-            //    foreach (XmlNode Item in ItemNode.SelectSingleNode("Resumen"))
-            //    {
-            //        TextBox1.Text += "\n\n" + Item.Name;
-            //        foreach (XmlNode Item2 in Item)
-            //        {
-            //            TextBox1.Text += "\n" + Item2.Name + ": " + APCEncrypt.ScorePlusEncrypt.DecryptString(Item2.InnerText);
-            //        }
-            //    }
-            //}
-
-            //// Score
-            //foreach (XmlNode ItemNode in ItemNodes)
-            //{
-            //    //TextBox1.Text = ItemNode.Name + " " + ItemNode.InnerXml;
-            //    foreach (XmlNode Item in ItemNode.SelectSingleNode("Score"))
-            //    {
-            //        TextBox1.Text += "\n\n" + Item.Name;
-            //        foreach (XmlNode Item2 in Item)
-            //        {
-            //            TextBox1.Text += "\n" + Item2.Name + ": " + APCEncrypt.ScorePlusEncrypt.DecryptString(Item2.InnerText);
-            //        }
-            //    }
-            //}
 
         }
     }
