@@ -9,10 +9,10 @@ const s3 = new aws.S3({
   secretAccessKey: AWS_Secret_access_key
 })
 
-const uploadFile = (file, entity_f, nameImage) => {
+const uploadFile = (file, entity_f, nameImage, id) => {
   const fileStream = fs.createReadStream(file.path)
   const uploadParams = {
-    Bucket: AWS_BUCKET_NAME + "/" + entity_f + "/" + nameImage,
+    Bucket: AWS_BUCKET_NAME + "/" + entity_f + "/" + nameImage + "/" + id,
     Body: fileStream,
     Key: file.filename
   }

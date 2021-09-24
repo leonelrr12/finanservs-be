@@ -15,12 +15,12 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage })
 
 fileRoutes.post('/file', upload.single('idUrl'), async (req, res) => {
-  const { bucket, entity_f, nameImage } = req.body
+  const { entity_f, nameImage, prospect } = req.body
   //console.log(req)
   console.log(entity_f, nameImage)
   const file = req.file
   //console.log(file)
-  const result = await uploadFile(file, entity_f, nameImage)
+  const result = await uploadFile(file, entity_f, nameImage, prospect)
   console.log(result)
   try {
     fs.unlinkSync(file.path)
