@@ -1,31 +1,24 @@
 const aws = require("aws-sdk");
-const multer = require("multer");
-const multerS3 = require("multer-s3");
+const fs = require('fs')
 
-const { S3_ENDPOINT, BUCKET_NAME } = process.env
-
-const spacesEnpoint = new aws.Endpoint(S3_ENDPOINT)
+const { AWS_Access_key_ID, AWS_Secret_access_key, AWS_BUCKET_NAME, AWS_REGION } = process.env
 
 const s3 = new aws.S3({
-  endpoint: spacesEnpoint
+  region: AWS_REGION,
+  accessKeyId: AWS_Access_key_ID,
+  secretAccessKey: AWS_Secret_access_key
 })
 
-const upload = multer({
-  storage: multerS3({
-    s3,
-    bucket: BUCKET_NAME,
-    acl: 'public-read',
-    metadata: (req, file, cb) => {
-      cb(null, {
-        fieldname: file.fieldname
-      })
-    },
-    key: (req, file, cb) => {
-      // console.log(file)
-      cb(null, file.originalname)
-    }
-  })
-}).single('idUrl')
+const uploadFile = (file, entity_f, nameImage) => {
+  const fileStream = fs.createReadStream(file.path)
+  const uploadParams = {
+    Bucket: AWS_BUCKET_NAME + "/" + entity_f + "/" + nameImage,
+    Body: fileStream,
+    Key: file.filename
+  }
+  debugger
+  //console.log(uploadParams)
+  return s3.upload(uploadParams).promise()
+}
 
-
-module.exports = { upload, s3 }
+module.exports = { uploadFile, s3 }
