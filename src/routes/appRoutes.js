@@ -21,21 +21,12 @@ appRoutes.get('/today-is', (request, response) => {
   response.json({ hoyes: dt2 })
 })
 
-
-appRoutes.get('/APC-PRUEBA', (request, response) => {
-  // response.json(America())
-  // response.json(Beny())
-  // response.json(Joann())
-  response.json(Maribet())
-  // response.json(Milagros())
-})
-
-
 appRoutes.get('/APC', (request, response) => {
-  
-  const URL = "https://apirestapc20210918231653.azurewebsites.net/api/APCScore"
+  // debugger
+  console.log('MMMMMMMMMMM',request)
+  const URL = "https://apirestapc20210918231653.azurewebsites.net/api/APCScore/12"
 
-  axios.get(URL)
+  axios.get(URL,{usuarioApc, claveApc, "cliente": id, tipoCliente, productoApc})
   .then((res) => {
       //console.log(res.data)
       const result = res.data
@@ -72,9 +63,42 @@ appRoutes.get('/APC', (request, response) => {
 
 appRoutes.post('/APC', (request, response) => {
 
-  const { usuario, clave, cliente, tipo, producto } = request.body
-  
+  const { usuarioApc, claveApc, id, tipoCliente, productoApc } = request.body
 
+  console.log('MMMMMMMMMMM',request)
+  const URL = "https://apirestapc20210918231653.azurewebsites.net/api/APCScore/12"
+
+  axios.post(URL,{usuarioApc, claveApc, "cliente": id, tipoCliente, productoApc})
+  .then((res) => {
+      console.log(res.data)
+      // const result = res.data
+      // const SCORE = result["SC"]["SCORE"]
+      // const PI = result["SC"]["PI"]
+      // const EXCLUSION = result["SC"]["EXCLUSION"]
+      // console.log(SCORE,PI,EXCLUSION)
+
+      const dato = [{"Ok": "TODO BIEN"}]
+      // Object.entries(result["DET"]).forEach(([key, value]) => {
+      //   if(value !== null) {
+      //     value.SCORE = SCORE
+      //     value.PI = PI
+      //     value.EXCLUSION = EXCLUSION
+      //     delete value['MONTO_CODIFICADO']
+      //     delete value['COD_GRUPO_ECON']
+      //     delete value['TIPO_ASOC']
+      //     delete value['MONTO_CODIFICADO']
+      //     delete value['FEC_INICIO_REL']
+      //     delete value['FEC_FIN_REL']
+      //     delete value['FEC_ACTUALIZACION']
+      //     dato.push(value)
+      //   }
+      // });
+      
+      //console.log(dato)
+      response.json(dato)
+  }).catch((error) => {
+      console.log(error)
+  });
 })
 
 
@@ -197,6 +221,12 @@ appRoutes.get('/laboral_sector_entity_f', (request, response) => {
   sql += " plazo_max,"
   sql += " tasa,"
   sql += " comision,"
+  sql += " salario_min,"
+  sql += " tasa_servicio,"
+  sql += " seg_vida,"
+  sql += " feci,"
+  sql += " itbms,"
+  sql += " notaria,"
   sql += " mount_min,"
   sql += " mount_max"
   sql += " from entity_params a"
