@@ -1,7 +1,6 @@
 {
   "files": {
     "main.css": "/static/css/main.6b86c434.chunk.css",
-<<<<<<< HEAD
     "main.js": "/static/js/main.75308a22.chunk.js",
     "main.js.map": "/static/js/main.75308a22.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.9f94ff00.js",
@@ -13,19 +12,6 @@
     "service-worker.js": "/service-worker.js",
     "static/css/main.6b86c434.chunk.css.map": "/static/css/main.6b86c434.chunk.css.map",
     "static/js/2.bdd20f30.chunk.js.LICENSE.txt": "/static/js/2.bdd20f30.chunk.js.LICENSE.txt",
-=======
-    "main.js": "/static/js/main.7153ba9b.chunk.js",
-    "main.js.map": "/static/js/main.7153ba9b.chunk.js.map",
-    "runtime-main.js": "/static/js/runtime-main.9f94ff00.js",
-    "runtime-main.js.map": "/static/js/runtime-main.9f94ff00.js.map",
-    "static/js/2.1032fa37.chunk.js": "/static/js/2.1032fa37.chunk.js",
-    "static/js/2.1032fa37.chunk.js.map": "/static/js/2.1032fa37.chunk.js.map",
-    "index.html": "/index.html",
-    "precache-manifest.66a81fe299b67077045a583126df760c.js": "/precache-manifest.66a81fe299b67077045a583126df760c.js",
-    "service-worker.js": "/service-worker.js",
-    "static/css/main.6b86c434.chunk.css.map": "/static/css/main.6b86c434.chunk.css.map",
-    "static/js/2.1032fa37.chunk.js.LICENSE.txt": "/static/js/2.1032fa37.chunk.js.LICENSE.txt",
->>>>>>> eb80824db82c572bfb7915cd37dc1dc9e5991c97
     "static/media/global-bank-logo-desaturated.png": "/static/media/global-bank-logo-desaturated.60c32fb1.png",
     "static/media/global-bank-logo.png": "/static/media/global-bank-logo.631abb1f.png",
     "static/media/home-step-1.png": "/static/media/home-step-1.62b21fac.png",
@@ -42,14 +28,8 @@
   },
   "entrypoints": [
     "static/js/runtime-main.9f94ff00.js",
-<<<<<<< HEAD
     "static/js/2.bdd20f30.chunk.js",
     "static/css/main.6b86c434.chunk.css",
     "static/js/main.75308a22.chunk.js"
-=======
-    "static/js/2.1032fa37.chunk.js",
-    "static/css/main.6b86c434.chunk.css",
-    "static/js/main.7153ba9b.chunk.js"
->>>>>>> eb80824db82c572bfb7915cd37dc1dc9e5991c97
   ]
 }
