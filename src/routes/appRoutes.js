@@ -31,8 +31,8 @@ appRoutes.post('/APC', (request, response) => {
 
   const { usuarioApc, claveApc, id, tipoCliente, productoApc } = request.body
 
-  // const URL = "https://apirestapc20210918231653.azurewebsites.net/api/APCScore"
-  const URL = "http://localhost:5000/api/APCScore"
+  const URL = "https://apirestapc20210918231653.azurewebsites.net/api/APCScore"
+  // const URL = "http://localhost:5000/api/APCScore"
 
   axios.post(URL,{"usuarioconsulta": usuarioApc, "claveConsulta": claveApc, "IdentCliente": id, "TipoCliente": tipoCliente, "Producto": productoApc})
   .then((res) => {
