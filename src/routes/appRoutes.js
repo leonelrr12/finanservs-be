@@ -17,6 +17,7 @@ appRoutes.get('/today-is', (request, response) => {
 })
 
 
+<<<<<<< HEAD
 appRoutes.post('/tracking', async (req, res) => {
   const {tracking, jobSector,  occupation} = req.body
   console.log(req.body)
@@ -27,12 +28,19 @@ appRoutes.post('/tracking', async (req, res) => {
 })
 
 
+=======
+>>>>>>> eb80824db82c572bfb7915cd37dc1dc9e5991c97
 appRoutes.post('/APC', (request, response) => {
 
   const { usuarioApc, claveApc, id, tipoCliente, productoApc } = request.body
 
+<<<<<<< HEAD
   // const URL = "https://apirestapc20210918231653.azurewebsites.net/api/APCScore"
   const URL = "http://localhost:5000/api/APCScore"
+=======
+  const URL = "https://apirestapc20210918231653.azurewebsites.net/api/APCScore"
+  // const URL = "http://localhost:31657/api/APCScore"
+>>>>>>> eb80824db82c572bfb7915cd37dc1dc9e5991c97
 
   axios.post(URL,{"usuarioconsulta": usuarioApc, "claveConsulta": claveApc, "IdentCliente": id, "TipoCliente": tipoCliente, "Producto": productoApc})
   .then((res) => {
