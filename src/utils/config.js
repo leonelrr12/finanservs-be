@@ -1,10 +1,19 @@
 require('dotenv').config()
+const mongoose = require('mongoose')
 const mysql = require('mysql2')
 
 const PORT = process.env.PORT || 3001
 const HOST = process.env.HOST
 const AWS_Access_key_ID = process.env.AWS_Access_key_ID
 const AWS_Secret_access_key = process.env.AWS_Secret_access_key
+
+const MDB_HOST = process.env.MDB_HOST
+const MDB_DATABASE = process.env.MDB_DATABASE
+const MDB_USER = process.env.MDB_USER
+const MDB_PWD = process.env.MDB_PWD
+const MDB_PORT = process.env.MDB_PORT
+const MDB_PROTOCOL = process.env.MDB_PROTOCOL
+
 
 // MySql DIgital Ocean-2
 const cnn = mysql.createConnection({
@@ -15,37 +24,26 @@ const cnn = mysql.createConnection({
     port: process.env.PORTDB
 })
 
-// // MySql DIgital Ocean
-// const cnn = mysql.createConnection({
-//     host: process.env.DB_HOST,
-//     database: process.env.DATABASE,
-//     user: process.env.DB_USER,
-//     password: process.env.DB_PWD
-// })
 
-// // MySql de James - IS
-// const cnn = mysql.createConnection({
-//     host: '69.10.63.218',
-//     database: 'finanservs',
-//     user: 'AdminFinanservs',
-//     password: '0t_pYv70'
-// })
+// MongoDB DIgital Ocean-2
+// mongoose.connect(
+//   `mongodb+srv://${MDB_USER}:${MDB_PWD}@db-mongodb-nyc3-97071-024615bf.mongo.ondigitalocean.com/${MDB_DATABASE}?authSource=${MDB_DATABASE}?&replicaSet=db-mongodb-nyc3-97071`
+// ).then(db => console.log("MongoDB is Online!"))
+// .catch(e => console.log("Error: ", e.message))
 
-// // MySql -->  Dockert
-// const cnn = mysql.createConnection({
-//   host:'localhost',
-//   database:'finanservs',
-//   user:'rsanchez',
-//   password:'cafekotowa'
-// })
+const strCnnMDB = {
+  MONGODB_URI: `mongodb+srv://${MDB_USER}:${MDB_PWD}@db-mongodb-nyc3-97071-024615bf.mongo.ondigitalocean.com/${MDB_DATABASE}?authSource=${MDB_DATABASE}?&replicaSet=db-mongodb-nyc3-97071`
+}
 
-// // MySql clever-cloud.com
-// const cnn = mysql.createConnection({
-//   host:'bjxexd6ulauq7ap6pqxv-mysql.services.clever-cloud.com',
-//   database:'bjxexd6ulauq7ap6pqxv',
-//   user:'usch2d6auluhu2pz',
-//   password:'2mO43d7a0ih8POFWvyBL'
-// })
+let cnnMDB = undefined
+// try {
+//     cnnMDB = mongoose.connect(strCnnMDB.MONGODB_URI, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true
+//   })
+//   console.log("Mongodb is connected to", MDB_HOST)
+// }
+// catch {e => console.log({"Error": e.message})}
 
 
 // Check connection
@@ -60,5 +58,6 @@ module.exports = {
   AWS_Secret_access_key,
   PORT,
   HOST,
-  cnn
+  cnn,
+  cnnMDB
 }

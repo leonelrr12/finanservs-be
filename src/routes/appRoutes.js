@@ -1,14 +1,9 @@
 const appRoutes = require('express').Router()
 const axios = require('axios')
+const Prospect = require('../models/Prospect')
 
 const config = require('../utils/config')
-const America = require('../data/America')
-const Beny = require('../data/Beny')
-const Joann = require('../data/Joann')
-const Maribet = require('../data/Maribet')
-const Milagros = require('../data/Milagros')
 const { json } = require('express')
-
 
 
 appRoutes.get('/', (request, response) => {
@@ -21,43 +16,14 @@ appRoutes.get('/today-is', (request, response) => {
   response.json({ hoyes: dt2 })
 })
 
-appRoutes.get('/APC', (request, response) => {
-  // debugger
-  console.log('MMMMMMMMMMM',request)
-  const URL = "https://apirestapc20210918231653.azurewebsites.net/api/APCScore/12"
 
-  axios.get(URL,{usuarioApc, claveApc, "cliente": id, tipoCliente, productoApc})
-  .then((res) => {
-      //console.log(res.data)
-      const result = res.data
-      const SCORE = result["SC"]["SCORE"]
-      const PI = result["SC"]["PI"]
-      const EXCLUSION = result["SC"]["EXCLUSION"]
-      console.log(SCORE,PI,EXCLUSION)
-
-      const dato = []
-      Object.entries(result["DET"]).forEach(([key, value]) => {
-        if(value !== null) {
-          value.SCORE = SCORE
-          value.PI = PI
-          value.EXCLUSION = EXCLUSION
-          delete value['MONTO_CODIFICADO']
-          delete value['COD_GRUPO_ECON']
-          delete value['TIPO_ASOC']
-          delete value['MONTO_CODIFICADO']
-          delete value['FEC_INICIO_REL']
-          delete value['FEC_FIN_REL']
-          delete value['FEC_ACTUALIZACION']
-          dato.push(value)
-        }
-      });
-      
-      //console.log(dato)
-      response.json(dato)
-  }).catch((error) => {
-      console.log(error)
-  });
-
+appRoutes.post('/tracking', async (req, res) => {
+  const {tracking, jobSector,  occupation} = req.body
+  console.log(req.body)
+  const newProspect =new Prospect({ tracking, jobSector,  occupation  })
+  console.log(newProspect)
+  await newProspect.save()
+  res.send("Ok.")
 })
 
 
@@ -65,34 +31,38 @@ appRoutes.post('/APC', (request, response) => {
 
   const { usuarioApc, claveApc, id, tipoCliente, productoApc } = request.body
 
-  console.log('MMMMMMMMMMM',request)
-  const URL = "https://apirestapc20210918231653.azurewebsites.net/api/APCScore/12"
+  // const URL = "https://apirestapc20210918231653.azurewebsites.net/api/APCScore"
+  const URL = "http://localhost:5000/api/APCScore"
 
-  axios.post(URL,{usuarioApc, claveApc, "cliente": id, tipoCliente, productoApc})
+  axios.post(URL,{"usuarioconsulta": usuarioApc, "claveConsulta": claveApc, "IdentCliente": id, "TipoCliente": tipoCliente, "Producto": productoApc})
   .then((res) => {
-      console.log(res.data)
-      // const result = res.data
-      // const SCORE = result["SC"]["SCORE"]
-      // const PI = result["SC"]["PI"]
-      // const EXCLUSION = result["SC"]["EXCLUSION"]
-      // console.log(SCORE,PI,EXCLUSION)
+      const result = res.data
+      //console.log(res.data)
+      let SCORE = ""
+      let PI = ""
+      let EXCLUSION = ""
+      if(result["sc"] !== null) {
+        SCORE = result["sc"]["score"]
+        PI = result["sc"]["pi"]
+        EXCLUSION = result["sc"]["exclusion"]
+      }
 
-      const dato = [{"Ok": "TODO BIEN"}]
-      // Object.entries(result["DET"]).forEach(([key, value]) => {
-      //   if(value !== null) {
-      //     value.SCORE = SCORE
-      //     value.PI = PI
-      //     value.EXCLUSION = EXCLUSION
-      //     delete value['MONTO_CODIFICADO']
-      //     delete value['COD_GRUPO_ECON']
-      //     delete value['TIPO_ASOC']
-      //     delete value['MONTO_CODIFICADO']
-      //     delete value['FEC_INICIO_REL']
-      //     delete value['FEC_FIN_REL']
-      //     delete value['FEC_ACTUALIZACION']
-      //     dato.push(value)
-      //   }
-      // });
+      const dato = []
+      Object.entries(result["det"]).forEach(([key, value]) => {
+        if(value !== null) {
+          value.socore = SCORE
+          value.pi = PI
+          value.exclision = EXCLUSION
+          delete value['montO_CODIFICADO']
+          delete value['coD_GRUPO_ECON']
+          delete value['tipO_ASOC']
+          delete value['montO_CODIFICADO']
+          delete value['feC_INICIO_REL']
+          delete value['feC_FIN_REL']
+          delete value['feC_ACTUALIZACION']
+          dato.push(value)
+        }
+      });
       
       //console.log(dato)
       response.json(dato)
@@ -227,6 +197,11 @@ appRoutes.get('/laboral_sector_entity_f', (request, response) => {
   sql += " feci,"
   sql += " itbms,"
   sql += " notaria,"
+  sql += " factor,"
+  sql += " letraRetenida,"
+  sql += " gastoLegal,"
+  sql += " timbres,"
+  sql += " servicioDescto,"
   sql += " mount_min,"
   sql += " mount_max"
   sql += " from entity_params a"
