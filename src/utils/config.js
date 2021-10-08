@@ -24,31 +24,32 @@ const cnn = mysql.createConnection({
     port: process.env.PORTDB
 })
 
-
 // MongoDB DIgital Ocean-2
-// mongoose.connect(
-//   `mongodb+srv://${MDB_USER}:${MDB_PWD}@db-mongodb-nyc3-97071-024615bf.mongo.ondigitalocean.com/${MDB_DATABASE}?authSource=${MDB_DATABASE}?&replicaSet=db-mongodb-nyc3-97071`
-// ).then(db => console.log("MongoDB is Online!"))
-// .catch(e => console.log("Error: ", e.message))
+// const MONGODB_URI = `mongodb+srv://${MDB_USER}:${MDB_PWD}@db-mongodb-nyc3-97071-024615bf.mongo.ondigitalocean.com/${MDB_DATABASE}?authSource=${MDB_DATABASE}?authSource=admin&replicaSet=db-mongodb-nyc3-97071&tls=true&tlsCAFile=ca-certificate-MDB.crt`
+const MONGODB_URI = "mongodb+srv://doadmin:30x814oJ67N2gyYW@db-mongodb-nyc3-97071-024615bf.mongo.ondigitalocean.com/Finanservs?authSource=admin&replicaSet=db-mongodb-nyc3-97071&tls=true&tlsCAFile=ca-certificate-MDB.crt"
 
-const strCnnMDB = {
-  MONGODB_URI: `mongodb+srv://${MDB_USER}:${MDB_PWD}@db-mongodb-nyc3-97071-024615bf.mongo.ondigitalocean.com/${MDB_DATABASE}?authSource=${MDB_DATABASE}?&replicaSet=db-mongodb-nyc3-97071`
-}
+// cnnMDB = mongoose.connect(MONGODB_URI)
 
-let cnnMDB = undefined
-// try {
-//     cnnMDB = mongoose.connect(strCnnMDB.MONGODB_URI, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true
-//   })
-//   console.log("Mongodb is connected to", MDB_HOST)
+// const strCnnMDB = {
+//   MONGODB_URI: `mongodb+srv://${MDB_USER}:${MDB_PWD}@db-mongodb-nyc3-97071-024615bf.mongo.ondigitalocean.com/${MDB_DATABASE}?authSource=${MDB_DATABASE}?&replicaSet=db-mongodb-nyc3-97071`
 // }
-// catch {e => console.log({"Error": e.message})}
+
+
+// const cnnMDB = mongoose.connection
+// cnnMDB.on('error', function(err){
+//   console.log('connection error', err)
+// })
+
+// cnnMDB.once('open', function(){
+//   console.log('Connection to DB successful')
+// })
+// const cnnMDB = mongoose.connection
+
 
 
 // Check connection
 cnn.connect(error => {
-  if (error) throw error;
+  // if (error) throw error;
   console.log('Database server runnuning!');
 })
 
@@ -59,5 +60,5 @@ module.exports = {
   PORT,
   HOST,
   cnn,
-  cnnMDB
+  MONGODB_URI
 }

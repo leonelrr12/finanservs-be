@@ -1,9 +1,9 @@
 const appRoutes = require('express').Router()
 const axios = require('axios')
+const mongoose = require('mongoose')
 const Prospect = require('../models/Prospect')
 
 const config = require('../utils/config')
-const { json } = require('express')
 
 
 appRoutes.get('/', (request, response) => {
@@ -18,13 +18,67 @@ appRoutes.get('/today-is', (request, response) => {
 
 
 appRoutes.post('/tracking', async (req, res) => {
-  const {tracking, jobSector,  occupation} = req.body
-  console.log(req.body)
-  const newProspect =new Prospect({ tracking, jobSector,  occupation  })
-  console.log(newProspect)
+
+  // await mongoose.connect(config.MONGODB_URI, {
+  //   useNewUrlParser: true, 
+  //   useUnifiedTopology: true
+  // })
+  //   .then(() => console.log('MongoDB Connected...'))
+  //   .catch((err) => console.log(err))
+
+  const newProspect =  new Prospect(req.body)
+
+  let ID = newProspect._id
   await newProspect.save()
-  res.send("Ok.")
+
+  res.send({"ID": ID})
 })
+
+appRoutes.put('/tracking', async (req, res) => {
+
+  // await mongoose.connect(config.MONGODB_URI, {
+  //   useNewUrlParser: true, useUnifiedTopology: true
+  // })
+  // .then(() => console.log('MongoDB Connected...'))
+  // .catch((err) => console.log(err))
+
+  try {
+    await Prospect.findByIdAndUpdate(req.params.id, req.body, {new: true})
+    await Prospect.save() 
+    res.send(result)
+  } catch(err)  {
+    res.status(500).send(err)
+  }
+})
+
+appRoutes.get('/tracking', (req, res) => {
+  Prospect.find(function(err, data) {
+      if(err){
+          console.log(err);
+      }
+      else{
+          res.send(data);
+      }
+  });  
+});
+
+appRoutes.delete('/tracking', (req, res) => {
+  const { id } = req.body
+  Prospect.findByIdAndDelete(id, function (err) {
+    if(err) console.log(err);
+    console.log("Successful deletion");
+    res.send("Ok!");
+  });
+});
+
+// appRoutes.delete('/tracking', (req, res) => {
+//   const { cond } = req.body
+//   Prospect.deleteMany(cond, function (err) {
+//     if(err) console.log(err);
+//     console.log("Successful deletion");
+//     res.send("Ok!");
+//   });
+// });
 
 
 appRoutes.post('/APC', (request, response) => {
@@ -34,22 +88,30 @@ appRoutes.post('/APC', (request, response) => {
   const URL = "https://apirestapc20210918231653.azurewebsites.net/api/APCScore"
   // const URL = "http://localhost:5000/api/APCScore"
 
+  const datos = []
   axios.post(URL,{"usuarioconsulta": usuarioApc, "claveConsulta": claveApc, "IdentCliente": id, "TipoCliente": tipoCliente, "Producto": productoApc})
   .then((res) => {
       const result = res.data
       //console.log(res.data)
-      let SCORE = ""
-      let PI = ""
-      let EXCLUSION = ""
+      if(result["estatus"] === "0") {
+        datos.push({"status": false, "message": "Sin Referencias de Crédito!"})
+        response.json(datos)
+        return
+      }
+
+      let SCORE = "0"
+      let PI = "0"
+      let EXCLUSION = "0"
       if(result["sc"] !== null) {
         SCORE = result["sc"]["score"]
         PI = result["sc"]["pi"]
         EXCLUSION = result["sc"]["exclusion"]
       }
 
-      const dato = []
       Object.entries(result["det"]).forEach(([key, value]) => {
         if(value !== null) {
+          value.status = true
+          value.message = "Ok"
           value.socore = SCORE
           value.pi = PI
           value.exclision = EXCLUSION
@@ -60,14 +122,15 @@ appRoutes.post('/APC', (request, response) => {
           delete value['feC_INICIO_REL']
           delete value['feC_FIN_REL']
           delete value['feC_ACTUALIZACION']
-          dato.push(value)
+          datos.push(value)
         }
       });
-      
-      //console.log(dato)
-      response.json(dato)
+
+      response.json(datos)
   }).catch((error) => {
       console.log(error)
+      datos.push({"status": false, "message": "WS-APC No disponible."})
+      response.json(datos)
   });
 })
 

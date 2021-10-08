@@ -2,9 +2,18 @@ const app = require('./app')
 const http = require('http')
 const config = require('./src/utils/config')
 const logger = require('./src/utils/logger')
-
+const mongoose = require('mongoose')
 
 const server = http.createServer(app)
+
+try {
+  mongoose.connect(config.MONGODB_URI, {
+    useNewUrlParser: true, 
+    useUnifiedTopology: true
+  })
+} catch (err) {
+  logger.info(`MongoDB Error ${err}`)
+}
 
 const PORT = config.PORT
 server.listen(PORT, () => {
