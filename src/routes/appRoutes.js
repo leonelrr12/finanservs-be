@@ -19,14 +19,176 @@ appRoutes.get('/today-is', (request, response) => {
 
 appRoutes.post('/tracking', async (req, res) => {
 
-  // await mongoose.connect(config.MONGODB_URI, {
-  //   useNewUrlParser: true, 
-  //   useUnifiedTopology: true
-  // })
-  //   .then(() => console.log('MongoDB Connected...'))
-  //   .catch((err) => console.log(err))
+  await mongoose.connect(config.MONGODB_URI, {
+    useNewUrlParser: true, 
+    useUnifiedTopology: true
+  })
+    .then(() => console.log('MongoDB Connected...'))
+    .catch((err) => console.log(err))
 
-  const newProspect =  new Prospect(req.body)
+    const {
+      Numero_Id,
+      Nombre,
+      Segundo_Nombre,
+      Apellido_Paterno,
+      Apellido_Materno,
+      Email,
+      Celular,
+      Genero,
+      Nacionalidad,
+      Fecha_Nac,
+      Estado_Civil,
+      Telefono_Casa,
+      Provincia,
+      Distrito,
+      Corregimiento,
+      Calle_No,
+
+      Sector, 
+      Profesion, 
+      Institucion,
+      Tipo_Residencia, 
+      Tipo_Contrato_Res, 
+      Mensualidad,
+      Historial_Credito, 
+      Frecuencia_Pago,
+
+      Salario, 
+      Servicios_Profesionales, 
+      Viaticos,
+      Tipo_Contrato,
+      Meses_Trabajo_Actual,
+      Compañia_Trabajo,
+      Cargo,
+      Direccion_Trabajo,
+      Telefono_Trabajo,
+      Extension_Trabajo,
+      Trabajo_Anterior,
+      Meses_Trabajo_Anterior,
+
+      Entidad_Seleccionada,
+      Prestamo_Opciones,
+
+      Img_ID,
+      Img_Ficha_CSS,
+      Img_Servicio_Publico,
+      Img_Carta_Trabajo,
+      Img_Comprobante_Pago,
+      Img_Autoriza_APC,
+      
+      Ref_Familia_Nombre,
+      Ref_Familia_Apellido,
+      Ref_Familia_Parentesco,
+      Ref_Familia_Telefono,
+      Ref_Familia_Casa_No,
+      Ref_Familia_Empresa,
+      Ref_Familia_Empresa_Telefono,
+      Ref_Familia_Empresa_Extension,
+
+      Ref_No_Familia_Nombre,
+      Ref_No_Familia_Apellido,
+      Ref_No_Familia_Parentesco,
+      Ref_No_Familia_Telefono,
+      Ref_No_Familia_Casa_No,
+      Ref_No_Familia_Empresa,
+      Ref_No_Familia_Empresa_Telefono,
+      Ref_No_Familia_Empresa_Extension,
+    
+    } = req.body
+
+  const opciones = Prestamo_Opciones ? JSON.parse(Prestamo_Opciones): ([{
+    bank: '',
+    loan: 0.00,
+    term: 0,
+    paysYear: 0.00,
+    monthlyFee: 0.00,
+    cashOnHand: 0.00
+  }])
+
+  const newProspect =  new Prospect({
+    Numero_Id,
+    Prospect: {
+      Nombre,
+      Segundo_Nombre,
+      Apellido_Paterno,
+      Apellido_Materno,
+      Email,
+      Celular,
+      Genero,
+      Nacionalidad,
+      Fecha_Nac,
+      Nacionalidad,
+      Estado_Civil,
+      Telefono_Casa,
+      Provincia,
+      Distrito,
+      Corregimiento,
+      Calle_No
+    },
+
+    Info: {
+      Sector, 
+      Profesion, 
+      Institucion,
+      Tipo_Residencia, 
+      Tipo_Contrato_Res,
+      Mensualidad,
+      Historial_Credito, 
+      Frecuencia_Pago,
+    },
+    
+    Ingresos: {
+      Salario, 
+      Servicios_Profesionales, 
+      Viaticos
+    },
+
+    Trabajo_Actual: {
+      Tipo_Contrato,
+      Meses_Trabajo_Actual,
+      Compañia_Trabajo,
+      Cargo,
+      Direccion_Trabajo,
+      Telefono_Trabajo,
+      Extension_Trabajo,
+      Trabajo_Anterior,
+      Meses_Trabajo_Anterior,
+    },
+
+    Entidad_Seleccionada,
+    Prestamo_Opciones: opciones,
+
+    Documentos: {
+      Img_ID,
+      Img_Ficha_CSS,
+      Img_Servicio_Publico,
+      Img_Carta_Trabajo,
+      Img_Comprobante_Pago,
+      Img_Autoriza_APC,
+    },
+
+    Ref_Personal_Familia: {
+      Ref_Familia_Nombre,
+      Ref_Familia_Apellido,
+      Ref_Familia_Parentesco,
+      Ref_Familia_Telefono,
+      Ref_Familia_Casa_No,
+      Ref_Familia_Empresa,
+      Ref_Familia_Empresa_Telefono,
+      Ref_Familia_Empresa_Extension,
+    },
+
+    Ref_Personal_No_Familia: {
+      Ref_No_Familia_Nombre,
+      Ref_No_Familia_Apellido,
+      Ref_No_Familia_Parentesco,
+      Ref_No_Familia_Telefono,
+      Ref_No_Familia_Casa_No,
+      Ref_No_Familia_Empresa,
+      Ref_No_Familia_Empresa_Telefono,
+      Ref_No_Familia_Empresa_Extension,
+    },
+  })
 
   let ID = newProspect._id
   await newProspect.save()
@@ -34,16 +196,187 @@ appRoutes.post('/tracking', async (req, res) => {
   res.send({"ID": ID})
 })
 
+
 appRoutes.put('/tracking', async (req, res) => {
 
-  // await mongoose.connect(config.MONGODB_URI, {
-  //   useNewUrlParser: true, useUnifiedTopology: true
-  // })
-  // .then(() => console.log('MongoDB Connected...'))
-  // .catch((err) => console.log(err))
+  await mongoose.connect(config.MONGODB_URI, {
+    useNewUrlParser: true, useUnifiedTopology: true
+  })
+  .then(() => console.log('MongoDB Connected...'))
+  .catch((err) => console.log(err))
 
+  const {
+    Numero_Id,
+    Nombre,
+    Segundo_Nombre,
+    Apellido_Paterno,
+    Apellido_Materno,
+    Email,
+    Celular,
+    Genero,
+    Nacionalidad,
+    Fecha_Nac,
+    Estado_Civil,
+    Telefono_Casa,
+    Provincia,
+    Distrito,
+    Corregimiento,
+    Calle_No,
+
+    Sector, 
+    Profesion, 
+    Institucion,
+    Ocupacion,
+    Planilla_CSS,
+    Tipo_Residencia,  
+    Mensualidad,
+    Historial_Credito, 
+    Frecuencia_Pago,
+
+    Salario, 
+    Servicios_Profesionales, 
+    Viaticos,
+    Tipo_Contrato,
+    Meses_Trabajo_Actual,
+    Compania_Trabajo,
+    Cargo,
+    Direccion_Trabajo,
+    Telefono_Trabajo,
+    Extension_Trabajo,
+    Trabajo_Anterior,
+    Meses_Trabajo_Anterior,
+
+    Entidad_Seleccionada,
+    Prestamo_Opciones,
+
+    Img_ID,
+    Img_Ficha_CSS,
+    Img_Servicio_Publico,
+    Img_Carta_Trabajo,
+    Img_Comprobante_Pago,
+    Img_Autoriza_APC,
+    
+    Ref_Familia_Nombre,
+    Ref_Familia_Apellido,
+    Ref_Familia_Parentesco,
+    Ref_Familia_Telefono,
+    Ref_Familia_Casa_No,
+    Ref_Familia_Empresa,
+    Ref_Familia_Empresa_Telefono,
+    Ref_Familia_Empresa_Extension,
+
+    Ref_No_Familia_Nombre,
+    Ref_No_Familia_Apellido,
+    Ref_No_Familia_Parentesco,
+    Ref_No_Familia_Telefono,
+    Ref_No_Familia_Casa_No,
+    Ref_No_Familia_Empresa,
+    Ref_No_Familia_Empresa_Telefono,
+    Ref_No_Familia_Empresa_Extension,
+
+    id_param,
+  
+  } = req.body
+
+  const opciones = Prestamo_Opciones ? JSON.parse(Prestamo_Opciones): ([{
+    bank: '',
+    loan: 0.00,
+    term: 0,
+    paysYear: 0.00,
+    monthlyFee: 0.00,
+    cashOnHand: 0.00
+  }])
+  // console.log(opciones)
+  
+  const udtDatos =  {
+    Numero_Id,
+    Prospect: {
+      Nombre,
+      Segundo_Nombre,
+      Apellido_Paterno,
+      Apellido_Materno,
+      Email,
+      Celular,
+      Genero,
+      Nacionalidad,
+      Fecha_Nac,
+      Nacionalidad,
+      Estado_Civil,
+      Telefono_Casa,
+      Provincia,
+      Distrito,
+      Corregimiento,
+      Calle_No
+    },
+    
+    Info: {
+      Sector, 
+      Profesion, 
+      Institucion,
+      Ocupacion,
+      Planilla_CSS,
+      Tipo_Residencia, 
+      Mensualidad,
+      Historial_Credito, 
+      Frecuencia_Pago,
+    },
+    
+    Ingresos: {
+      Salario, 
+      Servicios_Profesionales, 
+      Viaticos
+    },
+    
+    Entidad_Seleccionada,
+    Prestamo_Opciones: opciones,
+
+    Trabajo_Actual: {
+      Tipo_Contrato,
+      Meses_Trabajo_Actual,
+      Compania_Trabajo,
+      Cargo,
+      Direccion_Trabajo,
+      Telefono_Trabajo,
+      Extension_Trabajo,
+      Trabajo_Anterior,
+      Meses_Trabajo_Anterior,
+    },
+
+    Documentos: {
+      Img_ID,
+      Img_Ficha_CSS,
+      Img_Servicio_Publico,
+      Img_Carta_Trabajo,
+      Img_Comprobante_Pago,
+      Img_Autoriza_APC,
+    },
+
+    Ref_Personal_Familia: {
+      Ref_Familia_Nombre,
+      Ref_Familia_Apellido,
+      Ref_Familia_Parentesco,
+      Ref_Familia_Telefono,
+      Ref_Familia_Casa_No,
+      Ref_Familia_Empresa,
+      Ref_Familia_Empresa_Telefono,
+      Ref_Familia_Empresa_Extension,
+    },
+
+    Ref_Personal_No_Familia: {
+      Ref_No_Familia_Nombre,
+      Ref_No_Familia_Apellido,
+      Ref_No_Familia_Parentesco,
+      Ref_No_Familia_Telefono,
+      Ref_No_Familia_Casa_No,
+      Ref_No_Familia_Empresa,
+      Ref_No_Familia_Empresa_Telefono,
+      Ref_No_Familia_Empresa_Extension,
+    },
+  }
+
+  // console.log(udtDatos)
   try {
-    await Prospect.findByIdAndUpdate(req.params.id, req.body, {new: true})
+    await Prospect.findByIdAndUpdate(id_param, udtDatos, {new: true})
     await Prospect.save() 
     res.send(result)
   } catch(err)  {
@@ -51,7 +384,12 @@ appRoutes.put('/tracking', async (req, res) => {
   }
 })
 
+
 appRoutes.get('/tracking', (req, res) => {
+  mongoose.connect(config.MONGODB_URI, {
+    useNewUrlParser: true, useUnifiedTopology: true
+  })
+ 
   Prospect.find(function(err, data) {
       if(err){
           console.log(err);

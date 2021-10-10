@@ -6,15 +6,6 @@ const mongoose = require('mongoose')
 
 const server = http.createServer(app)
 
-try {
-  mongoose.connect(config.MONGODB_URI, {
-    useNewUrlParser: true, 
-    useUnifiedTopology: true
-  })
-} catch (err) {
-  logger.info(`MongoDB Error ${err}`)
-}
-
 const PORT = config.PORT
 server.listen(PORT, () => {
   logger.info(`Server conecting on port ${config.PORT}`)
