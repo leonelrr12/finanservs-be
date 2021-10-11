@@ -430,13 +430,13 @@ appRoutes.post('/APC', (request, response) => {
   axios.post(URL,{"usuarioconsulta": usuarioApc, "claveConsulta": claveApc, "IdentCliente": id, "TipoCliente": tipoCliente, "Producto": productoApc})
   .then((res) => {
       const result = res.data
-      //console.log(res.data)
       if(result["estatus"] === "0") {
         datos.push({"status": false, "message": "Sin Referencias de Crédito!"})
         response.json(datos)
         return
       }
 
+      // console.log(result)
       let SCORE = "0"
       let PI = "0"
       let EXCLUSION = "0"
@@ -450,7 +450,7 @@ appRoutes.post('/APC', (request, response) => {
         if(value !== null) {
           value.status = true
           value.message = "Ok"
-          value.socore = SCORE
+          value.score = SCORE
           value.pi = PI
           value.exclision = EXCLUSION
           delete value['montO_CODIFICADO']
