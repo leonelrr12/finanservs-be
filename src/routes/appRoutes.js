@@ -33,7 +33,7 @@ appRoutes.post('/clientify-token', async (req, res) => {
 })
 
 
-appRoutes.post('/clientify0', async (req, res) => {
+appRoutes.post('/clientify', async (req, res) => {
   const { body } = req
   const { token, first_name, last_name, email, phone, fecha_nacimiento, contrato_laboral, 
           meses_trabajo_actual, meses_trabajo_anterior, Salario, Sector, 
@@ -105,16 +105,14 @@ appRoutes.post('/clientify0', async (req, res) => {
 
 })
 
-appRoutes.post('/clientify1', async (req, res) => {
+
+appRoutes.put('/clientify', async (req, res) => {
   const { body } = req
-  const { token, first_name, last_name, email, phone, fecha_nacimiento, contrato_laboral, 
-          meses_trabajo_actual, meses_trabajo_anterior, Salario, Sector, 
-          Institucion, Ocupacion, Profesion, Planilla, Genero,
+  const { token, ID = 0, 
           donde_trabaja = 'N/A', Puesto = 'N/A', tipo_residencia = '0', mensualidad_casa = 0, Cedula = 'N/A', 
           img_cedula = 'N/A',  img_ficha_css = 'N/A', img_servicio_publico = 'N/A', img_carta_trabajo = 'N/A', 
           img_comprobante_pago = 'N/A', img_autoriza_apc = 'N/A', province, district, county, street = 'N/A'} = body
 
-  const wDate = date => (date.getFullYear()+ "-" + (date.getMonth() + 1)  + "-" +  date.getDate())
   const wCapit = text => (text.toLowerCase().split(' ').map(w => w[0].toUpperCase() + w.substr(1)).join(' '))
 
   let wprov = 'N/A'
@@ -131,33 +129,7 @@ appRoutes.post('/clientify1', async (req, res) => {
     wdist = result[0].district
   })
 
-  let wprof = 'N/A'
-  await axios.get(`http://localhost:3001/api/profesions/${Profesion}`)
-  .then(res => {
-    const result = res.data
-    wprof = result[0].profesion
-  })
-
-  let wocup = 'N/A'
-  let URL = ""
-  if(Profesion === '2') URL =  `http://localhost:3001/api/profesions_lw/${Ocupacion}`
-  else if(Profesion === '4') URL = `http://localhost:3001/api/institutions/${Institucion}`
-  else if(Profesion === '5') URL = `http://localhost:3001/api/profesions_acp/${Ocupacion}`
-  else if(Profesion === '6') URL = `http://localhost:3001/api/ranges_pol/${Ocupacion}`
-  else URL = `http://localhost:3001/api/planillas_j/${Planilla}`
-  
-  await axios.get(URL)
-  .then(res => {
-    const result = res.data
-    wocup = result[0].ocupacion
-  })
-
   raw = JSON.stringify({
-    first_name, 
-    last_name, 
-    email, 
-    phone, 
-    "birthday": wDate(new Date(fecha_nacimiento)),
     "google_id": "google_id",
     "facebook_id": "facebook_id",
     "addresses": [
@@ -170,14 +142,6 @@ appRoutes.post('/clientify1', async (req, res) => {
       }
     ],
     "custom_fields": [
-      {"field": "contrato_laboral", "value": contrato_laboral}, 
-      {"field": "meses_trabajo_actual", "value": Number(meses_trabajo_actual)},
-      {"field": "meses_trabajo_anterior", "value": Number(meses_trabajo_anterior)},
-      {"field": "Salario", "value": Number(Salario)},
-      {"field": "Sector", "value": Sector}, 
-      {"field": "Profesion", "value": wprof}, 
-      {"field": "Ocupacion", "value": wocup}, 
-      {"field": "Genero", "value": Genero},
       {"field": "donde_trabaja", "value": donde_trabaja},
       {"field": "Puesto", "value": Puesto},
       {"field": "tipo_residencia", "value": tipo_residencia === '1' ? "Casa Propia": 
@@ -194,14 +158,14 @@ appRoutes.post('/clientify1', async (req, res) => {
     ]
   })
 
-  const url = "https://api.clientify.net/v1/contacts/"
+  const url = `https://api.clientify.net/v1/contacts/${ID}`
   const headers = {
     "Authorization": `Token ${token}`,
     "Content-Type": "application/json"
   }
 
   axios({
-    method: "POST",
+    method: "PUT",
     url, 
     data: raw,
     headers: headers,
@@ -212,8 +176,6 @@ appRoutes.post('/clientify1', async (req, res) => {
   .catch(error => console.log('error', error))
 
 })
-
-
 
 
 appRoutes.post('/tracking', async (req, res) => {
@@ -582,7 +544,6 @@ appRoutes.put('/tracking', async (req, res) => {
     res.status(500).send(err)
   }
 })
-
 
 appRoutes.get('/tracking', (req, res) => {
   mongoose.connect(config.MONGODB_URI, {
