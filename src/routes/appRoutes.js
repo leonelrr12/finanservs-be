@@ -36,10 +36,11 @@ appRoutes.post('/clientify-token', async (req, res) => {
 appRoutes.post('/clientify', async (req, res) => {
   const { body } = req
   const { token, first_name, last_name, email, phone, fecha_nacimiento, contrato_laboral, 
-          meses_trabajo_actual, meses_trabajo_anterior, Salario, Sector, 
+          meses_trabajo_actual, meses_trabajo_anterior, Salario, Sector, acepta_terminos_condiciones, 
           Institucion, Ocupacion, Profesion, Planilla, Genero, tipo_residencia, mensualidad_casa } = body
 
   const wDate = date => (date.getFullYear()+ "-" + (date.getMonth() + 1)  + "-" +  date.getDate())
+  const wCapit = text => (text.toLowerCase().split(' ').map(w => w[0].toUpperCase() + w.substr(1)).join(' '))
 
   let wprof = 'N/A'
   await axios.get(`http://localhost:3001/api/profesions/${Profesion}`)
@@ -54,13 +55,15 @@ appRoutes.post('/clientify', async (req, res) => {
   else if(Profesion === '4') URL = `http://localhost:3001/api/institutions/${Institucion}`
   else if(Profesion === '5') URL = `http://localhost:3001/api/profesions_acp/${Ocupacion}`
   else if(Profesion === '6') URL = `http://localhost:3001/api/ranges_pol/${Ocupacion}`
-  else URL = `http://localhost:3001/api/planillas_j/${Planilla}`
+  else if(Profesion === '7') URL = `http://localhost:3001/api/planillas_j/${Planilla}`
   
-  await axios.get(URL)
-  .then(res => {
-    const result = res.data
-    wocup = result[0].ocupacion
-  })
+  if(URL.length) {
+    await axios.get(URL)
+    .then(res => {
+      const result = res.data
+      wocup = result[0].ocupacion
+    })
+  }
 
   raw = JSON.stringify({
     first_name, 
@@ -77,8 +80,9 @@ appRoutes.post('/clientify', async (req, res) => {
       {"field": "Salario", "value": Number(Salario)},
       {"field": "Sector", "value": Sector}, 
       {"field": "Profesion", "value": wprof}, 
-      {"field": "Ocupacion", "value": wocup}, 
+      {"field": "Ocupacion", "value": wocup.length > 3 ? wCapit(wocup) : wocup,}, 
       {"field": "Genero", "value": Genero},
+      {"field": "acepta_terminos_condiciones", "value": acepta_terminos_condiciones},
       {"field": "tipo_residencia", "value": tipo_residencia === '1' ? "Casa Propia": 
                                             tipo_residencia === '2' ? "Padres o Familiares": 
                                             tipo_residencia === '3' ? "Casa Hipotecada": "Casa Alquilada"},
@@ -744,7 +748,7 @@ appRoutes.get('/planillas_j', (request, response) => {
   })
 })
 appRoutes.get('/planillas_j/:id', (request, response) => {
-  let sql = "SELECT name as planilla"
+  let sql = "SELECT name as ocupacion"
   sql += " FROM planillas_j"
   sql += " WHERE id = ?"
 
@@ -772,7 +776,7 @@ appRoutes.get('/ranges_pol', (request, response) => {
   })
 })
 appRoutes.get('/ranges_pol/:id', (request, response) => {
-  let sql = "SELECT name as rango"
+  let sql = "SELECT name as ocupacion"
   sql += " FROM ranges_pol"
   sql += " WHERE id = ?"
 
