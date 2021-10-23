@@ -16,6 +16,7 @@ const prospectSchema = new Schema({
     Celular: {type: String},
     Genero: {type: String},
     Fecha_Nac: {type: Date},
+    Terminos_Condiciones: {type: String},
     Nacionalidad: {type: String},
     Estado_Civil: {type: String},
     Telefono_Casa: {type: String},

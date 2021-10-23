@@ -35,7 +35,8 @@ appRoutes.post('/clientify-token', async (req, res) => {
 
 appRoutes.post('/clientify', async (req, res) => {
   const { body } = req
-  const { token, first_name, last_name, email, phone, fecha_nacimiento, contrato_laboral, 
+  const { token, Tracking,
+          first_name, last_name, email, phone, fecha_nacimiento, contrato_laboral, 
           meses_trabajo_actual, meses_trabajo_anterior, Salario, Sector, acepta_terminos_condiciones, 
           Institucion, Ocupacion, Profesion, Planilla, Genero, tipo_residencia, mensualidad_casa } = body
 
@@ -66,6 +67,7 @@ appRoutes.post('/clientify', async (req, res) => {
   }
 
   raw = JSON.stringify({
+    Tracking,
     first_name, 
     last_name, 
     email, 
@@ -74,6 +76,7 @@ appRoutes.post('/clientify', async (req, res) => {
     "google_id": "google_id",
     "facebook_id": "facebook_id",
     "custom_fields": [
+      {"field": "Tracking", "value": Tracking}, 
       {"field": "contrato_laboral", "value": contrato_laboral}, 
       {"field": "meses_trabajo_actual", "value": Number(meses_trabajo_actual)},
       {"field": "meses_trabajo_anterior", "value": Number(meses_trabajo_anterior)},
@@ -112,7 +115,7 @@ appRoutes.post('/clientify', async (req, res) => {
 
 appRoutes.put('/clientify', async (req, res) => {
   const { body } = req
-  const { token, ID = 0, 
+  const { token, ID = 0, Tracking,
           donde_trabaja = 'N/A', Puesto = 'N/A', tipo_residencia = '0', mensualidad_casa = 0, Cedula = 'N/A', 
           img_cedula = 'N/A',  img_ficha_css = 'N/A', img_servicio_publico = 'N/A', img_carta_trabajo = 'N/A', 
           img_comprobante_pago = 'N/A', img_autoriza_apc = 'N/A', province, district, county, street = 'N/A'} = body
@@ -146,6 +149,7 @@ appRoutes.put('/clientify', async (req, res) => {
       }
     ],
     "custom_fields": [
+      {"field": "Tracking", "value": Tracking}, 
       {"field": "donde_trabaja", "value": donde_trabaja},
       {"field": "Puesto", "value": Puesto},
       {"field": "tipo_residencia", "value": tipo_residencia === '1' ? "Casa Propia": 
@@ -202,6 +206,7 @@ appRoutes.post('/tracking', async (req, res) => {
       Genero,
       Nacionalidad,
       Fecha_Nac,
+      Terminos_Condiciones,
       Estado_Civil,
       Telefono_Casa,
       Provincia,
@@ -282,6 +287,7 @@ appRoutes.post('/tracking', async (req, res) => {
       Genero,
       Nacionalidad,
       Fecha_Nac,
+      Terminos_Condiciones,
       Nacionalidad,
       Estado_Civil,
       Telefono_Casa,
@@ -381,6 +387,7 @@ appRoutes.put('/tracking', async (req, res) => {
     Genero,
     Nacionalidad,
     Fecha_Nac,
+    Terminos_Condiciones,
     Estado_Civil,
     Telefono_Casa,
     Provincia,
@@ -465,6 +472,7 @@ appRoutes.put('/tracking', async (req, res) => {
       Genero,
       Nacionalidad,
       Fecha_Nac,
+      Terminos_Condiciones,
       Nacionalidad,
       Estado_Civil,
       Telefono_Casa,
