@@ -519,7 +519,7 @@ admRoutes.get('/profesions_lw/:page/:linePage', (request, response) => {
   const linePage = parseInt(request.params.linePage)
   const params = [page, linePage]
 
-  console.log(params);
+  // console.log(params);
   // config.cnn.query(sql, params, (error, results) => {
   config.cnn.query(sql, (error, results) => {
     if (error) {
@@ -1114,7 +1114,7 @@ admRoutes.post('/estados_tramite', (request, response) => {
   const {name, is_active} = request.body
   const params = [id, name, is_active === 'Si' ? true : false];
 
-  console.log(sql);
+  // console.log(sql);
   config.cnn.query(sql, params, (error, results, next) => {
     if (error) {
       logger.error('Error SQL:', error.sqlMessage)
@@ -1397,7 +1397,7 @@ admRoutes.delete('/entities_f/:id', (request, response) => {
   const sql = "DELETE FROM entities_f WHERE id = ?"
   const params = [request.params.id]; 
 
-  console.log(sql, params);
+  // console.log(sql, params);
   config.cnn.query(sql, params, (error, results) => {
     if (error) {
       logger.error('Error SQL:', error.sqlMessage)
@@ -1571,7 +1571,7 @@ admRoutes.post('/entity_params', (request, response) => {
   const {id_entity_f,id_sector_profesion,descto_ship, descto_chip, deuda_chip, deuda_ship,plazo_max,tasa,comision,mount_min,mount_max, is_active} = request.body
   const params = [id_entity_f,id_sector_profesion,descto_ship, descto_chip, deuda_chip, deuda_ship,plazo_max,tasa,comision,mount_min,mount_max,is_active === 'Si' ? true : false]
 
-  console.log(params, sql);
+  // console.log(params, sql);
   config.cnn.query(sql, params, (error, results, next) => {
     if (error) {
       logger.error('Error SQL:', error.sqlMessage)
@@ -1773,7 +1773,7 @@ admRoutes.post('/roles', (request, response) => {
   const {role,description} = request.body
   const params = [role,description]
 
-  console.log(params, sql);
+  // console.log(params, sql);
   config.cnn.query(sql, params, (error, results, next) => {
     if (error) {
       logger.error('Error SQL:', error.sqlMessage)
