@@ -52,6 +52,7 @@ const prospectSchema = new Schema({
   },
 
   Entidad_Seleccionada: {type: String},
+  Monto_Maximo: {type: Number},
 
   Prestamo_Opciones: [{
     bank: {type: String},

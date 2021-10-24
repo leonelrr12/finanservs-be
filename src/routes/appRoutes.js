@@ -35,13 +35,20 @@ appRoutes.post('/clientify-token', async (req, res) => {
 
 appRoutes.post('/clientify', async (req, res) => {
   const { body } = req
-  const { token, Tracking,
+  const { token, Tracking, entidad_seleccionada, prestamo_opciones, monto_max, 
           first_name, last_name, email, phone, fecha_nacimiento, contrato_laboral, 
           meses_trabajo_actual, meses_trabajo_anterior, Salario, Sector, acepta_terminos_condiciones, 
           Institucion, Ocupacion, Profesion, Planilla, Genero, tipo_residencia, mensualidad_casa } = body
 
   const wDate = date => (date.getFullYear()+ "-" + (date.getMonth() + 1)  + "-" +  date.getDate())
   const wCapit = text => (text.toLowerCase().split(' ').map(w => w[0].toUpperCase() + w.substr(1)).join(' '))
+
+  let wbanco = 'N/A'
+  await axios.get(`http://localhost:3001/api/entities_f/${entidad_seleccionada}`)
+  .then(res => {
+    const result = res.data
+    wbanco = result[0].name
+  })
 
   let wprof = 'N/A'
   await axios.get(`http://localhost:3001/api/profesions/${Profesion}`)
@@ -50,6 +57,15 @@ appRoutes.post('/clientify', async (req, res) => {
     wprof = result[0].profesion
   })
 
+  const opciones = prestamo_opciones ? JSON.parse(prestamo_opciones): ([{
+    bank: '',
+    loan: 0.00,
+    term: 0,
+    paysYear: 0.00,
+    monthlyFee: 0.00,
+    cashOnHand: 0.00
+  }])
+  
   let wocup = 'N/A'
   let URL = ""
   if(Profesion === '2') URL =  `http://localhost:3001/api/profesions_lw/${Ocupacion}`
@@ -90,6 +106,9 @@ appRoutes.post('/clientify', async (req, res) => {
                                             tipo_residencia === '2' ? "Padres o Familiares": 
                                             tipo_residencia === '3' ? "Casa Hipotecada": "Casa Alquilada"},
       {"field": "mensualidad_casa", "value": Number(mensualidad_casa)},
+      {"field": "prestamo_opciones", "value": prestamo_opciones},
+      {"field": "entidad_seleccionada", "value": wbanco},
+      {"field": "monto_maximo", "value": Number(monto_max)}
     ]
   })
 
@@ -98,6 +117,8 @@ appRoutes.post('/clientify', async (req, res) => {
     "Authorization": `Token ${token}`,
     "Content-Type": "application/json"
   }
+
+  // console.log(raw)
 
   axios({
     method: "POST",
@@ -115,7 +136,7 @@ appRoutes.post('/clientify', async (req, res) => {
 
 appRoutes.put('/clientify', async (req, res) => {
   const { body } = req
-  const { token, ID = 0, Tracking,
+  const { token, ID = 0, Tracking, 
           donde_trabaja = 'N/A', Puesto = 'N/A', tipo_residencia = '0', mensualidad_casa = 0, Cedula = 'N/A', 
           img_cedula = 'N/A',  img_ficha_css = 'N/A', img_servicio_publico = 'N/A', img_carta_trabajo = 'N/A', 
           img_comprobante_pago = 'N/A', img_autoriza_apc = 'N/A', province, district, county, street = 'N/A'} = body
@@ -162,7 +183,7 @@ appRoutes.put('/clientify', async (req, res) => {
       {"field": "img_ficha_css", "value": img_ficha_css},
       {"field": "img_carta_trabajo", "value": img_carta_trabajo},
       {"field": "img_comprobante_pago", "value": img_comprobante_pago},
-      {"field": "img_autoriza_apc", "value": img_autoriza_apc},
+      {"field": "img_autoriza_apc", "value": img_autoriza_apc}
     ]
   })
 
@@ -238,6 +259,7 @@ appRoutes.post('/tracking', async (req, res) => {
 
       Entidad_Seleccionada,
       Prestamo_Opciones,
+      Monto_Maximo,
 
       Img_ID,
       Img_Ficha_CSS,
@@ -328,6 +350,7 @@ appRoutes.post('/tracking', async (req, res) => {
 
     Entidad_Seleccionada,
     Prestamo_Opciones: opciones,
+    Monto_Maximo,
 
     Documentos: {
       Img_ID,
@@ -420,6 +443,7 @@ appRoutes.put('/tracking', async (req, res) => {
 
     Entidad_Seleccionada,
     Prestamo_Opciones,
+    Monto_Maximo,
 
     Img_ID,
     Img_Ficha_CSS,
@@ -502,6 +526,7 @@ appRoutes.put('/tracking', async (req, res) => {
     
     Entidad_Seleccionada,
     Prestamo_Opciones: opciones,
+    Monto_Maximo,
 
     Trabajo_Actual: {
       Tipo_Contrato,
@@ -1120,6 +1145,22 @@ appRoutes.get('/entities_f', (request, response) => {
     }
   })
 })
+appRoutes.get('/entities_f/:id', (request, response) => {
+  let sql = "SELECT name"
+  sql += " FROM entities_f"
+  sql += " WHERE id_ruta = ?"
+
+  const params = [request.params.id];
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) throw error
+    if (results.length > 0) {
+      response.json(results)
+    } else {
+      response.send('Not results!')
+    }
+  })
+})
+
 
 appRoutes.get('/sector_profesion', (request, response) => {
   let sql = "SELECT a.id, concat(b.name, ' - ', c.name) as name"
