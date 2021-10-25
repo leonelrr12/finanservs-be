@@ -35,13 +35,24 @@ appRoutes.post('/clientify-token', async (req, res) => {
 
 appRoutes.post('/clientify', async (req, res) => {
   const { body } = req
-  const { token, Tracking, entidad_seleccionada, prestamo_opciones, monto_max, 
+  const { token, Tracking, entidad_seleccionada, prestamo_opciones,  
           first_name, last_name, email, phone, fecha_nacimiento, contrato_laboral, 
           meses_trabajo_actual, meses_trabajo_anterior, Salario, Sector, acepta_terminos_condiciones, 
           Institucion, Ocupacion, Profesion, Planilla, Genero, tipo_residencia, mensualidad_casa } = body
 
   const wDate = date => (date.getFullYear()+ "-" + (date.getMonth() + 1)  + "-" +  date.getDate())
   const wCapit = text => (text.toLowerCase().split(' ').map(w => w[0].toUpperCase() + w.substr(1)).join(' '))
+
+  let Monto = 0, Letra = 0, Plazo = 0, Efectivo = 0
+
+  const opciones = JSON.parse(prestamo_opciones)
+  if(opciones.length) {
+    const opcion = opciones.filter((item) => item.bank === entidad_seleccionada)
+    Monto = opcion[0].loan
+    Letra = opcion[0].monthlyFee
+    Plazo = opcion[0].term
+    Efectivo = opcion[0].cashOnHand
+  }
 
   let wbanco = 'N/A'
   await axios.get(`http://localhost:3001/api/entities_f/${entidad_seleccionada}`)
@@ -57,15 +68,6 @@ appRoutes.post('/clientify', async (req, res) => {
     wprof = result[0].profesion
   })
 
-  const opciones = prestamo_opciones ? JSON.parse(prestamo_opciones): ([{
-    bank: '',
-    loan: 0.00,
-    term: 0,
-    paysYear: 0.00,
-    monthlyFee: 0.00,
-    cashOnHand: 0.00
-  }])
-  
   let wocup = 'N/A'
   let URL = ""
   if(Profesion === '2') URL =  `http://localhost:3001/api/profesions_lw/${Ocupacion}`
@@ -82,8 +84,9 @@ appRoutes.post('/clientify', async (req, res) => {
     })
   }
 
+  // {"field": "Ocupacion", "value": wocup.length > 3 ? wCapit(wocup) : wocup,}, 
+
   raw = JSON.stringify({
-    Tracking,
     first_name, 
     last_name, 
     email, 
@@ -99,16 +102,18 @@ appRoutes.post('/clientify', async (req, res) => {
       {"field": "Salario", "value": Number(Salario)},
       {"field": "Sector", "value": Sector}, 
       {"field": "Profesion", "value": wprof}, 
-      {"field": "Ocupacion", "value": wocup.length > 3 ? wCapit(wocup) : wocup,}, 
+      {"field": "Ocupacion", "value": wocup}, 
       {"field": "Genero", "value": Genero},
       {"field": "acepta_terminos_condiciones", "value": acepta_terminos_condiciones},
       {"field": "tipo_residencia", "value": tipo_residencia === '1' ? "Casa Propia": 
                                             tipo_residencia === '2' ? "Padres o Familiares": 
                                             tipo_residencia === '3' ? "Casa Hipotecada": "Casa Alquilada"},
       {"field": "mensualidad_casa", "value": Number(mensualidad_casa)},
-      {"field": "prestamo_opciones", "value": prestamo_opciones},
       {"field": "entidad_seleccionada", "value": wbanco},
-      {"field": "monto_maximo", "value": Number(monto_max)}
+
+      {"field": "Monto", "value": Number(Monto)},
+      {"field": "Letra", "value": Number(Letra)},
+      {"field": "Plazo", "value": Number(Plazo)}
     ]
   })
 
@@ -136,12 +141,64 @@ appRoutes.post('/clientify', async (req, res) => {
 
 appRoutes.put('/clientify', async (req, res) => {
   const { body } = req
-  const { token, ID = 0, Tracking, 
-          donde_trabaja = 'N/A', Puesto = 'N/A', tipo_residencia = '0', mensualidad_casa = 0, Cedula = 'N/A', 
-          img_cedula = 'N/A',  img_ficha_css = 'N/A', img_servicio_publico = 'N/A', img_carta_trabajo = 'N/A', 
-          img_comprobante_pago = 'N/A', img_autoriza_apc = 'N/A', province, district, county, street = 'N/A'} = body
 
+  const { token, ID, Tracking, entidad_seleccionada, prestamo_opciones,
+          first_name, last_name, email, phone, fecha_nacimiento, contrato_laboral, 
+          meses_trabajo_actual, meses_trabajo_anterior, Salario, Sector, acepta_terminos_condiciones, 
+          Institucion, Ocupacion, Profesion, Planilla, Genero, tipo_residencia, mensualidad_casa,
+
+          donde_trabaja = 'N/A', Puesto = 'N/A', Cedula = 'N/A', 
+          img_cedula = 'N/A',  img_ficha_css = 'N/A', img_servicio_publico = 'N/A', img_carta_trabajo = 'N/A', 
+          img_comprobante_pago = 'N/A', img_autoriza_apc = 'N/A', province, district, county, street = 'N/A'
+        
+        } = body
+
+  const wDate = date => (date.getFullYear()+ "-" + (date.getMonth() + 1)  + "-" +  date.getDate())
   const wCapit = text => (text.toLowerCase().split(' ').map(w => w[0].toUpperCase() + w.substr(1)).join(' '))
+
+  let Monto = 0, Letra = 0, Plazo = 0, Efectivo = 0
+
+  const opciones = JSON.parse(prestamo_opciones)
+  if(opciones.length) {
+    const opcion = opciones.filter((item) => item.bank === entidad_seleccionada)
+    Monto = opcion[0].loan
+    Letra = opcion[0].monthlyFee
+    Plazo = opcion[0].term
+    Efectivo = opcion[0].cashOnHand
+  }
+
+  let wbanco = 'N/A'
+  await axios.get(`http://localhost:3001/api/entities_f/${entidad_seleccionada}`)
+  .then(res => {
+    const result = res.data
+    wbanco = result[0].name
+  })
+  if(wbanco === undefined) wbanco = 'N/A'
+
+  let wprof = 'N/A'
+  await axios.get(`http://localhost:3001/api/profesions/${Profesion}`)
+  .then(res => {
+    const result = res.data
+    wprof = result[0].profesion
+  })
+  if(wprof === undefined) wprof = 'N/A'
+
+  let wocup = 'N/A'
+  let URL = ""
+  if(Profesion === '2') URL =  `http://localhost:3001/api/profesions_lw/${Ocupacion}`
+  else if(Profesion === '4') URL = `http://localhost:3001/api/institutions/${Institucion}`
+  else if(Profesion === '5') URL = `http://localhost:3001/api/profesions_acp/${Ocupacion}`
+  else if(Profesion === '6') URL = `http://localhost:3001/api/ranges_pol/${Ocupacion}`
+  else if(Profesion === '7') URL = `http://localhost:3001/api/planillas_j/${Planilla}`
+  
+  if(URL.length) {
+    await axios.get(URL)
+    .then(res => {
+      const result = res.data
+      wocup = result[0].ocupacion
+    })
+  }
+  if(wocup === undefined) wocup = 'N/A'
 
   let wprov = 'N/A'
   await axios.get(`http://localhost:3001/api/provinces/${province}`)
@@ -149,6 +206,7 @@ appRoutes.put('/clientify', async (req, res) => {
     const result = res.data
     wprov = result[0].province
   })
+  if(wprov === undefined) wprov = 'N/A'
 
   let wdist = 'N/A'
   await axios.get(`http://localhost:3001/api/districts/${district}`)
@@ -156,15 +214,23 @@ appRoutes.put('/clientify', async (req, res) => {
     const result = res.data
     wdist = result[0].district
   })
+  if(wdist === undefined) wdist = 'N/A'
+
+  // {"field": "Ocupacion", "value": (wocup || '').length > 3 ? wCapit(wocup) : wocup,}, 
 
   raw = JSON.stringify({
+    first_name, 
+    last_name, 
+    email, 
+    phone, 
+    "birthday": wDate(new Date(fecha_nacimiento)),
     "google_id": "google_id",
     "facebook_id": "facebook_id",
     "addresses": [
       {
         "street": street,
-        "city": (wdist || '').length > 1 ? wCapit(wdist) : "N/A",
-        "state": (wprov || '').length > 1 ? wCapit(wprov) : "N/A",
+        "city": (wdist || '').length > 3 ? wCapit(wdist) : "N/A",
+        "state": (wprov || '').length > 3 ? wCapit(wprov) : "N/A",
         "country": "Panamá",
         "type": 5
       }
@@ -183,9 +249,26 @@ appRoutes.put('/clientify', async (req, res) => {
       {"field": "img_ficha_css", "value": img_ficha_css},
       {"field": "img_carta_trabajo", "value": img_carta_trabajo},
       {"field": "img_comprobante_pago", "value": img_comprobante_pago},
-      {"field": "img_autoriza_apc", "value": img_autoriza_apc}
+      {"field": "img_autoriza_apc", "value": img_autoriza_apc},
+
+      {"field": "contrato_laboral", "value": contrato_laboral}, 
+      {"field": "meses_trabajo_actual", "value": Number(meses_trabajo_actual)},
+      {"field": "meses_trabajo_anterior", "value": Number(meses_trabajo_anterior)},
+      {"field": "Salario", "value": Number(Salario)},
+      {"field": "Sector", "value": Sector}, 
+      {"field": "Profesion", "value": wprof}, 
+      {"field": "Ocupacion", "value": wocup}, 
+      {"field": "Genero", "value": Genero},
+      {"field": "acepta_terminos_condiciones", "value": acepta_terminos_condiciones},
+
+      {"field": "entidad_seleccionada", "value": wbanco},
+      {"field": "Monto", "value": Monto},
+      {"field": "Letra", "value": Letra},
+      {"field": "Plazo", "value": Plazo}
     ]
   })
+
+  // console.log(raw)
 
   const url = `https://api.clientify.net/v1/contacts/${ID}`
   const headers = {
@@ -320,7 +403,6 @@ appRoutes.post('/tracking', async (req, res) => {
 
       Entidad_Seleccionada,
       Prestamo_Opciones,
-      Monto_Maximo,
 
       Img_ID,
       Img_Ficha_CSS,
@@ -349,14 +431,6 @@ appRoutes.post('/tracking', async (req, res) => {
     
     } = req.body
 
-  const opciones = Prestamo_Opciones ? JSON.parse(Prestamo_Opciones): ([{
-    bank: '',
-    loan: 0.00,
-    term: 0,
-    paysYear: 0.00,
-    monthlyFee: 0.00,
-    cashOnHand: 0.00
-  }])
 
   const newProspect =  new Prospect({
     Numero_Id,
@@ -410,8 +484,8 @@ appRoutes.post('/tracking', async (req, res) => {
     },
 
     Entidad_Seleccionada,
-    Prestamo_Opciones: opciones,
-    Monto_Maximo,
+    Prestamo_Opciones: Prestamo_Opciones,
+    Monto_max: 0,
 
     Documentos: {
       Img_ID,
@@ -504,7 +578,6 @@ appRoutes.put('/tracking', async (req, res) => {
 
     Entidad_Seleccionada,
     Prestamo_Opciones,
-    Monto_Maximo,
 
     Img_ID,
     Img_Ficha_CSS,
@@ -534,16 +607,6 @@ appRoutes.put('/tracking', async (req, res) => {
     id_param,
   
   } = req.body
-
-  const opciones = Prestamo_Opciones ? JSON.parse(Prestamo_Opciones): ([{
-    bank: '',
-    loan: 0.00,
-    term: 0,
-    paysYear: 0.00,
-    monthlyFee: 0.00,
-    cashOnHand: 0.00
-  }])
-  // console.log(opciones)
   
   const udtDatos =  {
     Numero_Id,
@@ -586,8 +649,8 @@ appRoutes.put('/tracking', async (req, res) => {
     },
     
     Entidad_Seleccionada,
-    Prestamo_Opciones: opciones,
-    Monto_Maximo,
+    Prestamo_Opciones: Prestamo_Opciones,
+    Monto_Maximo: 0,
 
     Trabajo_Actual: {
       Tipo_Contrato,
