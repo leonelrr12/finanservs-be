@@ -206,6 +206,67 @@ appRoutes.put('/clientify', async (req, res) => {
 
 })
 
+appRoutes.post('/clientify-rechazo', async (req, res) => {
+  const { body } = req
+  const { token, Tracking } = body
+
+  raw = JSON.stringify({
+    "custom_fields": [
+      {"field": "Tracking", "value": Tracking}
+    ]
+  })
+
+  const url = "https://api.clientify.net/v1/contacts/"
+  const headers = {
+    "Authorization": `Token ${token}`,
+    "Content-Type": "application/json"
+  }
+
+  // console.log(raw)
+
+  axios({
+    method: "POST",
+    url, 
+    data: raw,
+    headers: headers,
+    redirect: 'follow'
+  })
+  .then(result => res.json(result.data))
+  // .then(result => console.log(result.data))
+  .catch(error => console.log('error', error))
+
+})
+
+
+appRoutes.put('/clientify-rechazo', async (req, res) => {
+  const { body } = req
+  const { token, ID = 0, Tracking } = body
+
+  raw = JSON.stringify({
+    "custom_fields": [
+      {"field": "Tracking", "value": Tracking}
+    ]
+  })
+
+  const url = `https://api.clientify.net/v1/contacts/${ID}`
+  const headers = {
+    "Authorization": `Token ${token}`,
+    "Content-Type": "application/json"
+  }
+
+  axios({
+    method: "PUT",
+    url, 
+    data: raw,
+    headers: headers,
+    redirect: 'follow'
+  })
+  .then(result => res.json(result.data))
+  // .then(result => console.log(result.data))
+  .catch(error => console.log('error', error))
+
+})
+
 
 appRoutes.post('/tracking', async (req, res) => {
 
