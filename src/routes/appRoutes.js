@@ -500,7 +500,7 @@ appRoutes.post('/tracking', async (req, res) => {
     },
 
     Entidad_Seleccionada,
-    Prestamo_Opciones: Prestamo_Opciones,
+    // Prestamo_Opciones: Prestamo_Opciones,
     Monto_max: 0,
 
     Documentos: {
@@ -665,7 +665,7 @@ appRoutes.put('/tracking', async (req, res) => {
     },
     
     Entidad_Seleccionada,
-    Prestamo_Opciones: Prestamo_Opciones,
+    // Prestamo_Opciones: Prestamo_Opciones,
     Monto_Maximo: 0,
 
     Trabajo_Actual: {
