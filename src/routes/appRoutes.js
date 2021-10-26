@@ -447,7 +447,7 @@ appRoutes.post('/tracking', async (req, res) => {
     
     } = req.body
 
-
+      // Historial_Credito, 
   const newProspect =  new Prospect({
     Numero_Id,
     Prospect: {
@@ -477,7 +477,7 @@ appRoutes.post('/tracking', async (req, res) => {
       Tipo_Residencia, 
       Tipo_Contrato_Res,
       Mensualidad,
-      // Historial_Credito, 
+
       Frecuencia_Pago,
     },
     
@@ -624,6 +624,7 @@ appRoutes.put('/tracking', async (req, res) => {
   
   } = req.body
   
+        // Historial_Credito, 
   const udtDatos =  {
     Numero_Id,
     Prospect: {
@@ -654,7 +655,7 @@ appRoutes.put('/tracking', async (req, res) => {
       Planilla_CSS,
       Tipo_Residencia, 
       Mensualidad,
-      // Historial_Credito, 
+
       Frecuencia_Pago,
     },
     
