@@ -92,7 +92,6 @@ appRoutes.post('/clientify', async (req, res) => {
     })
   }
   if(wocup == undefined) wocup = 'N/A'
-  console.log('wocup =================> ',wocup)
 
   raw = JSON.stringify({
     first_name, 
@@ -110,7 +109,7 @@ appRoutes.post('/clientify', async (req, res) => {
       {"field": "Salario", "value": Number(Salario)},
       {"field": "Sector", "value": Sector}, 
       {"field": "Profesion", "value": wprof}, 
-      {"field": "Ocupacion", "value": wocup.length > 3 ? wCapit(wocup) : wocup,}, 
+      {"field": "Ocupacion", "value": wocup}, 
       {"field": "Genero", "value": Genero},
       {"field": "acepta_terminos_condiciones", "value": acepta_terminos_condiciones},
       {"field": "tipo_residencia", "value": tipo_residencia === '1' ? "Casa Propia": 
@@ -274,7 +273,7 @@ appRoutes.put('/clientify', async (req, res) => {
       {"field": "Salario", "value": Number(Salario)},
       {"field": "Sector", "value": Sector}, 
       {"field": "Profesion", "value": wprof}, 
-      {"field": "Ocupacion", "value": (wocup || '').length > 3 ? wCapit(wocup) : wocup,}, 
+      {"field": "Ocupacion", "value": wocup}, 
       {"field": "Genero", "value": Genero},
       {"field": "acepta_terminos_condiciones", "value": acepta_terminos_condiciones},
 
