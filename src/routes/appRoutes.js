@@ -92,6 +92,7 @@ appRoutes.post('/clientify', async (req, res) => {
     })
   }
   if(wocup == undefined) wocup = 'N/A'
+  console.log('wocup =================> ',wocup)
 
   raw = JSON.stringify({
     first_name, 
