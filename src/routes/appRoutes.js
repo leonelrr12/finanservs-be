@@ -59,14 +59,20 @@ appRoutes.post('/clientify', async (req, res) => {
   .then(res => {
     const result = res.data
     wbanco = result[0].name
+  }).catch(() => {
+    wbanco = 'N/A'
   })
+  if(wbanco === undefined) wbanco = 'N/A'
 
   let wprof = 'N/A'
   await axios.get(`http://localhost:3001/api/profesions/${Profesion}`)
   .then(res => {
     const result = res.data
     wprof = result[0].profesion
+  }).catch(() => {
+    wprof = 'N/A'
   })
+  if(wprof === undefined) wprof = 'N/A'
 
   let wocup = 'N/A'
   let URL = ""
@@ -81,10 +87,11 @@ appRoutes.post('/clientify', async (req, res) => {
     .then(res => {
       const result = res.data
       wocup = result[0].ocupacion
+    }).catch(() => {
+      wocup = 'N/A'
     })
   }
-
-  // {"field": "Ocupacion", "value": wocup.length > 3 ? wCapit(wocup) : wocup,}, 
+  if(wocup === undefined) wocup = 'N/A'
 
   raw = JSON.stringify({
     first_name, 
@@ -102,7 +109,7 @@ appRoutes.post('/clientify', async (req, res) => {
       {"field": "Salario", "value": Number(Salario)},
       {"field": "Sector", "value": Sector}, 
       {"field": "Profesion", "value": wprof}, 
-      {"field": "Ocupacion", "value": wocup}, 
+      {"field": "Ocupacion", "value": wocup.length > 3 ? wCapit(wocup) : wocup,}, 
       {"field": "Genero", "value": Genero},
       {"field": "acepta_terminos_condiciones", "value": acepta_terminos_condiciones},
       {"field": "tipo_residencia", "value": tipo_residencia === '1' ? "Casa Propia": 
@@ -172,6 +179,8 @@ appRoutes.put('/clientify', async (req, res) => {
   .then(res => {
     const result = res.data
     wbanco = result[0].name
+  }).catch(() => {
+    wbanco = 'N/A'
   })
   if(wbanco === undefined) wbanco = 'N/A'
 
@@ -180,6 +189,8 @@ appRoutes.put('/clientify', async (req, res) => {
   .then(res => {
     const result = res.data
     wprof = result[0].profesion
+  }).catch(() => {
+    wprof = 'N/A'
   })
   if(wprof === undefined) wprof = 'N/A'
 
@@ -196,6 +207,8 @@ appRoutes.put('/clientify', async (req, res) => {
     .then(res => {
       const result = res.data
       wocup = result[0].ocupacion
+    }).catch(() => {
+      wocup = 'N/A'
     })
   }
   if(wocup === undefined) wocup = 'N/A'
@@ -205,6 +218,8 @@ appRoutes.put('/clientify', async (req, res) => {
   .then(res => {
     const result = res.data
     wprov = result[0].province
+  }).catch(() => {
+    wprov = 'N/A'
   })
   if(wprov === undefined) wprov = 'N/A'
 
@@ -213,10 +228,11 @@ appRoutes.put('/clientify', async (req, res) => {
   .then(res => {
     const result = res.data
     wdist = result[0].district
+  }).catch(() => {
+    wdist = 'N/A'
   })
   if(wdist === undefined) wdist = 'N/A'
 
-  // {"field": "Ocupacion", "value": (wocup || '').length > 3 ? wCapit(wocup) : wocup,}, 
 
   raw = JSON.stringify({
     first_name, 
@@ -257,7 +273,7 @@ appRoutes.put('/clientify', async (req, res) => {
       {"field": "Salario", "value": Number(Salario)},
       {"field": "Sector", "value": Sector}, 
       {"field": "Profesion", "value": wprof}, 
-      {"field": "Ocupacion", "value": wocup}, 
+      {"field": "Ocupacion", "value": (wocup || '').length > 3 ? wCapit(wocup) : wocup,}, 
       {"field": "Genero", "value": Genero},
       {"field": "acepta_terminos_condiciones", "value": acepta_terminos_condiciones},
 
