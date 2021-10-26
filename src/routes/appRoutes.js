@@ -62,7 +62,7 @@ appRoutes.post('/clientify', async (req, res) => {
   }).catch(() => {
     wbanco = 'N/A'
   })
-  if(wbanco === undefined) wbanco = 'N/A'
+  if(wbanco == undefined) wbanco = 'N/A'
 
   let wprof = 'N/A'
   await axios.get(`http://localhost:3001/api/profesions/${Profesion}`)
@@ -72,7 +72,7 @@ appRoutes.post('/clientify', async (req, res) => {
   }).catch(() => {
     wprof = 'N/A'
   })
-  if(wprof === undefined) wprof = 'N/A'
+  if(wprof == undefined) wprof = 'N/A'
 
   let wocup = 'N/A'
   let URL = ""
@@ -91,7 +91,7 @@ appRoutes.post('/clientify', async (req, res) => {
       wocup = 'N/A'
     })
   }
-  if(wocup === undefined) wocup = 'N/A'
+  if(wocup == undefined) wocup = 'N/A'
 
   raw = JSON.stringify({
     first_name, 
@@ -192,7 +192,7 @@ appRoutes.put('/clientify', async (req, res) => {
   }).catch(() => {
     wprof = 'N/A'
   })
-  if(wprof === undefined) wprof = 'N/A'
+  if(wprof == undefined) wprof = 'N/A'
 
   let wocup = 'N/A'
   let URL = ""
@@ -211,7 +211,7 @@ appRoutes.put('/clientify', async (req, res) => {
       wocup = 'N/A'
     })
   }
-  if(wocup === undefined) wocup = 'N/A'
+  if(wocup == undefined) wocup = 'N/A'
 
   let wprov = 'N/A'
   await axios.get(`http://localhost:3001/api/provinces/${province}`)
@@ -221,7 +221,7 @@ appRoutes.put('/clientify', async (req, res) => {
   }).catch(() => {
     wprov = 'N/A'
   })
-  if(wprov === undefined) wprov = 'N/A'
+  if(wprov == undefined) wprov = 'N/A'
 
   let wdist = 'N/A'
   await axios.get(`http://localhost:3001/api/districts/${district}`)
@@ -231,7 +231,7 @@ appRoutes.put('/clientify', async (req, res) => {
   }).catch(() => {
     wdist = 'N/A'
   })
-  if(wdist === undefined) wdist = 'N/A'
+  if(wdist == undefined) wdist = 'N/A'
 
 
   raw = JSON.stringify({
