@@ -477,7 +477,7 @@ appRoutes.post('/tracking', async (req, res) => {
       Tipo_Residencia, 
       Tipo_Contrato_Res,
       Mensualidad,
-      Historial_Credito, 
+      // Historial_Credito, 
       Frecuencia_Pago,
     },
     
@@ -654,7 +654,7 @@ appRoutes.put('/tracking', async (req, res) => {
       Planilla_CSS,
       Tipo_Residencia, 
       Mensualidad,
-      Historial_Credito, 
+      // Historial_Credito, 
       Frecuencia_Pago,
     },
     
