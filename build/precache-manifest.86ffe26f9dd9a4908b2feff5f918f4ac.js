@@ -1,23 +1,23 @@
 self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
-    "revision": "14ffcad23fd1c4ac031ed629e1d1c3bd",
+    "revision": "66f4aa3becff8ff32a1fb6291f60d509",
     "url": "/index.html"
   },
   {
-    "revision": "41d42667c8adf845a135",
+    "revision": "5b9130ca1f7647876112",
     "url": "/static/css/main.6b86c434.chunk.css"
   },
   {
-    "revision": "8a8b28e98bdbdcdc6eab",
-    "url": "/static/js/2.239f75fb.chunk.js"
+    "revision": "e9a0d45043519f3eacac",
+    "url": "/static/js/2.a3f1815c.chunk.js"
   },
   {
     "revision": "f180f33ee137986066bf864b2f704259",
-    "url": "/static/js/2.239f75fb.chunk.js.LICENSE.txt"
+    "url": "/static/js/2.a3f1815c.chunk.js.LICENSE.txt"
   },
   {
-    "revision": "41d42667c8adf845a135",
-    "url": "/static/js/main.49d5575e.chunk.js"
+    "revision": "5b9130ca1f7647876112",
+    "url": "/static/js/main.4fb7af6b.chunk.js"
   },
   {
     "revision": "b3f450e9e7100242d5b3",
@@ -44,6 +44,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/media/home-step-3.bc4d62e0.png"
   },
   {
+    "revision": "7a6c96fb19dfba9d5c0d65be2bc88712",
+    "url": "/static/media/img-rechazo.7a6c96fb.jpg"
+  },
+  {
     "revision": "329a434616b9ab9e625b9e3e804f6de3",
     "url": "/static/media/logo-horizontal-white.329a4346.png"
   },
@@ -60,12 +64,20 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/media/multibank-logo.5da7572f.png"
   },
   {
-    "revision": "7301f5e25959f08971123c1da812c5b2",
-    "url": "/static/media/slide-1-mobile.7301f5e2.jpg"
+    "revision": "8e51ace047c26bb8049d58e54b629089",
+    "url": "/static/media/pop-picture-falta-poco.8e51ace0.png"
   },
   {
-    "revision": "3b82952d684340af0cea5b9e76fc2054",
-    "url": "/static/media/slide-1.3b82952d.jpg"
+    "revision": "0d9c109040086feb8315b65777b51348",
+    "url": "/static/media/pop-picture-upload-doc.0d9c1090.png"
+  },
+  {
+    "revision": "11b75795544a5fc90fd66cf04b0d1e4e",
+    "url": "/static/media/slide-1-mobile.11b75795.jpg"
+  },
+  {
+    "revision": "b3469d53e39791b8f48846ecf20c3c1f",
+    "url": "/static/media/slide-1.b3469d53.jpg"
   },
   {
     "revision": "9086b7b84c245257aa28a63c32035d0a",
