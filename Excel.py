@@ -114,6 +114,24 @@ def insert_plan(id, name, cnn):
             print("MySQL connection is closed")
 
 
+def insert_pais(id, name, cnn):
+    try:
+        cursor = cnn.cursor()
+        mySql_insert_query = "INSERT INTO nationality (id,name,is_active) VALUES (%s,%s,1)"
+
+        record = (id,name)
+        cursor.execute(mySql_insert_query, record)
+        # cnn.commit()
+        # print("Record inserted!")
+    except mysql.connector.Error as error:
+        print("Failed to insert into MySQL table {}".format(error))
+    
+    finally:
+        if cnn.is_connected():
+            cursor.close()
+            print("MySQL connection is closed")
+
+
 def insert_prov(id, name, cnn):
     try:
         cursor = cnn.cursor()
@@ -290,6 +308,28 @@ def plan():
         cnn.close()
         print("MySQL Finish ...")
 
+# # No. 567
+def pais():
+    fichero = r"D:\Documentos\Desarrollo Web\Finanservs\paises_estandar.xlsx"
+
+    book = openpyxl.load_workbook(fichero, data_only=True)
+    hoja = book.active
+
+    celdas = hoja['A2' : 'B238']
+
+    cnn = fcnn()
+
+    print("Paises ...")
+    for fila in celdas:
+        data = [celda.value for celda in fila]
+        insert_pais(data[0], data[1], cnn)
+
+    cnn.commit()
+    if cnn.is_connected():
+        cnn.close()
+        print("MySQL Finish ...")
+
+
 # # No. 5
 def prov():
     fichero = r"D:\Documentos\Desarrollo Web\Finanservs\prov-codigo.xlsx"
@@ -358,8 +398,9 @@ def corr():
 
 #acp()
 #lw()
-inst()
+#inst()
 #plan()
+pais()
 #prov()
 #dist()
 #corr()

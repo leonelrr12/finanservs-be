@@ -1,5 +1,6 @@
 const aws = require("aws-sdk");
 const fs = require('fs')
+const PDF = require('html-pdf')
 
 const { AWS_Access_key_ID, AWS_Secret_access_key, AWS_BUCKET_NAME, AWS_REGION } = process.env
 
@@ -11,14 +12,24 @@ const s3 = new aws.S3({
 
 const uploadFile = (file, entity_f, nameImage, id) => {
   const fileStream = fs.createReadStream(file.path)
+  console.log(file.filename)
+  const ext = file.filename.split('.')[1]
   const uploadParams = {
-    Bucket: AWS_BUCKET_NAME + "/" + entity_f + "/" + nameImage + "/" + id,
+    Bucket: AWS_BUCKET_NAME + "/" + entity_f + "/" + nameImage, // + "/" + id,  2021-10-29
     Body: fileStream,
-    Key: file.filename
+    Key: id+'.'+ext //file.filename
   }
-  debugger
-  //console.log(uploadParams)
   return s3.upload(uploadParams).promise()
 }
 
-module.exports = { uploadFile, s3 }
+const uploadFile2 = (file, entity_f, nameImage, id) => {
+  const fileStream = fs.createReadStream(file)
+  const uploadParams = {
+    Bucket: AWS_BUCKET_NAME + "/" + entity_f + "/" + nameImage,
+    Body: fileStream,
+    Key: id
+  }
+  return s3.upload(uploadParams).promise()
+}
+
+module.exports = { uploadFile, s3, uploadFile2 }

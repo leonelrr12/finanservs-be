@@ -460,6 +460,7 @@ CREATE TABLE `nationality` (
 ) ;
 
 
+Ver Tabla en Excel paises_satandar
 insert into nationality (name, is_active) value ('Panameña', true);
 insert into nationality (name, is_active) value ('Venezolano', true);
 insert into nationality (name, is_active) value ('Colombiano', true);
