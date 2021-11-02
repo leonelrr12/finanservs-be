@@ -774,7 +774,7 @@ appRoutes.post('/APC', (request, response) => {
         return
       }
 
-      // console.log(result)
+      console.log('2222222222222222222 ', result)
       let SCORE = "0"
       let PI = "0"
       let EXCLUSION = "0"
