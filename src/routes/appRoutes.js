@@ -447,7 +447,7 @@ appRoutes.post('/tracking', async (req, res) => {
     
     } = req.body
 
-      // Historial_Credito, 
+  // Historial_Credito, 
   const newProspect =  new Prospect({
     Numero_Id,
     Prospect: {
@@ -477,7 +477,7 @@ appRoutes.post('/tracking', async (req, res) => {
       Tipo_Residencia, 
       Tipo_Contrato_Res,
       Mensualidad,
-
+      Historial_Credito,
       Frecuencia_Pago,
     },
     
@@ -500,7 +500,7 @@ appRoutes.post('/tracking', async (req, res) => {
     },
 
     Entidad_Seleccionada,
-    // Prestamo_Opciones: Prestamo_Opciones,
+    Prestamo_Opciones: Prestamo_Opciones ? JSON.parse(Prestamo_Opciones): "",
     Monto_max: 0,
 
     Documentos: {
@@ -624,7 +624,7 @@ appRoutes.put('/tracking', async (req, res) => {
   
   } = req.body
   
-        // Historial_Credito, 
+  // Historial_Credito, 
   const udtDatos =  {
     Numero_Id,
     Prospect: {
@@ -655,7 +655,7 @@ appRoutes.put('/tracking', async (req, res) => {
       Planilla_CSS,
       Tipo_Residencia, 
       Mensualidad,
-
+      Historial_Credito,
       Frecuencia_Pago,
     },
     
@@ -666,7 +666,7 @@ appRoutes.put('/tracking', async (req, res) => {
     },
     
     Entidad_Seleccionada,
-    // Prestamo_Opciones: Prestamo_Opciones,
+    Prestamo_Opciones: Prestamo_Opciones ? JSON.parse(Prestamo_Opciones): "",
     Monto_Maximo: 0,
 
     Trabajo_Actual: {
@@ -716,7 +716,6 @@ appRoutes.put('/tracking', async (req, res) => {
   // console.log(udtDatos)
   try {
     await Prospect.findByIdAndUpdate(id_param, udtDatos, {new: true})
-    await Prospect.save() 
     res.send(result)
   } catch(err)  {
     res.status(500).send(err)
@@ -759,7 +758,7 @@ appRoutes.delete('/tracking', (req, res) => {
 
 appRoutes.post('/APC', (request, response) => {
 
-  const { usuarioApc, claveApc, id, tipoCliente, productoApc } = request.body
+  const { usuarioApc, claveApc, id, tipoCliente, productoApc, idMongo } = request.body
 
   const URL = "https://apirestapc20210918231653.azurewebsites.net/api/APCScore"
   // const URL = "http://localhost:5000/api/APCScore"
@@ -768,13 +767,14 @@ appRoutes.post('/APC', (request, response) => {
   axios.post(URL,{"usuarioconsulta": usuarioApc, "claveConsulta": claveApc, "IdentCliente": id, "TipoCliente": tipoCliente, "Producto": productoApc})
   .then((res) => {
       const result = res.data
+      const copia = {...result}
+
       if(result["estatus"] === "0") {
         datos.push({"status": false, "message": "Sin Referencias de Crédito!"})
         response.json(datos)
         return
       }
 
-      console.log('2222222222222222222 ', result)
       let SCORE = "0"
       let PI = "0"
       let EXCLUSION = "0"
@@ -790,18 +790,19 @@ appRoutes.post('/APC', (request, response) => {
           value.message = "Ok"
           value.score = SCORE
           value.pi = PI
-          value.exclision = EXCLUSION
-          delete value['montO_CODIFICADO']
-          delete value['coD_GRUPO_ECON']
-          delete value['tipO_ASOC']
-          delete value['montO_CODIFICADO']
-          delete value['feC_INICIO_REL']
-          delete value['feC_FIN_REL']
-          delete value['feC_ACTUALIZACION']
+          value.exclusion = EXCLUSION
+          // delete value['montO_CODIFICADO']
+          // delete value['coD_GRUPO_ECON']
+          // delete value['tipO_ASOC']
+          // delete value['montO_CODIFICADO']
+          // delete value['feC_INICIO_REL']
+          // delete value['feC_FIN_REL']
+          // delete value['feC_ACTUALIZACION']
           datos.push(value)
         }
       });
 
+      guardarRef(copia, idMongo)
       response.json(datos)
   }).catch((error) => {
       console.log(error)
@@ -809,6 +810,201 @@ appRoutes.post('/APC', (request, response) => {
       response.json(datos)
   });
 })
+
+
+const guardarRef = async (refApc, idMongo) => {
+
+  // console.log(refApc)
+  const { nombre, apellido, idenT_CLIE, noM_ASOC, } = refApc.gen
+
+  const Generales = {
+    "Nombre": nombre + " " + apellido,
+    "Id": idenT_CLIE,
+    "Usuario": "WSACSORAT001",
+    "Asociado": noM_ASOC
+  }
+
+  const Resumen = []
+  Object.entries(refApc["res"]).forEach(([key, value]) => {
+    if(value !== null) {
+      const dato = {}
+      for (var i in value) {
+        switch(i) {
+          case "relacion":
+            dato.Relacion = value[i]
+            break
+          case "cantidad":
+            dato.Cantidad = value[i]
+            break
+          case "monto":
+            dato.Monto = value[i]
+            break
+          case "saldO_ACTUAL":
+            dato.Saldo_Actual = value[i]
+            break
+          default:
+            // code block
+        }
+      }
+      Resumen.push(dato)
+    }
+  })
+
+  const Referencias = []
+  Object.entries(refApc["det"]).forEach(([key, value]) => {
+    if(value !== null) {
+      const dato = {}
+      for (var i in value) {
+        switch(i) {
+          case "noM_ASOC":
+            dato.Agente_Economico = value[i]
+            break
+          case "descR_CORTA_RELA":
+            dato.Relacion = value[i]
+            break
+          case "montO_ORIGINAL":
+            dato.Monto_Original = value[i]
+            break
+          case "saldO_ACTUAL":
+            dato.Saldo_Actual = value[i]
+            break
+          case "nuM_REFER":
+            dato.Referencia = value[i]
+            break
+          case "nuM_PAGOS":
+            dato.Num_Pagos = value[i]
+            break
+          case "descR_FORMA_PAGO":
+            dato.Forma_Pago = value[i]
+            break
+          case "importE_PAGO":
+            dato.Letra = value[i]
+            break
+          case "montO_ULTIMO_PAGO":
+            dato.Monto_Utimo_Pago = value[i]
+            break
+          case "feC_ULTIMO_PAGO":
+            dato.Fec_Ultimo_pago = value[i]
+            break
+          case "descR_OBS_CORTA":
+            dato.Observacion = value[i]
+            break
+          case "nuM_DIAS_ATRASO":
+            dato.Dias_Atraso = value[i]
+            break
+          case "historia":
+            dato.Historial = value[i]
+            break
+          case "feC_INICIO_REL":
+            dato.Fec_Ini_Relacion = value[i]
+            break
+          case "feC_FIN_REL":
+            dato.Fec_Vencimiento = value[i]
+            break
+          case "feC_ACTUALIZACION":
+            dato.Fec_Actualiazacion = value[i]
+            break
+          default:
+            // code block
+        }
+      }
+      dato.Estado = "ACTULIZADA"
+      dato.Fec_Prescripcion = ""
+      Referencias.push(dato)
+    }
+  })
+
+  const Ref_Canceladas = []
+  Object.entries(refApc["ref"]).forEach(([key, value]) => {
+    if(value !== null) {
+      const dato = {}
+      for (var i in value) {
+        switch(i) {
+          case "noM_ASOC":
+            dato.Agente_Economico = value[i]
+            break
+          case "descR_CORTA_RELA":
+            dato.Relacion = value[i]
+            break
+          case "montO_ORIGINAL":
+            dato.Monto_Original = value[i]
+            break
+          case "nuM_REFER":
+            dato.Referencia = value[i]
+            break
+
+          case "feC_INICIO_REL":
+            dato.Fec_Ini_Relacion = value[i]
+            break
+          case "feC_FIN_REL":
+            dato.Fec_Vencimiento = value[i]
+            break
+          case "feC_LIQUIDACION":
+            dato.Fec_Cancelacion = value[i]
+            break
+
+          case "feC_ULTIMO_PAGO":
+            dato.Fec_Ultimo_pago = value[i]
+            break
+          case "descR_OBS_CORTA":
+            dato.Observacion = value[i]
+            break
+          case "historia":
+            dato.Historial = value[i]
+            break
+
+          default:
+            // code block
+        }
+      }
+      dato.Fec_Prescripcion = ""
+      Ref_Canceladas.push(dato)
+    }
+  })
+
+  const Score = {
+    Score: 0,
+    PI: 0,
+    Exclusion: ""
+  }
+
+  if(refApc["sc"] !== null) {
+    Score.Score = refApc["sc"]["score"]
+    Score.PI = refApc["sc"]["pi"]
+    Score.Exclusion = refApc["sc"]["exclusion"]
+  }
+
+  // console.log(Generales)
+  // console.log(Resumen)
+  // console.log(Referencias)
+  // console.log(Ref_Canceladas)
+  // console.log(Score)
+
+  const udtDatos = {
+    APC: {
+      Generales,
+      Resumen,
+      Referencias,
+      Ref_Canceladas,
+      Score
+    }
+  }
+
+  await mongoose.connect(config.MONGODB_URI, {
+    useNewUrlParser: true, 
+    useUnifiedTopology: true
+  })
+  .then(() => console.log('MongoDB Connected...'))
+  .catch((err) => console.log(err))
+
+  try {
+    await Prospect.findByIdAndUpdate(idMongo, udtDatos, {new: true})
+  } catch(err)  {
+    console.log(err)
+  }
+
+  return udtDatos
+}
 
 
 appRoutes.get('/sectors', (request, response) => {
