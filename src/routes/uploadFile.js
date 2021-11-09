@@ -112,7 +112,14 @@ fileRoutes.get('/createPDF', async (req, res) => {
 
   // Como crear una linea
   // {canvas: [{type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1}]},
-  var dd = {
+  const datosxl = [  
+    [{ style: 'blueWhite', text: 'Nombre:' }, { text: 'JOSE DARIO ANTONIO', style: 'small' }, { border: [false, false, false, false], text: '' }, { style: ['blueWhite', 'right'], text: 'Fecha: ' }, { style: 'small', text: 'fecha' }],
+    [{ style: 'blueWhite', text: 'Identificación:' }, { text: '4-725-1443', style: 'small' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }],
+    [{ style: 'blueWhite', text: 'Usuario Consulta:' }, { text: 'WSACSORAT001', style: 'small' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }],
+    [{ style: 'blueWhite', text: 'Asociado:' }, { text: 'ACSORAT, S.A.', style: 'small' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }],
+  ]
+
+  const dd = {
     pageSize: 'LETTER',
     pageOrientation: 'landscape',
     pageMargins: 60,
@@ -127,12 +134,7 @@ fileRoutes.get('/createPDF', async (req, res) => {
         style: 'tableExample',
         table: {
           widths: [100, 150, 100, 80, 160],
-          body: [
-            [{ style: 'blueWhite', text: 'Nombre:' }, { text: 'JOSE DARIO ANTONIO', style: 'small' }, { border: [false, false, false, false], text: '' }, { style: ['blueWhite', 'right'], text: 'Fecha: ' }, { style: 'small', text: 'fecha' }],
-            [{ style: 'blueWhite', text: 'Identificación:' }, { text: '4-725-1443', style: 'small' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }],
-            [{ style: 'blueWhite', text: 'Usuario Consulta:' }, { text: 'WSACSORAT001', style: 'small' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }],
-            [{ style: 'blueWhite', text: 'Asociado:' }, { text: 'ACSORAT, S.A.', style: 'small' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }],
-          ]
+          body: datosxl
         }
       },
       '\n',

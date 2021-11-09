@@ -1,17 +1,17 @@
 {
   "files": {
     "main.css": "/static/css/main.6b86c434.chunk.css",
-    "main.js": "/static/js/main.770c3007.chunk.js",
-    "main.js.map": "/static/js/main.770c3007.chunk.js.map",
+    "main.js": "/static/js/main.a1db2997.chunk.js",
+    "main.js.map": "/static/js/main.a1db2997.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.9f94ff00.js",
     "runtime-main.js.map": "/static/js/runtime-main.9f94ff00.js.map",
-    "static/js/2.a051a917.chunk.js": "/static/js/2.a051a917.chunk.js",
-    "static/js/2.a051a917.chunk.js.map": "/static/js/2.a051a917.chunk.js.map",
+    "static/js/2.ce9742ea.chunk.js": "/static/js/2.ce9742ea.chunk.js",
+    "static/js/2.ce9742ea.chunk.js.map": "/static/js/2.ce9742ea.chunk.js.map",
     "index.html": "/index.html",
-    "precache-manifest.e35d63467e280b073b13b9fa15508420.js": "/precache-manifest.e35d63467e280b073b13b9fa15508420.js",
+    "precache-manifest.09686e69b624a196d9f3c57cba9d093c.js": "/precache-manifest.09686e69b624a196d9f3c57cba9d093c.js",
     "service-worker.js": "/service-worker.js",
     "static/css/main.6b86c434.chunk.css.map": "/static/css/main.6b86c434.chunk.css.map",
-    "static/js/2.a051a917.chunk.js.LICENSE.txt": "/static/js/2.a051a917.chunk.js.LICENSE.txt",
+    "static/js/2.ce9742ea.chunk.js.LICENSE.txt": "/static/js/2.ce9742ea.chunk.js.LICENSE.txt",
     "static/media/global-bank-logo-desaturated.png": "/static/media/global-bank-logo-desaturated.60c32fb1.png",
     "static/media/global-bank-logo.png": "/static/media/global-bank-logo.631abb1f.png",
     "static/media/home-step-1.png": "/static/media/home-step-1.62b21fac.png",
@@ -31,8 +31,8 @@
   },
   "entrypoints": [
     "static/js/runtime-main.9f94ff00.js",
-    "static/js/2.a051a917.chunk.js",
+    "static/js/2.ce9742ea.chunk.js",
     "static/css/main.6b86c434.chunk.css",
-    "static/js/main.770c3007.chunk.js"
+    "static/js/main.a1db2997.chunk.js"
   ]
 }
