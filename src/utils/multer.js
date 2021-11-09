@@ -1,6 +1,6 @@
 const aws = require("aws-sdk");
 const fs = require('fs')
-const PDF = require('html-pdf')
+// const PDF = require('html-pdf')
 
 const { AWS_Access_key_ID, AWS_Secret_access_key, AWS_BUCKET_NAME, AWS_REGION } = process.env
 
