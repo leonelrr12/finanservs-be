@@ -28,6 +28,7 @@
     "multer-s3": "^2.9.0",
     "mysql2": "^2.2.5",
     "path": "^0.12.7",
+    "pdfmake": "^0.2.3",
     "xmlhttprequest": "^1.8.0"
   }
 }

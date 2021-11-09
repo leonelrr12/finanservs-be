@@ -1,8 +1,14 @@
 const fileRoutes = require('express').Router()
+const mongoose = require('mongoose')
+const Prospect = require('../models/Prospect')
+
 const multer = require('multer')
 const config = require('../utils/config')
 const { uploadFile, uploadFile2 } = require("../utils/multer")
-const PDF = require('html-pdf')
+// const PDF = require('html-pdf')
+const pdfMake = require('pdfmake/build/pdfmake');
+const pdfPrinter = require('pdfmake/src/printer');
+const pdfFonts = require('pdfmake/build/vfs_fonts');
 const fs = require('fs')
 const path = require('path');
 
@@ -86,55 +92,174 @@ fileRoutes.get('/list', async (request, response) => {
 })
 
 
-fileRoutes.post('/createPDF', async (req, res) => {
+fileRoutes.get('/createPDF', async (req, res) => {
 
-  const content  = `
-  <!doctype html>
-  <html>
-      <head>
-          <meta charset="utf-8">
-          <title>PDF Result Template</title>
-          <style>
-              h1 {
-                  color: green;
-              }
-          </style>
-      </head>
-      <body>
-          <div id="pageHeader" style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">
-              <p>Finanservs.com - Referencias de Crédito de APC</p>
-          </div>
-          <div id="pageFooter" style="border-top: 1px solid #ddd; padding-top: 5px;">
-              <p style="color: #666; width: 70%; margin: 0; padding-bottom: 5px; text-align: let; font-family: sans-serif; font-size: .65em; float: left;"><a href="https://finanservs.com" target="_blank">https://finanservs.com</a></p>
-              <p style="color: #666; margin: 0; padding-bottom: 5px; text-align: right; font-family: sans-serif; font-size: .65em">Página {{page}} de {{pages}}</p>
-          </div>
-          <h1>111 Pruebas de Refencias Bancarias con html-pdf</h1>
-          <p>222 Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen. No sólo sobrevivió 500 años, sino que tambien ingresó como texto de relleno en documentos electrónicos, quedando esencialmente igual al original. Fue popularizado en los 60s con la creación de las hojas "Letraset", las cuales contenian pasajes de Lorem Ipsum, y más recientemente con software de autoedición, como por ejemplo Aldus PageMaker, el cual incluye versiones de Lorem Ipsum.</p>
-      </body>
-  </html>`
+  await mongoose.connect(config.MONGODB_URI, {
+    useNewUrlParser: true, 
+    useUnifiedTopology: true
+  })
+  .then(() => console.log('MongoDB Connected...'))
+  .catch((err) => console.log(err))
 
-  console.log(content)
-
-  const options = { 
-    format: 'Letter', 
-    border: {
-        "top": "0.3in",            // default is 0, units: mm, cm, in, px
-        "right": "1in",
-        "bottom": "0.31in",
-        "left": "1in"
-    },
+  try {
+    result = await Prospect.findById("6181cf8499cb258e2077d7d1")
+    console.log(result.APC)
+  } catch(err)  {
+    console.log(err)
   }
 
-  let fileName = path.join(`./pdfs/tmp-pdf-${Date.now()}.pdf`)
+  res.send(result.APC)
 
-  await PDF.create(content, options).toFile(fileName, (err, res2) => {
-    if(err) {
-      console.log(err)
-    } else {
-      // console.log(res.filename)
-      res.send(res2)
+  // Como crear una linea
+  // {canvas: [{type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1}]},
+  var dd = {
+    pageSize: 'LETTER',
+    pageOrientation: 'landscape',
+    pageMargins: 60,
+    content: [
+      {
+        text: 'REPORTE DE CRÉDITO',
+        style: 'header'
+      },
+      { text: 'www.finanservs.com', link: 'https:www//finanservs.com', style: { fontSize: 8, alignment: 'center', color: 'blue' } },
+      '\n\n',
+      {
+        style: 'tableExample',
+        table: {
+          widths: [100, 150, 100, 80, 160],
+          body: [
+            [{ style: 'blueWhite', text: 'Nombre:' }, { text: 'JOSE DARIO ANTONIO', style: 'small' }, { border: [false, false, false, false], text: '' }, { style: ['blueWhite', 'right'], text: 'Fecha: ' }, { style: 'small', text: 'fecha' }],
+            [{ style: 'blueWhite', text: 'Identificación:' }, { text: '4-725-1443', style: 'small' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }],
+            [{ style: 'blueWhite', text: 'Usuario Consulta:' }, { text: 'WSACSORAT001', style: 'small' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }],
+            [{ style: 'blueWhite', text: 'Asociado:' }, { text: 'ACSORAT, S.A.', style: 'small' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }],
+          ]
+        }
+      },
+      '\n',
+      {
+        table: {
+          // headers are automatically repeated if the table spans over multiple pages
+          // you can declare how many rows should be treated as headers
+          widths: [150],
+          body: [
+            [{ text: 'Referencias Activas', style: 'blueWhite', border: [true, true, true, false] }],
+          ]
+        }
+      },
+      {
+        layout: 'lightVerticalLines', // optional
+        // style: 'blueWhite',
+        table: {
+          // headers are automatically repeated if the table spans over multiple pages
+          // you can declare how many rows should be treated as headers
+          // headerRows: 2,
+          // widths: [ '*', 'auto', 100, '*' ],
+          widths: [ 130, 100, 80, 80, 80, '*' ],
+          body: [
+            [{ style: 'blueWhite', text: 'Agente Económico' }, { style: 'blueWhite', text: 'Monto Original' }, { style: 'blueWhite', text: 'Fec. Inicio Relación' }, { style: 'blueWhite', text: 'Importe' }, { style: 'blueWhite', rowSpan: 2, text: 'Dias Atraso'}, { style: 'blueWhite', text: 'Forma Pago' }],
+            [{ style: 'blueWhite', text: 'Relación' }, { style: 'blueWhite', text: 'Saldo Actual' }, { style: 'blueWhite', text: 'Fecha Actualización' }, { style: 'blueWhite', text: 'Monto Último Pago' },'', { style: 'blueWhite', text: 'Historial' }],
+            [{ style: 'small', text: 'CAJA DE AHORROS' }, { style: ['small', 'right'], text: '25,352.86' }, { style: ['small', 'center'], text: '11/Nov/2018' }, { style: ['small', 'right'], text: '250.45' }, {rowSpan: 2, style: ['small', 'center'], text: '93' }, { style: 'small', text: 'DESCUENTO DIRECTO' }],
+            [{ style: 'small', text: 'HIPOTECA' }, { style: ['small', 'right'], text: '10,352.86' }, { style: ['small', 'center'], text: '11/Nov/2021' }, { style: ['small', 'right'], text: '250.45' },'', { style: 'small', text: '111111122221113311133344' }]
+          ]
+        }
+      },
+      '\n',
+      {
+        table: {
+          // headers are automatically repeated if the table spans over multiple pages
+          // you can declare how many rows should be treated as headers
+          widths: [150],
+          body: [
+            [{ text: 'Referencias Canceladas', style: 'blueWhite', border: [true, true, true, false] }],
+          ]
+        }
+      },
+      {
+        // layout: 'lightVerticalLines', // optional
+        // style: 'blueWhite',
+        table: {
+          // headers are automatically repeated if the table spans over multiple pages
+          // you can declare how many rows should be treated as headers
+          // headerRows: 2,
+          // widths: [ '*', 'auto', 100, '*' ],
+          widths: [ 130, 100, 80, 80, 80, '*' ],
+          body: [
+            [{ style: 'blueWhite', text: 'Relación' }, { style: 'blueWhite', text: 'No. Referencia' }, { style: ['blueWhite', 'center'], text: 'Fec. Úlyimo Pago' }, { style: ['blueWhite', 'right'], text: 'Monto Original' }, { style: ['blueWhite', 'center'], text: 'Fec. Cancelación' }, { style: 'blueWhite', text: 'Historial' }],
+            [{ style: 'small', text: 'Agente Económico:' }, { colSpan: 5, style: 'small', text: 'BANCO GENERAL xyz' }],
+            [{ style: 'small', text: 'PRESTAMO PERSONAL' }, { style: ['small'], text: '20105555' }, { style: ['small', 'center'], text: '11/Nov/2018' }, { style: ['small', 'right'], text: '6,500.45' }, { style: ['small', 'center'], text: '23/jun/2020' }, { style: 'small', text: '111111555551111166667777' }],
+            [{ style: 'small', text: 'Comentarios:' }, { colSpan: 5, style: 'small', text: '' }],
+          ]
+        }
+      }
+    ],
+    styles: {
+      header: {
+        fontSize: 12,
+        bold: true,
+        alignment: 'center'
+      },
+      subheader: {
+        fontSize: 10,
+        bold: true
+      },
+      quote: {
+        italics: true
+      },
+      small: {
+        fontSize: 8
+      },
+      blueWhite: {
+        fillColor: '#00007b',
+        color: 'white',
+        fontSize: 8
+      },
+      center: {
+        alignment: 'center'
+      },
+      right: {
+        alignment: 'right'
+      }
     }
-  })
+  }
+
+  var fonts = {
+    Roboto: {
+        normal: './src/fonts/Roboto-Regular.ttf',
+        bold: './src/fonts/Roboto-Medium.ttf',
+        italics: './src/fonts/Roboto-Italic.ttf',
+        bolditalics: './srcset/fonts/Roboto-MediumItalic.ttf'
+    }
+  };
+
+  const printer = new pdfPrinter(fonts)
+  var pdfDoc = printer.createPdfKitDocument(dd);
+  pdfDoc.pipe(fs.createWriteStream('pdfs/basics.pdf')).on('finish',function(){
+      //success
+  });
+  pdfDoc.end();
+
+  // console.log(content)
+
+  // const options = { 
+  //   format: 'Letter', 
+  //   border: {
+  //       "top": "0.3in",            // default is 0, units: mm, cm, in, px
+  //       "right": "1in",
+  //       "bottom": "0.31in",
+  //       "left": "1in"
+  //   },
+  // }
+
+  // let fileName = path.join(`./pdfs/tmp-pdf-${Date.now()}.pdf`)
+
+  // await PDF.create(content, options).toFile(fileName, (err, res2) => {
+  //   if(err) {
+  //     console.log(err)
+  //   } else {
+  //     // console.log(res.filename)
+  //     res.send(res2)
+  //   }
+  // })
 })
 
 module.exports = fileRoutes
