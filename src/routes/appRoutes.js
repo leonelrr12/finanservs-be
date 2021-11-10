@@ -156,7 +156,7 @@ appRoutes.put('/clientify', async (req, res) => {
 
           donde_trabaja = 'N/A', Puesto = 'N/A', Cedula = 'N/A', 
           img_cedula = 'N/A',  img_ficha_css = 'N/A', img_servicio_publico = 'N/A', img_carta_trabajo = 'N/A', 
-          img_comprobante_pago = 'N/A', img_autoriza_apc = 'N/A', province, district, county, street = 'N/A'
+          img_comprobante_pago = 'N/A', img_autoriza_apc = 'N/A', img_referencias_apc = 'N/A', province, district, county, street = 'N/A'
         
         } = body
 
@@ -266,6 +266,7 @@ appRoutes.put('/clientify', async (req, res) => {
       {"field": "img_carta_trabajo", "value": img_carta_trabajo},
       {"field": "img_comprobante_pago", "value": img_comprobante_pago},
       {"field": "img_autoriza_apc", "value": img_autoriza_apc},
+      {"field": "img_referencias_apc", "value": img_referencias_apc},
 
       {"field": "contrato_laboral", "value": contrato_laboral}, 
       {"field": "meses_trabajo_actual", "value": Number(meses_trabajo_actual)},
@@ -416,39 +417,11 @@ appRoutes.post('/tracking', async (req, res) => {
       Extension_Trabajo,
       Trabajo_Anterior,
       Meses_Trabajo_Anterior,
-
-      Entidad_Seleccionada,
-      Prestamo_Opciones,
-
-      Img_ID,
-      Img_Ficha_CSS,
-      Img_Servicio_Publico,
-      Img_Carta_Trabajo,
-      Img_Comprobante_Pago,
-      Img_Autoriza_APC,
-      
-      Ref_Familia_Nombre,
-      Ref_Familia_Apellido,
-      Ref_Familia_Parentesco,
-      Ref_Familia_Telefono,
-      Ref_Familia_Casa_No,
-      Ref_Familia_Empresa,
-      Ref_Familia_Empresa_Telefono,
-      Ref_Familia_Empresa_Extension,
-
-      Ref_No_Familia_Nombre,
-      Ref_No_Familia_Apellido,
-      Ref_No_Familia_Parentesco,
-      Ref_No_Familia_Telefono,
-      Ref_No_Familia_Casa_No,
-      Ref_No_Familia_Empresa,
-      Ref_No_Familia_Empresa_Telefono,
-      Ref_No_Familia_Empresa_Extension,
-    
     } = req.body
 
   // Historial_Credito, 
   const newProspect =  new Prospect({
+    Email,
     Numero_Id,
     Prospect: {
       Nombre,
@@ -497,41 +470,6 @@ appRoutes.post('/tracking', async (req, res) => {
       Extension_Trabajo,
       Trabajo_Anterior,
       Meses_Trabajo_Anterior,
-    },
-
-    Entidad_Seleccionada,
-    Prestamo_Opciones: Prestamo_Opciones ? JSON.parse(Prestamo_Opciones): "",
-    Monto_max: 0,
-
-    Documentos: {
-      Img_ID,
-      Img_Ficha_CSS,
-      Img_Servicio_Publico,
-      Img_Carta_Trabajo,
-      Img_Comprobante_Pago,
-      Img_Autoriza_APC,
-    },
-
-    Ref_Personal_Familia: {
-      Ref_Familia_Nombre,
-      Ref_Familia_Apellido,
-      Ref_Familia_Parentesco,
-      Ref_Familia_Telefono,
-      Ref_Familia_Casa_No,
-      Ref_Familia_Empresa,
-      Ref_Familia_Empresa_Telefono,
-      Ref_Familia_Empresa_Extension,
-    },
-
-    Ref_Personal_No_Familia: {
-      Ref_No_Familia_Nombre,
-      Ref_No_Familia_Apellido,
-      Ref_No_Familia_Parentesco,
-      Ref_No_Familia_Telefono,
-      Ref_No_Familia_Casa_No,
-      Ref_No_Familia_Empresa,
-      Ref_No_Familia_Empresa_Telefono,
-      Ref_No_Familia_Empresa_Extension,
     },
   })
 
@@ -601,6 +539,7 @@ appRoutes.put('/tracking', async (req, res) => {
     Img_Carta_Trabajo,
     Img_Comprobante_Pago,
     Img_Autoriza_APC,
+    Img_Referencias_APC,
     
     Ref_Familia_Nombre,
     Ref_Familia_Apellido,
@@ -621,12 +560,14 @@ appRoutes.put('/tracking', async (req, res) => {
     Ref_No_Familia_Empresa_Extension,
 
     id_param,
-  
+    Tracking,
   } = req.body
   
   // Historial_Credito, 
   const udtDatos =  {
+    Email,
     Numero_Id,
+    Tracking,
     Prospect: {
       Nombre,
       Segundo_Nombre,
@@ -688,6 +629,7 @@ appRoutes.put('/tracking', async (req, res) => {
       Img_Carta_Trabajo,
       Img_Comprobante_Pago,
       Img_Autoriza_APC,
+      Img_Referencias_APC
     },
 
     Ref_Personal_Familia: {
@@ -722,6 +664,57 @@ appRoutes.put('/tracking', async (req, res) => {
   }
 })
 
+appRoutes.get('/tracking/:email', (req, res) => {
+
+  const { email } = req.params
+
+  mongoose.connect(config.MONGODB_URI, {
+    useNewUrlParser: true, useUnifiedTopology: true
+  })
+ 
+  Prospect.find({ "Email": email }, '_id', function (err, data) {
+    if (err) return handleError(err);
+    // 'athletes' contains the list of athletes that match the criteria.
+    res.send(data)
+  })
+})
+
+appRoutes.get('/tracking/id/:id', (req, res) => {
+
+  const { id } = req.params
+
+  mongoose.connect(config.MONGODB_URI, {
+    useNewUrlParser: true, useUnifiedTopology: true
+  })
+ 
+  Prospect.findById({ "_id": id }, function(err, data) {
+    if(err){
+        console.log(err)
+    }
+    else{
+        res.send(data)
+    }
+  }) 
+})
+
+appRoutes.get('/tracking/delete/:id', (req, res) => {
+
+  const { id } = req.params
+
+  mongoose.connect(config.MONGODB_URI, {
+    useNewUrlParser: true, useUnifiedTopology: true
+  })
+ 
+  Prospect.findByIdAndRemove({ "_id": id }, function(err, result) {
+    if(err){
+        console.log(err)
+    }
+    else{
+        res.send("Ok")
+    }
+  }) 
+})
+
 appRoutes.get('/tracking', (req, res) => {
   mongoose.connect(config.MONGODB_URI, {
     useNewUrlParser: true, useUnifiedTopology: true
@@ -729,13 +722,13 @@ appRoutes.get('/tracking', (req, res) => {
  
   Prospect.find(function(err, data) {
       if(err){
-          console.log(err);
+          console.log(err)
       }
       else{
-          res.send(data);
+          res.send(data)
       }
-  });  
-});
+  }) 
+})
 
 appRoutes.delete('/tracking', (req, res) => {
   const { id } = req.body
@@ -745,16 +738,6 @@ appRoutes.delete('/tracking', (req, res) => {
     res.send("Ok!");
   });
 });
-
-// appRoutes.delete('/tracking', (req, res) => {
-//   const { cond } = req.body
-//   Prospect.deleteMany(cond, function (err) {
-//     if(err) console.log(err);
-//     console.log("Successful deletion");
-//     res.send("Ok!");
-//   });
-// });
-
 
 appRoutes.post('/APC', (request, response) => {
 

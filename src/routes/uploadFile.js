@@ -5,7 +5,6 @@ const Prospect = require('../models/Prospect')
 const multer = require('multer')
 const config = require('../utils/config')
 const { uploadFile, uploadFile2 } = require("../utils/multer")
-// const PDF = require('html-pdf')
 const pdfMake = require('pdfmake/build/pdfmake');
 const pdfPrinter = require('pdfmake/src/printer');
 const pdfFonts = require('pdfmake/build/vfs_fonts');
@@ -92,7 +91,9 @@ fileRoutes.get('/list', async (request, response) => {
 })
 
 
-fileRoutes.get('/createPDF', async (req, res) => {
+fileRoutes.post('/createPDF', async (req, res) => {
+
+  const { idMongo } = req.body
 
   await mongoose.connect(config.MONGODB_URI, {
     useNewUrlParser: true, 
@@ -102,166 +103,201 @@ fileRoutes.get('/createPDF', async (req, res) => {
   .catch((err) => console.log(err))
 
   try {
-    result = await Prospect.findById("6181cf8499cb258e2077d7d1")
-    console.log(result.APC)
+    // PONER A LEER POR EMAIL
+    result = await Prospect.findById(idMongo)
+
+    const separator = (numb) => {
+      var str = numb.toString().split(".");
+      if(str.length > 1) {
+        str[1] = str[1].padEnd(2, '0')
+      } else {
+        str[1]='00'
+      }
+      str[0] = str[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      return str.join(".");
+    }
+
+    const hoyes = new Date().toLocaleString()
+    const gen = result.APC.Generales
+    const ref = result.APC.Referencias
+    const refC = result.APC.Ref_Canceladas
+
+    // Como crear una linea
+    // {canvas: [{type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1}]},
+
+    const datosRef = [
+      [{ style: 'blueWhite', colSpan: 2, text: 'Agente Económico' }, {}, { style: 'blueWhite', text: 'Monto Original' }, { style: 'blueWhite', text: 'Fec. Inicio Relación' }, { style: 'blueWhite', text: 'Importe' }, { style: 'blueWhite', text: 'Num. Pagos'}, { style: 'blueWhite', text: 'Forma Pago' }],
+      [{ style: 'blueWhite', text: 'Relación' }, { style: 'blueWhite', text: 'No. Referencia' }, { style: 'blueWhite', text: 'Saldo Actual' }, { style: 'blueWhite', text: 'Fecha Actualización' }, { style: 'blueWhite', text: 'Monto Último Pago' }, { style: 'blueWhite', text: 'Días Atraso'}, { style: 'blueWhite', text: 'Historial' }],
+    ]
+    
+    ref.forEach(r => {
+      datosRef.push([{ border: [true, false, false, false], style: 'small0', colSpan: 2, text: r.Agente_Economico }, {}, { border: [true, false, false, false], style: ['small0', 'right'], text: separator(r.Monto_Original) }, { border: [true, false, false, false], style: ['small0', 'center'], text: r.Fec_Ini_Relacion }, { border: [true, false, false, false], style: ['small0', 'right'], text: separator(r.Letra) }, { border: [true, false, false, false], style: ['small0', 'center'], text: r.Num_Pagos }, { border: [true, false, true, false], style: 'small0', text: r.Forma_Pago }])
+      datosRef.push([{ border: [true, false, false, false], style: 'small', text: r.Relacion }, { border: [true, false, false, false], style: 'small', text: r.Referencia }, { border: [true, false, false, false], style: ['small', 'right'], text: separator(r.Saldo_Actual) }, { border: [true, false, false, false], style: ['small', 'center'], text: r.Fec_Actualizacion }, { border: [true, false, false, false], style: ['small', 'right'], text: separator(r.Monto_Utimo_Pago) }, { border: [true, false, false, false], style: ['small', 'center'], text: r.Dias_Atraso }, { border: [true, false, true, false], style: 'small', text: r.Historial }])
+    })
+    datosRef.push([{ colSpan: 7, border: [false, true, false, false], text: '' }])
+
+    const datosRefC = [
+      [{ style: 'blueWhite', text: 'Relación' }, { style: 'blueWhite', text: 'No. Referencia' }, { style: ['blueWhite', 'center'], text: 'Fec. Último Pago' }, { style: ['blueWhite', 'right'], text: 'Monto Original' }, { style: ['blueWhite', 'center'], text: 'Fec. Cancelación' }, { style: 'blueWhite', text: 'Historial' }],
+    ]
+
+    refC.forEach(r => {
+      datosRefC.push([{ border: [true, false, false, false], style: ['small', { bold: true }], text: 'Agente Económico:' }, { colSpan: 5, border: [true, false, true, false], style: 'small', text: r.Agente_Economico }])
+      datosRefC.push([{ border: [true, false, false, false], style: 'small0', text: r.Relacion }, { border: [true, false, false, false], style: ['small0'], text: r.Referencia }, { border: [true, false, false, false], style: ['small0', 'center'], text: '' }, { border: [true, false, false, false], style: ['small0', 'right'], text: separator(0) }, { border: [true, false, false, false], style: ['small0', 'center'], text: r.Fec_Cancelacion }, { border: [true, false, true, false], style: 'small0', text: r.Historial }])
+      datosRefC.push([{ border: [true, false, false, false], style: ['small', { bold: true }], text: 'Observación:' }, { colSpan: 5, border: [true, false, true, false], style: 'small', text: r.Observacion }])
+    })
+    datosRefC.push([{ colSpan: 6, border: [false, true, false, false], text: '' }])
+
+    // pageOrientation: 'landscape',
+    // footer: function(currentPage, pageCount) { return currentPage.toString() + ' of ' + pageCount; },
+    // header: function(currentPage, pageCount, pageSize) {
+    //   // you can apply any logic and return any valid pdfmake element
+
+    //   return [
+    //     { text: 'simple text', alignment: (currentPage % 2) ? 'left' : 'right' },
+    //     { canvas: [ { type: 'rect', x: 170, y: 32, w: pageSize.width - 170, h: 40 } ] }
+    //   ]
+    // },
+
+    const dd = {
+      pageSize: 'LETTER',
+      pageMargins: 20,
+
+      content: [
+        {
+          text: 'REPORTE DE CRÉDITO',
+          style: 'header'
+        },
+        { text: 'www.fiinanservs.com', link: 'https:www//finanservs.com', style: { fontSize: 8, alignment: 'center', color: 'blue' } },
+        '\n\n',
+        {
+          style: 'tableExample',
+          table: {
+            widths: [100, 150, 90, 70, 110],
+            body: [  
+              [{ style: 'blueWhite', text: 'Nombre:' }, { text: gen.Nombre, style: 'small1' }, { border: [false, false, false, false], text: '' }, { style: ['blueWhite', 'right'], text: 'Fecha: ' }, { style: 'small1', text: hoyes }],
+              [{ style: 'blueWhite', text: 'Identificación:' }, { text: gen.Id, style: 'small1' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }],
+              [{ style: 'blueWhite', text: 'Usuario Consulta:' }, { text: gen.Usuario, style: 'small1' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }],
+              [{ style: 'blueWhite', text: 'Asociado:' }, { text: gen.Asociado, style: 'small1' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }],
+            ]
+          }
+        },
+        '\n',
+        {
+          table: {
+            // headers are automatically repeated if the table spans over multiple pages
+            // you can declare how many rows should be treated as headers
+            widths: [150],
+            body: [
+              [{ text: 'Referencias Activas', style: 'blueWhite', border: [true, true, true, false] }],
+            ]
+          }
+        },
+        {
+          layout: 'lightVerticalLines', // optional
+          // style: 'blueWhite',
+          table: {
+            // headers are automatically repeated if the table spans over multiple pages
+            // you can declare how many rows should be treated as headers
+            // headerRows: 2,
+            // widths: [ '*', 'auto', 100, '*' ],
+            widths: [ 100, 70, 50, 50, 50, 50, '*' ],
+            body: datosRef
+          }
+        },
+        '\n',
+        {
+          table: {
+            // headers are automatically repeated if the table spans over multiple pages
+            // you can declare how many rows should be treated as headers
+            widths: [150],
+            body: [
+              [{ text: 'Referencias Canceladas', style: 'blueWhite', border: [true, true, true, false] }],
+            ]
+          }
+        },
+        {
+          // layout: 'lightVerticalLines', // optional
+          // style: 'blueWhite',
+          table: {
+            // headers are automatically repeated if the table spans over multiple pages
+            // you can declare how many rows should be treated as headers
+            // headerRows: 2,
+            // widths: [ '*', 'auto', 100, '*' ],
+            widths: [ 120, 50, 50, 50, 50, '*' ],
+            body: datosRefC
+          }
+        },
+        '\n\n',
+        {
+          // under NodeJS (or in case you use virtual file system provided by pdfmake)
+          // you can also pass file names here
+          image: './public/images/leer-historial-apc.png',
+          width: 300,
+          height: 200,
+          alignment: 'center'
+        }
+      ],
+      styles: {
+        header: {
+          fontSize: 12,
+          bold: true,
+          alignment: 'center'
+        },
+        subheader: {
+          fontSize: 10,
+          bold: true
+        },
+        quote: {
+          italics: true
+        },
+        small0: {
+          fontSize: 7,
+          fillColor: '#dddddd',
+        },
+        small1: {
+          fontSize: 7,
+        },
+        small: {
+          fontSize: 7,
+          fillColor: '#eeeeee',
+        },
+        blueWhite: {
+          fillColor: '#00007b',
+          color: 'white',
+          fontSize: 8,
+          bold: true
+        },
+        center: {
+          alignment: 'center'
+        },
+        right: {
+          alignment: 'right'
+        }
+      }
+    }
+
+    var fonts = {
+      Roboto: {
+          normal: './public/fonts/Roboto-Regular.ttf',
+          bold: './public/fonts/Roboto-Medium.ttf',
+          italics: './public/fonts/Roboto-Italic.ttf',
+          bolditalics: './public/fonts/Roboto-MediumItalic.ttf'
+      }
+    };
+
+    let fileName = path.join(`./pdfs/tmp-pdf-${Date.now()}.pdf`)
+
+    const printer = new pdfPrinter(fonts)
+    var pdfDoc = printer.createPdfKitDocument(dd);
+    pdfDoc.pipe(fs.createWriteStream(fileName)).on('finish',function(){
+        //success
+    });
+    pdfDoc.end();
+
+    res.json({'fileName': fileName})
   } catch(err)  {
     console.log(err)
   }
-
-  res.send(result.APC)
-
-  // Como crear una linea
-  // {canvas: [{type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1}]},
-  const datosxl = [  
-    [{ style: 'blueWhite', text: 'Nombre:' }, { text: 'JOSE DARIO ANTONIO', style: 'small' }, { border: [false, false, false, false], text: '' }, { style: ['blueWhite', 'right'], text: 'Fecha: ' }, { style: 'small', text: 'fecha' }],
-    [{ style: 'blueWhite', text: 'Identificación:' }, { text: '4-725-1443', style: 'small' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }],
-    [{ style: 'blueWhite', text: 'Usuario Consulta:' }, { text: 'WSACSORAT001', style: 'small' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }],
-    [{ style: 'blueWhite', text: 'Asociado:' }, { text: 'ACSORAT, S.A.', style: 'small' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }],
-  ]
-
-  const dd = {
-    pageSize: 'LETTER',
-    pageOrientation: 'landscape',
-    pageMargins: 60,
-    content: [
-      {
-        text: 'REPORTE DE CRÉDITO',
-        style: 'header'
-      },
-      { text: 'www.finanservs.com', link: 'https:www//finanservs.com', style: { fontSize: 8, alignment: 'center', color: 'blue' } },
-      '\n\n',
-      {
-        style: 'tableExample',
-        table: {
-          widths: [100, 150, 100, 80, 160],
-          body: datosxl
-        }
-      },
-      '\n',
-      {
-        table: {
-          // headers are automatically repeated if the table spans over multiple pages
-          // you can declare how many rows should be treated as headers
-          widths: [150],
-          body: [
-            [{ text: 'Referencias Activas', style: 'blueWhite', border: [true, true, true, false] }],
-          ]
-        }
-      },
-      {
-        layout: 'lightVerticalLines', // optional
-        // style: 'blueWhite',
-        table: {
-          // headers are automatically repeated if the table spans over multiple pages
-          // you can declare how many rows should be treated as headers
-          // headerRows: 2,
-          // widths: [ '*', 'auto', 100, '*' ],
-          widths: [ 130, 100, 80, 80, 80, '*' ],
-          body: [
-            [{ style: 'blueWhite', text: 'Agente Económico' }, { style: 'blueWhite', text: 'Monto Original' }, { style: 'blueWhite', text: 'Fec. Inicio Relación' }, { style: 'blueWhite', text: 'Importe' }, { style: 'blueWhite', rowSpan: 2, text: 'Dias Atraso'}, { style: 'blueWhite', text: 'Forma Pago' }],
-            [{ style: 'blueWhite', text: 'Relación' }, { style: 'blueWhite', text: 'Saldo Actual' }, { style: 'blueWhite', text: 'Fecha Actualización' }, { style: 'blueWhite', text: 'Monto Último Pago' },'', { style: 'blueWhite', text: 'Historial' }],
-            [{ style: 'small', text: 'CAJA DE AHORROS' }, { style: ['small', 'right'], text: '25,352.86' }, { style: ['small', 'center'], text: '11/Nov/2018' }, { style: ['small', 'right'], text: '250.45' }, {rowSpan: 2, style: ['small', 'center'], text: '93' }, { style: 'small', text: 'DESCUENTO DIRECTO' }],
-            [{ style: 'small', text: 'HIPOTECA' }, { style: ['small', 'right'], text: '10,352.86' }, { style: ['small', 'center'], text: '11/Nov/2021' }, { style: ['small', 'right'], text: '250.45' },'', { style: 'small', text: '111111122221113311133344' }]
-          ]
-        }
-      },
-      '\n',
-      {
-        table: {
-          // headers are automatically repeated if the table spans over multiple pages
-          // you can declare how many rows should be treated as headers
-          widths: [150],
-          body: [
-            [{ text: 'Referencias Canceladas', style: 'blueWhite', border: [true, true, true, false] }],
-          ]
-        }
-      },
-      {
-        // layout: 'lightVerticalLines', // optional
-        // style: 'blueWhite',
-        table: {
-          // headers are automatically repeated if the table spans over multiple pages
-          // you can declare how many rows should be treated as headers
-          // headerRows: 2,
-          // widths: [ '*', 'auto', 100, '*' ],
-          widths: [ 130, 100, 80, 80, 80, '*' ],
-          body: [
-            [{ style: 'blueWhite', text: 'Relación' }, { style: 'blueWhite', text: 'No. Referencia' }, { style: ['blueWhite', 'center'], text: 'Fec. Úlyimo Pago' }, { style: ['blueWhite', 'right'], text: 'Monto Original' }, { style: ['blueWhite', 'center'], text: 'Fec. Cancelación' }, { style: 'blueWhite', text: 'Historial' }],
-            [{ style: 'small', text: 'Agente Económico:' }, { colSpan: 5, style: 'small', text: 'BANCO GENERAL xyz' }],
-            [{ style: 'small', text: 'PRESTAMO PERSONAL' }, { style: ['small'], text: '20105555' }, { style: ['small', 'center'], text: '11/Nov/2018' }, { style: ['small', 'right'], text: '6,500.45' }, { style: ['small', 'center'], text: '23/jun/2020' }, { style: 'small', text: '111111555551111166667777' }],
-            [{ style: 'small', text: 'Comentarios:' }, { colSpan: 5, style: 'small', text: '' }],
-          ]
-        }
-      }
-    ],
-    styles: {
-      header: {
-        fontSize: 12,
-        bold: true,
-        alignment: 'center'
-      },
-      subheader: {
-        fontSize: 10,
-        bold: true
-      },
-      quote: {
-        italics: true
-      },
-      small: {
-        fontSize: 8
-      },
-      blueWhite: {
-        fillColor: '#00007b',
-        color: 'white',
-        fontSize: 8
-      },
-      center: {
-        alignment: 'center'
-      },
-      right: {
-        alignment: 'right'
-      }
-    }
-  }
-
-  var fonts = {
-    Roboto: {
-        normal: './src/fonts/Roboto-Regular.ttf',
-        bold: './src/fonts/Roboto-Medium.ttf',
-        italics: './src/fonts/Roboto-Italic.ttf',
-        bolditalics: './srcset/fonts/Roboto-MediumItalic.ttf'
-    }
-  };
-
-  const printer = new pdfPrinter(fonts)
-  var pdfDoc = printer.createPdfKitDocument(dd);
-  pdfDoc.pipe(fs.createWriteStream('pdfs/basics.pdf')).on('finish',function(){
-      //success
-  });
-  pdfDoc.end();
-
-  // console.log(content)
-
-  // const options = { 
-  //   format: 'Letter', 
-  //   border: {
-  //       "top": "0.3in",            // default is 0, units: mm, cm, in, px
-  //       "right": "1in",
-  //       "bottom": "0.31in",
-  //       "left": "1in"
-  //   },
-  // }
-
-  // let fileName = path.join(`./pdfs/tmp-pdf-${Date.now()}.pdf`)
-
-  // await PDF.create(content, options).toFile(fileName, (err, res2) => {
-  //   if(err) {
-  //     console.log(err)
-  //   } else {
-  //     // console.log(res.filename)
-  //     res.send(res2)
-  //   }
-  // })
 })
 
 module.exports = fileRoutes

@@ -2,8 +2,9 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const prospectSchema = new Schema({
+  Email: {type: String},
   Numero_Id: {type: String, default: null},
-  Tracking: {type: String, default: "Step No.1: Login"},
+  Tracking: {type: String},
   "Creado el": {type: Date, default: new Date()},
   "Modificado el": {type: Date, default: new Date()},
 
@@ -69,6 +70,7 @@ const prospectSchema = new Schema({
     Img_Carta_Trabajo: {type: String},
     Img_Comprobante_Pago: {type: String},
     Img_Autoriza_APC: {type: String},
+    Img_Referencias_APC: {type: String},
   },
   Ref_Personal_Familia: {
     Ref_Familia_Nombre: {type: String},
