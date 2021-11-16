@@ -48,15 +48,15 @@ admRoutes.get('/prospects', (request, response) => {
 })
 
 admRoutes.post('/prospects', (request, response) => {
-  const sql = "INSERT INTO prospects (id_personal,idUser,name,fname,fname_2,lname,lname_2,"
+  let sql = "INSERT INTO prospects (id_personal,idUser,name,fname,fname_2,lname,lname_2,"
   sql += " entity_f,estado,email,cellphone,phoneNumber,idUrl,socialSecurityProofUrl,"
   sql += " publicGoodProofUrl,workLetterUrl,payStubUrl,origin_idUser,gender,birthDate,"
   sql += " contractType,jobSector,occupation,paymentFrecuency,profession,residenceType,"
   sql += " civil_status,province,district,salary,fcreate,fupdate,quotation,application,sign,"
-  sql += " loanPP,loanAuto,loanTC,loanHip,cashOnHand,plazo,monto)"
-  sql += " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,now(),now(),?,?,?,?,?,?,?,?,?,?)"
+  sql += " loanPP,loanAuto,loanTC,loanHip,cashOnHand,plazo)"
+  sql += " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,now(),now(),?,?,?,?,?,?,?,?,?)"
 
-  let {id_personal,idUser,name,fname,fname_2,lname,lname_2,entity_f,estado,email,cellphone,phoneNumber,idUrl,socialSecurityProofUrl,publicGoodProofUrl,workLetterUrl,payStubUrl,origin_idUser,gender,birthDate,contractType,jobSector,occupation,paymentFrecuency,profession,residenceType,civil_status,province,district,salary,quotation,application,sign,loanPP,loanAuto,loanTC,loanHip,cashOnHand,plazo,monto} = request.body
+  let {id_personal,idUser,name,fname,fname_2,lname,lname_2,entity_f,estado,email,cellphone,phoneNumber,idUrl,socialSecurityProofUrl,publicGoodProofUrl,workLetterUrl,payStubUrl,origin_idUser,gender,birthDate,contractType,jobSector,occupation,paymentFrecuency,profession,residenceType,civil_status,province,district,salary,quotation,application,sign,loanPP,loanAuto,loanTC,loanHip,cashOnHand,plazo} = request.body
 
   estado = 1 // Nuevo registro queda con estatus de nuevo
 
@@ -64,7 +64,7 @@ admRoutes.post('/prospects', (request, response) => {
   if(cellphone === undefined) cellphone = 'N/A'
   
   birthDate = birthDate.slice(0,10)
-  const params = [id_personal,idUser,name,fname,fname_2,lname,lname_2,entity_f,estado,email,cellphone,phoneNumber,idUrl,socialSecurityProofUrl,publicGoodProofUrl,workLetterUrl,payStubUrl,origin_idUser,gender,birthDate,contractType,jobSector,occupation,paymentFrecuency,profession,residenceType,civil_status,province,district,salary,quotation,application,sign,loanPP,loanAuto,loanTC,loanHip,cashOnHand,plazo,monto]
+  const params = [id_personal,idUser,name,fname,fname_2,lname,lname_2,entity_f,estado,email,cellphone,phoneNumber,idUrl,socialSecurityProofUrl,publicGoodProofUrl,workLetterUrl,payStubUrl,origin_idUser,gender,birthDate,contractType,jobSector,occupation,paymentFrecuency,profession,residenceType,civil_status,province,district,salary,quotation,application,sign,loanPP,loanAuto,loanTC,loanHip,cashOnHand,plazo]
 
   // console.log(request.body);
   // console.log(params);

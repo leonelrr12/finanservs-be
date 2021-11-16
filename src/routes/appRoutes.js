@@ -55,6 +55,9 @@ appRoutes.post('/email', async (req, res) => {
       auth: {
         user: "guasimo12@gmail.com", 
         pass: "nicol1204"
+      },
+      tls: {
+        rejectUnauthorized: false
       }
     })
 
