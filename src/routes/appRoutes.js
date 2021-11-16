@@ -719,7 +719,7 @@ appRoutes.get('/tracking/:email', cors(), (req, res) => {
 
   const { email } = req.params
 
-  return res.send(email)
+  // return res.send(email)
 
   mongoose.connect(config.MONGODB_URI, {
     useNewUrlParser: true, useUnifiedTopology: true
