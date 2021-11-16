@@ -66,8 +66,8 @@ admRoutes.post('/prospects', (request, response) => {
   birthDate = birthDate.slice(0,10)
   const params = [id_personal,idUser,name,fname,fname_2,lname,lname_2,entity_f,estado,email,cellphone,phoneNumber,idUrl,socialSecurityProofUrl,publicGoodProofUrl,workLetterUrl,payStubUrl,origin_idUser,gender,birthDate,contractType,jobSector,occupation,paymentFrecuency,profession,residenceType,civil_status,province,district,salary,quotation,application,sign,loanPP,loanAuto,loanTC,loanHip,cashOnHand,plazo]
 
-  // console.log(request.body);
-  // console.log(params);
+  console.log(request.body);
+  console.log(params);
   // response.send('Ok!')
 
   config.cnn.query(sql, params, (error, results, next) => {
