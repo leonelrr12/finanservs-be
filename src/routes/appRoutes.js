@@ -1,6 +1,7 @@
 const appRoutes = require('express').Router()
 const axios = require('axios')
 const mongoose = require('mongoose')
+var cors = require('cors')
 // const nodemailer = require('nodemailer')
 
 const Prospect = require('../models/Prospect')
@@ -715,7 +716,7 @@ appRoutes.put('/tracking', async (req, res) => {
   }
 })
 
-appRoutes.get('/tracking/:email', (req, res) => {
+appRoutes.get('/tracking/:email', cors(), (req, res) => {
 
   const { email } = req.params
 
