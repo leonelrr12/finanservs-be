@@ -715,7 +715,7 @@ appRoutes.put('/tracking', async (req, res) => {
   }
 })
 
-appRoutes.get('/tracking/:email', cors(), (req, res) => {
+appRoutes.get('/tracking/:email', (req, res) => {
 
   const { email } = req.params
 
