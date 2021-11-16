@@ -706,9 +706,11 @@ appRoutes.put('/tracking', async (req, res) => {
 
   // console.log(udtDatos)
   try {
-    await Prospect.findByIdAndUpdate(id_param, udtDatos, {new: true})
+    const result = await Prospect.findByIdAndUpdate(id_param, udtDatos)
+    // console.log(result)
     res.send(result)
   } catch(err)  {
+    console.log(err)
     res.status(500).send(err)
   }
 })
