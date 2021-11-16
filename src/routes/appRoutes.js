@@ -1,8 +1,9 @@
 const appRoutes = require('express').Router()
 const axios = require('axios')
 const mongoose = require('mongoose')
-const Prospect = require('../models/Prospect')
+const nodemailer = require('nodemailer')
 
+const Prospect = require('../models/Prospect')
 const config = require('../utils/config')
 
 appRoutes.get('/', (request, response) => {
@@ -30,6 +31,51 @@ appRoutes.post('/clientify-token', async (req, res) => {
   })
   .then(result => res.json(result.data))
   .catch(error => console.log('error', error))
+})
+
+
+appRoutes.post('/email', async (req, res) => {
+
+  const { email, asunto, mensaje } = req.body
+
+  nodemailer.createTestAccount(( err, account ) => {
+    const htmlEmail = `
+      <h3>Nuevo Prospecto desde Finanservs.com</h3>
+      <ul>
+        <li>Email: ${email}</li>
+        <li>Email: ${asunto}</li>
+      </ul>
+      <h3>Mensaje</h3>
+      <p>${mensaje}</p>
+    `
+  
+    let transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      auth: {
+        user: "guasimo12@gmail.com", 
+        pass: "nicol1204"
+      }
+    })
+
+    let mailOptions = {
+      from: "info@finanservs.com",
+      to: email,
+      replyto: "rsanchez@finanservs.com",
+      subject: asunto,
+      text: mensaje,
+      html: htmlEmail
+    }
+
+    transporter.sendMail(mailOptions, ( err, info ) => {
+      if(err) {
+        return console.error("Estamos aqui",err)
+      }
+      console.log("Mensaje enviado: %s", info.mensaje)
+      console.log("Url del mensaje: %s", nodemailer.getTestMessageUrl(info))
+    })
+  })
+
 })
 
 

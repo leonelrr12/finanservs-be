@@ -1,0 +1,251 @@
+POST http://localhost:3001/api/users
+content-type: application/json
+
+{
+    "username": "guasimo01@gmail.com",
+    "name": "Leonel",
+    "password": 12345678
+}
+
+
+###
+GET http://localhost:3001/api/login
+content-type: application/json
+
+{
+    "username": "guasimo01@gmail.com",
+    "password": 12345678
+}
+
+
+###
+POST http://localhost:3001/api/login/token-verify
+content-type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Imd1YXNpbW8wMUBnbWFpbC5jb20iLCJpZCI6IjYwNWNmMjIyMDQ3NDQ5NWI0NDQyMzg1YyIsImlhdCI6MTYxNjcwNDAzNH0.ymANOFrahclc0KjecYsU_ljoJdySfJR9SHKo9enDgDE"    
+}
+
+###
+GET http://localhost:3001/api/users
+
+###
+GET http://localhost:3001/api/login/hrodced@gmail.com/123456
+
+###
+PUT http://localhost:3001/api/login/chgpwd
+content-type: application/json
+
+{
+    "id": 1,
+    "password": "elguasimo"
+}
+
+
+###
+GET http://localhost:3001/api-token-auth
+
+###
+GET http://localhost:3001/api/sectors
+
+###
+GET http://localhost:3001/api/profesions
+
+###
+GET http://localhost:3001/api/profesions_acp
+
+###
+GET http://localhost:3001/api/profesions_lw
+
+###
+GET http://localhost:3001/api/planillas_j
+
+###
+GET http://localhost:3001/api/ranges_pol
+
+
+###
+GET http://localhost:3001/api/laboral_sector
+
+
+###
+GET http://localhost:3001/api/laboral_sector_institution
+
+###
+GET http://localhost:3001/api/laboral_sector_entity_f
+
+###
+GET http://localhost:3001/api/laboral_status
+
+###
+GET http://localhost:3001/api/marital_status
+
+###
+GET http://localhost:3001/api/purpose
+
+###
+GET http://localhost:3001/api/housing_types
+
+###
+GET http://localhost:3001/api/payment_types
+
+###
+GET http://localhost:3001/upload/file
+
+###
+GET http://localhost:3001/adm/prospects
+
+
+###
+GET http://localhost:3001/adm/prospects_sign/1
+
+
+
+###
+GET http://localhost:3001/adm/sectors/1
+
+
+###
+GET http://localhost:3001/api/provinces
+
+###
+GET http://localhost:3001/api/districts
+
+###
+GET http://localhost:3001/api/counties
+
+###
+GET http://localhost:3001/adm/type_documents
+
+###
+GET http://localhost:3001/api/type_documents
+
+###
+GET http://localhost:3001/api/terms_loan
+
+###
+GET http://localhost:3001/api/nationality
+
+###
+GET http://localhost:3001/adm/sector_profesion
+
+###
+GET http://localhost:3001/api/sector_profesion
+
+###
+GET http://localhost:3001/api/entities_f
+
+###
+GET http://localhost:3001/adm/entity_params/1
+
+###
+GET http://localhost:3001/api/login/new-user/guasimo01@gmail.com
+
+
+###
+GET http://localhost:3001/adm/sector_profesion
+
+
+###
+GET http://localhost:3001/api/provinces/7
+
+###
+GET http://localhost:3001/api/districts/43
+
+
+###
+GET http://localhost:3001/api/profesions_lw/6
+
+###
+GET http://localhost:3001/api/entity_f/700
+
+###
+GET http://localhost:3001/api/planillas_j/2
+
+###
+get http://localhost:3001/upload/list
+content-type: application/json
+
+{
+    "bucket": "finanservs.com",
+    "entity_f": "BAC"
+}
+
+###
+GET http://localhost:3001/upload/list2
+content-type: application/json
+
+{
+    "bucket": "finanservs.com",
+    "entity_f": "BAC"
+}
+
+
+###
+GET http://localhost:3001/upload/createPDF
+
+###
+GET http://localhost:3001/upload/prueba
+
+
+###
+GET http://localhost:3001/upload/file/45465465
+content-type: application/json
+
+{
+    "bucket": "finanservs",
+    "entity_f": "BAC"
+}
+
+###
+GET http://localhost:3001/api/APC
+
+###
+GET http://localhost:3001/api/APC
+
+
+###
+POST http://localhost:3001/api/APC
+{
+"usuarioconsulta": "WSACSORAT001", 
+"claveConsulta": "7DNhn2E5$ErHkJ^", 
+"IdentCliente": "7-94-485", 
+"TipoCliente": 1, 
+"Producto": 1
+}
+
+
+###
+GET http://localhost:3001/api/subgrupo_institution
+
+
+###
+POST http://localhost:3001/upload/subirArchivo
+
+
+###
+POST http://localhost:3001/api/clientify
+
+
+###
+GET http://localhost:3001/api/tracking
+
+###
+GET http://localhost:3001/api/tracking/id/618b38eae377327388333aa8
+
+###
+GET http://localhost:3001/api/tracking/delete/618b3239ebbe75d92e4028e5
+
+###
+GET http://localhost:3001/api/tracking/guasimo12@gmail.com
+
+
+###
+POST http://localhost:3001/api/email
+content-type: application/json
+
+{
+    "email": "guasimo01@gmail.com",
+    "asunto": "Pruebas con el correo de ADMON",
+    "mensaje": "Pruebas con el correo de ADMON"
+}
