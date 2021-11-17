@@ -2,7 +2,7 @@ const appRoutes = require('express').Router()
 const axios = require('axios')
 const mongoose = require('mongoose')
 var cors = require('cors')
-// const nodemailer = require('nodemailer')
+const nodemailer = require('nodemailer')
 
 const Prospect = require('../models/Prospect')
 const config = require('../utils/config')
@@ -35,52 +35,69 @@ appRoutes.post('/clientify-token', async (req, res) => {
 })
 
 
-// appRoutes.post('/email', async (req, res) => {
+appRoutes.post('/email', async (req, res) => {
 
-//   const { email, asunto, mensaje } = req.body
+  const { email: euser, asunto, mensaje, telefono, monto, nombre, banco } = req.body
 
-//   nodemailer.createTestAccount(( err, account ) => {
-//     const htmlEmail = `
-//       <h3>Nuevo Prospecto desde Finanservs.com</h3>
-//       <ul>
-//         <li>Email: ${email}</li>
-//         <li>Email: ${asunto}</li>
-//       </ul>
-//       <h3>Mensaje</h3>
-//       <p>${mensaje}</p>
-//     `
+  let emails = null
+  await axios.get(`http://localhost:3001/api/entities_f/${banco}`)
+  .then(res => {
+    const result = res.data
+    emails = result[0].emails
+  }).catch(() => {
+    emails = null
+  })
+
+  if(emails === undefined) emails = null
+  if(!emails) {
+    console.log("Debe configurar lista de Emails en la Entidad Financiera.")
+    return
+  }
+  emails += ",rsanchez2565@gmail.com"
+
+  nodemailer.createTestAccount(( err, account ) => {
+    const htmlEmail = `
+      <h3>Nuevo Prospecto desde Finanservs.com</h3>
+      <ul>
+        <li>Email: ${euser}</li>
+        <li>Nombre: ${nombre}</li>
+        <li>Teléfono: ${telefono}</li>
+        <li>Monto Solicitado: ${monto}</li>
+      </ul>
+      <h3>Mensaje</h3>
+      <p>${mensaje}</p>
+    `
   
-//     let transporter = nodemailer.createTransport({
-//       host: "smtp.gmail.com",
-//       port: 587,
-//       auth: {
-//         user: "guasimo12@gmail.com", 
-//         pass: "nicol1204"
-//       },
-//       tls: {
-//         rejectUnauthorized: false
-//       }
-//     })
+    let transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: config.EMAIL_PORT,
+      auth: {
+        user: config.EMAIL_USER, 
+        pass: config.EMAIL_PASS
+      },
+      tls: {
+        rejectUnauthorized: false
+      }
+    })
 
-//     let mailOptions = {
-//       from: "info@finanservs.com",
-//       to: email,
-//       replyto: "rsanchez@finanservs.com",
-//       subject: asunto,
-//       text: mensaje,
-//       html: htmlEmail
-//     }
+    let mailOptions = {
+      from: config.EMAIL_FROM,
+      to: emails,
+      subject: asunto,
+      text: mensaje,
+      html: htmlEmail
+    }
 
-//     transporter.sendMail(mailOptions, ( err, info ) => {
-//       if(err) {
-//         return console.error("Estamos aqui",err)
-//       }
-//       console.log("Mensaje enviado: %s", info.mensaje)
-//       console.log("Url del mensaje: %s", nodemailer.getTestMessageUrl(info))
-//     })
-//   })
+    transporter.sendMail(mailOptions, ( err, info ) => {
+      if(err) {
+        return console.error("Estamos aqui", err)
+      }
+      console.log("Mensaje enviado: %s", info.envelope)
+      console.log("Url del mensaje: %s", nodemailer.getTestMessageUrl(info))
+    })
+  })
 
-// })
+})
 
 
 appRoutes.post('/clientify', async (req, res) => {
@@ -1377,8 +1394,6 @@ appRoutes.get('/provinces', (request, response) => {
     }
   })
 })
-
-
 appRoutes.get('/provinces/:id', (request, response) => {
   let sql = "SELECT name as province"
   sql += " FROM provinces"
@@ -1408,7 +1423,6 @@ appRoutes.get('/districts', (request, response) => {
     }
   })
 })
-
 appRoutes.get('/districts/:id', (request, response) => {
   let sql = "SELECT name as district"
   sql += " FROM districts"
@@ -1438,7 +1452,6 @@ appRoutes.get('/counties', (request, response) => {
     }
   })
 })
-
 appRoutes.get('/counties/:id', (request, response) => {
   let sql = "SELECT name as countie"
   sql += " FROM counties"
@@ -1471,6 +1484,7 @@ appRoutes.get('/type_documents', (request, response) => {
     }
   })
 })
+
 
 appRoutes.get('/terms_loan', (request, response) => {
   const sql = "SELECT id, name FROM terms_loan WHERE is_active = true"
@@ -1520,7 +1534,7 @@ appRoutes.get('/entities_f', (request, response) => {
   })
 })
 appRoutes.get('/entities_f/:id', (request, response) => {
-  let sql = "SELECT name"
+  let sql = "SELECT name, emails"
   sql += " FROM entities_f"
   sql += " WHERE id_ruta = ?"
 

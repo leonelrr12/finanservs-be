@@ -9,7 +9,6 @@ admRoutes.get('/', (request, response) => {
 })
 
 
-
 admRoutes.get('/prospects', (request, response) => {
   sql  = " SELECT a.id as 'ID', c.name as Estado, datediff(now(), fcreate) as 'Dias Antiguedad' ,id_personal as 'Cédula Id', a.name as Nombre,"
   sql += " e.name as 'Sector',f.name as Profesión, CASE WHEN profession=5 THEN m.titulo  ELSE n.titulo END as 'Ocupación',"

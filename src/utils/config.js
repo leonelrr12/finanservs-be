@@ -15,6 +15,14 @@ const MDB_PORT = process.env.MDB_PORT
 const MDB_PROTOCOL = process.env.MDB_PROTOCOL
 
 
+//SMTP gmail
+const EMAIL_USER = process.env.EMAIL_USER
+const EMAIL_PASS = process.env.EMAIL_PASS
+const EMAIL_FROM = process.env.EMAIL_FROM
+const EMAIL_PORT = process.env.EMAIL_PORT
+
+
+
 // MySql DIgital Ocean-2
 const cnn = mysql.createConnection({
     host: process.env.DB_HOST,
@@ -60,5 +68,9 @@ module.exports = {
   PORT,
   HOST,
   cnn,
-  MONGODB_URI
+  MONGODB_URI,
+  EMAIL_USER,
+  EMAIL_PASS,
+  EMAIL_FROM,
+  EMAIL_PORT,
 }

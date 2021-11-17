@@ -246,6 +246,13 @@ content-type: application/json
 
 {
     "email": "guasimo01@gmail.com",
-    "asunto": "Pruebas con el correo de ADMON",
-    "mensaje": "Pruebas con el correo de ADMON"
+    "asunto": "Solicitud de Préstamo de:  ",
+    "mensaje": "Pruebas con el correo de ADMON",
+    "telefono": "6676-4545",
+    "monto": 3500,
+    "nombre": "Juan Perez",
+    "banco": "700"
 }
+
+###
+GET http://localhost:3001/api/entities_f/700
