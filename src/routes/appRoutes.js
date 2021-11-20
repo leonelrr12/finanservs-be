@@ -1284,7 +1284,7 @@ appRoutes.get('/laboral_sector_entity_f', (request, response) => {
   sql += " timbres,"
   sql += " servicioDescto,"
   sql += " mount_min,"
-  sql += " mount_max"
+  sql += " mount_max, min_antiguedad"
   sql += " from entity_params a"
   sql += " inner join entities_f d on d.id = a.id_entity_f"
   sql += " inner join sector_profesion b on b.id=a.id_sector_profesion"
