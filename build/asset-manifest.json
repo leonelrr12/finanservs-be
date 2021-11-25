@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/static/css/main.6b86c434.chunk.css",
-    "main.js": "/static/js/main.cc35da35.chunk.js",
-    "main.js.map": "/static/js/main.cc35da35.chunk.js.map",
+    "main.css": "/static/css/main.e145806f.chunk.css",
+    "main.js": "/static/js/main.a8d9e132.chunk.js",
+    "main.js.map": "/static/js/main.a8d9e132.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.9f94ff00.js",
     "runtime-main.js.map": "/static/js/runtime-main.9f94ff00.js.map",
     "static/js/2.55ec6372.chunk.js": "/static/js/2.55ec6372.chunk.js",
     "static/js/2.55ec6372.chunk.js.map": "/static/js/2.55ec6372.chunk.js.map",
     "index.html": "/index.html",
-    "precache-manifest.1e3649123755cd8e467c847d705d8693.js": "/precache-manifest.1e3649123755cd8e467c847d705d8693.js",
+    "precache-manifest.7829f65a891cbeb1542f203136fd3739.js": "/precache-manifest.7829f65a891cbeb1542f203136fd3739.js",
     "service-worker.js": "/service-worker.js",
-    "static/css/main.6b86c434.chunk.css.map": "/static/css/main.6b86c434.chunk.css.map",
+    "static/css/main.e145806f.chunk.css.map": "/static/css/main.e145806f.chunk.css.map",
     "static/js/2.55ec6372.chunk.js.LICENSE.txt": "/static/js/2.55ec6372.chunk.js.LICENSE.txt",
     "static/media/banisi-logo-desaturated.png": "/static/media/banisi-logo-desaturated.3e8df241.png",
     "static/media/banisi-logo.png": "/static/media/banisi-logo.3e8df241.png",
@@ -34,7 +34,7 @@
   "entrypoints": [
     "static/js/runtime-main.9f94ff00.js",
     "static/js/2.55ec6372.chunk.js",
-    "static/css/main.6b86c434.chunk.css",
-    "static/js/main.cc35da35.chunk.js"
+    "static/css/main.e145806f.chunk.css",
+    "static/js/main.a8d9e132.chunk.js"
   ]
 }
