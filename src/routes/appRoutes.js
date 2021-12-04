@@ -1257,7 +1257,7 @@ appRoutes.get('/laboral_sector', (request, response) => {
       cnn.connect(error => {
         if (error) {
           logger.error('Error SQL:', error.message)
-          res.status(500)
+          response.status(500)
         }
         console.log('Database server runnuning!');
       })
