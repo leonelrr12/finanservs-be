@@ -1253,7 +1253,15 @@ appRoutes.get('/laboral_sector', (request, response) => {
   sql += " where is_active = true;"
   
   config.cnn.query(sql, (error, results) => {
-    if (error) throw error
+    if (error) {
+      cnn.connect(error => {
+        if (error) {
+          logger.error('Error SQL:', error.message)
+          res.status(500)
+        }
+        console.log('Database server runnuning!');
+      })
+    } 
     if (results.length > 0) {
       response.json(results)
     } else {
