@@ -2,6 +2,116 @@ const admRoutes = require('express').Router()
 const bcrypt = require('bcryptjs')
 const config = require('../utils/config')
 const logger = require('../utils/logger')
+const mongoose = require('mongoose')
+const Prospect = require('../models/Prospect')
+
+admRoutes.get('/mongoDBtoMySql', (req, res) => {
+
+  sql = "select id,email from finanservs.prospects;"
+  const prospect = new Prospect();
+
+  config.cnn.query(sql, (error, rows) => {
+    if (error) {
+      logger.error("Error SQL:", error.message);
+      response.status(500);
+    }
+    if (rows && rows.length > 0) {
+
+      rows.forEach( r => {
+
+        console.log(r.email)
+
+        mongoose.connect(config.MONGODB_URI, {
+          useNewUrlParser: true, 
+          useUnifiedTopology: true
+        })
+        .then(() => console.log('MongoDB Connected...'))
+        .catch((err) => console.log(err))
+
+        Prospect.findOne({ 'Email': r.email })
+        .then( data => {
+
+          const { Info, Trabajo_Actual, Ref_Personal_Familia: Ref_F, Ref_Personal_No_Familia: Ref_nF } = data;
+
+          let sqlUdt = "UPDATE finanservs.prospects"
+          sqlUdt += " SET residenceMonthly=?, "
+          sqlUdt += " work_name=?,"
+          sqlUdt += " work_cargo=?,"
+          sqlUdt += " work_address=?,"
+          sqlUdt += " work_phone=?,"
+          sqlUdt += " work_phone_ext=?,"
+          sqlUdt += " work_month=?,"
+          sqlUdt += " work_prev_name=?,"
+          sqlUdt += " work_prev_month=?,"
+          sqlUdt += " barrio_Casa_Calle=?"
+          sqlUdt += " WHERE id=?;"
+
+          let params = [
+            Info.Mensualidad,
+            Trabajo_Actual.Compania_Trabajo,
+            Trabajo_Actual.Cargo,
+            Trabajo_Actual.Direccion_Trabajo,
+            Trabajo_Actual.Telefono_Trabajo,
+            Trabajo_Actual.Extension_Trabajo,
+            Trabajo_Actual.Meses_Trabajo_Actual,
+            Trabajo_Actual.Trabajo_Anterior,
+            Trabajo_Actual.Meses_Trabajo_Anterior,
+            Trabajo_Actual.Calle_No,
+            r.id
+          ]
+
+          config.cnn.query(sqlUdt, params, (error, results, next) => {
+            if (error) throw error;
+          })
+
+
+          sqlUdt  = "INSERT INTO finanservs.ref_person_family"
+          sqlUdt += "(name, id_prospect, apellido, parentesco, cellphone, phonenumber, work_name, work_phonenumber)"
+          sqlUdt += " values (?,?,?,?,?,?,?,?)"
+
+          params = [
+            Ref_F.Ref_Familia_Nombre,
+            r.id,
+            Ref_F.Ref_Familia_Apellido,
+            Ref_F.Ref_Familia_Parentesco,
+            Ref_F.Ref_Familia_Telefono,
+            Ref_F.Ref_Familia_Casa_No,
+            Ref_F.Ref_Familia_Empresa,
+            Ref_F.Ref_Familia_Empresa_Telefono,
+            Ref_F.Ref_Familia_Empresa_Extension,
+          ]
+
+          console.log(sqlUdt, params)
+          config.cnn.query(sqlUdt, params, (error, results, next) => {
+            if (error) next;
+          })
+
+          sqlUdt  = "INSERT INTO finanservs.ref_person_no_family"
+          sqlUdt += "(name, id_prospect, apellido, parentesco, cellphone, phonenumber, work_name, work_phonenumber)"
+          sqlUdt += " values (?,?,?,?,?,?,?,?)"
+
+          params = [
+            Ref_nF.Ref_No_Familia_Nombre,
+            r.id,
+            Ref_nF.Ref_No_Familia_Apellido,
+            Ref_nF.Ref_No_Familia_Parentesco,
+            Ref_nF.Ref_No_Familia_Telefono,
+            Ref_nF.Ref_No_Familia_Casa_No,
+            Ref_nF.Ref_No_Familia_Empresa,
+            Ref_nF.Ref_No_Familia_Empresa_Telefono,
+            Ref_nF.Ref_No_Familia_Empresa_Extension,
+          ]
+
+          config.cnn.query(sqlUdt, params, (error, results, next) => {
+            if (error) next;
+          })
+        })
+        .catch( err => console.log(err))
+
+      })
+    }
+  })
+})  
 
 
 admRoutes.get('/', (request, response) => {
