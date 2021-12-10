@@ -21,46 +21,37 @@ const EMAIL_PASS = process.env.EMAIL_PASS
 const EMAIL_FROM = process.env.EMAIL_FROM
 const EMAIL_PORT = process.env.EMAIL_PORT
 
+// // MySql DIgital Ocean-2
+// const cnn = mysql.createConnection({
+//     host: process.env.DB_HOST,
+//     database: process.env.DATABASE,
+//     user: process.env.DB_USER,
+//     password: process.env.DB_PWD,
+//     port: process.env.PORTDB
+// })
+
+// // Check connection
+// cnn.connect(error => {
+//   // if (error) throw error;
+//   console.log('Database server runnuning!');
+// })
 
 
-// MySql DIgital Ocean-2
-const cnn = mysql.createConnection({
-    host: process.env.DB_HOST,
-    database: process.env.DATABASE,
-    user: process.env.DB_USER,
-    password: process.env.DB_PWD,
-    port: process.env.PORTDB
-})
-
-// MongoDB DIgital Ocean-2
-// const MONGODB_URI = `mongodb+srv://${MDB_USER}:${MDB_PWD}@db-mongodb-nyc3-97071-024615bf.mongo.ondigitalocean.com/${MDB_DATABASE}?authSource=${MDB_DATABASE}?authSource=admin&replicaSet=db-mongodb-nyc3-97071&tls=true&tlsCAFile=ca-certificate-MDB.crt`
+// MongoDB Digital Ocean-2
 const MONGODB_URI = "mongodb+srv://doadmin:30x814oJ67N2gyYW@db-mongodb-nyc3-97071-024615bf.mongo.ondigitalocean.com/Finanservs?authSource=admin&replicaSet=db-mongodb-nyc3-97071&tls=true&tlsCAFile=ca-certificate-MDB.crt"
 
-// cnnMDB = mongoose.connect(MONGODB_URI)
 
-// const strCnnMDB = {
-//   MONGODB_URI: `mongodb+srv://${MDB_USER}:${MDB_PWD}@db-mongodb-nyc3-97071-024615bf.mongo.ondigitalocean.com/${MDB_DATABASE}?authSource=${MDB_DATABASE}?&replicaSet=db-mongodb-nyc3-97071`
-// }
-
-
-// const cnnMDB = mongoose.connection
-// cnnMDB.on('error', function(err){
-//   console.log('connection error', err)
-// })
-
-// cnnMDB.once('open', function(){
-//   console.log('Connection to DB successful')
-// })
-// const cnnMDB = mongoose.connection
-
-
-
-// Check connection
-cnn.connect(error => {
-  // if (error) throw error;
-  console.log('Database server runnuning!');
-})
-
+// MySql Digital Ocean-2
+const cnn = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  database: process.env.DATABASE,
+  password: process.env.DB_PWD,
+  port: process.env.PORTDB,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+});
 
 module.exports = {
   AWS_Access_key_ID,

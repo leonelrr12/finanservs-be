@@ -5,114 +5,6 @@ const logger = require('../utils/logger')
 const mongoose = require('mongoose')
 const Prospect = require('../models/Prospect')
 
-admRoutes.get('/mongoDBtoMySql', (req, res) => {
-
-  sql = "select id,email from finanservs.prospects;"
-  const prospect = new Prospect();
-
-  config.cnn.query(sql, (error, rows) => {
-    if (error) {
-      logger.error("Error SQL:", error.message);
-      response.status(500);
-    }
-    if (rows && rows.length > 0) {
-
-      rows.forEach( r => {
-
-        console.log(r.email)
-
-        mongoose.connect(config.MONGODB_URI, {
-          useNewUrlParser: true, 
-          useUnifiedTopology: true
-        })
-        .then(() => console.log('MongoDB Connected...'))
-        .catch((err) => console.log(err))
-
-        Prospect.findOne({ 'Email': r.email })
-        .then( data => {
-
-          const { Info, Trabajo_Actual, Ref_Personal_Familia: Ref_F, Ref_Personal_No_Familia: Ref_nF } = data;
-
-          let sqlUdt = "UPDATE finanservs.prospects"
-          sqlUdt += " SET residenceMonthly=?, "
-          sqlUdt += " work_name=?,"
-          sqlUdt += " work_cargo=?,"
-          sqlUdt += " work_address=?,"
-          sqlUdt += " work_phone=?,"
-          sqlUdt += " work_phone_ext=?,"
-          sqlUdt += " work_month=?,"
-          sqlUdt += " work_prev_name=?,"
-          sqlUdt += " work_prev_month=?,"
-          sqlUdt += " barrio_Casa_Calle=?"
-          sqlUdt += " WHERE id=?;"
-
-          let params = [
-            Info.Mensualidad,
-            Trabajo_Actual.Compania_Trabajo,
-            Trabajo_Actual.Cargo,
-            Trabajo_Actual.Direccion_Trabajo,
-            Trabajo_Actual.Telefono_Trabajo,
-            Trabajo_Actual.Extension_Trabajo,
-            Trabajo_Actual.Meses_Trabajo_Actual,
-            Trabajo_Actual.Trabajo_Anterior,
-            Trabajo_Actual.Meses_Trabajo_Anterior,
-            Trabajo_Actual.Calle_No,
-            r.id
-          ]
-
-          config.cnn.query(sqlUdt, params, (error, results, next) => {
-            if (error) throw error;
-          })
-
-
-          sqlUdt  = "INSERT INTO finanservs.ref_person_family"
-          sqlUdt += "(name, id_prospect, apellido, parentesco, cellphone, phonenumber, work_name, work_phonenumber)"
-          sqlUdt += " values (?,?,?,?,?,?,?,?)"
-
-          params = [
-            Ref_F.Ref_Familia_Nombre,
-            r.id,
-            Ref_F.Ref_Familia_Apellido,
-            Ref_F.Ref_Familia_Parentesco,
-            Ref_F.Ref_Familia_Telefono,
-            Ref_F.Ref_Familia_Casa_No,
-            Ref_F.Ref_Familia_Empresa,
-            Ref_F.Ref_Familia_Empresa_Telefono,
-            Ref_F.Ref_Familia_Empresa_Extension,
-          ]
-
-          console.log(sqlUdt, params)
-          config.cnn.query(sqlUdt, params, (error, results, next) => {
-            if (error) next;
-          })
-
-          sqlUdt  = "INSERT INTO finanservs.ref_person_no_family"
-          sqlUdt += "(name, id_prospect, apellido, parentesco, cellphone, phonenumber, work_name, work_phonenumber)"
-          sqlUdt += " values (?,?,?,?,?,?,?,?)"
-
-          params = [
-            Ref_nF.Ref_No_Familia_Nombre,
-            r.id,
-            Ref_nF.Ref_No_Familia_Apellido,
-            Ref_nF.Ref_No_Familia_Parentesco,
-            Ref_nF.Ref_No_Familia_Telefono,
-            Ref_nF.Ref_No_Familia_Casa_No,
-            Ref_nF.Ref_No_Familia_Empresa,
-            Ref_nF.Ref_No_Familia_Empresa_Telefono,
-            Ref_nF.Ref_No_Familia_Empresa_Extension,
-          ]
-
-          config.cnn.query(sqlUdt, params, (error, results, next) => {
-            if (error) next;
-          })
-        })
-        .catch( err => console.log(err))
-
-      })
-    }
-  })
-})  
-
 
 admRoutes.get('/', (request, response) => {
   response.send('Hola Mundo!!! Desde Admin Routes')
@@ -157,23 +49,46 @@ admRoutes.get('/prospects', (request, response) => {
 })
 
 admRoutes.post('/prospects', (request, response) => {
-  let sql = "INSERT INTO prospects (id_personal,id_referido,idUser,name,fname,fname_2,lname,lname_2,"
+  let sql = "INSERT INTO prospects ("
+  sql += " id_personal,id_referido,idUser,name,fname,fname_2,lname,lname_2,"
   sql += " entity_f,estado,email,cellphone,phoneNumber,idUrl,socialSecurityProofUrl,"
   sql += " publicGoodProofUrl,workLetterUrl,payStubUrl,origin_idUser,gender,birthDate,"
   sql += " contractType,jobSector,occupation,paymentFrecuency,profession,residenceType,"
   sql += " civil_status,province,district,salary,fcreate,fupdate,quotation,application,sign,"
-  sql += " loanPP,loanAuto,loanTC,loanHip,cashOnHand,plazo,apcReferenceUrl,apcLetterUrl)"
-  sql += " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,now(),now(),?,?,?,?,?,?,?,?,?,?,?)"
+  sql += " loanPP,loanAuto,loanTC,loanHip,cashOnHand,plazo,apcReferenceUrl,apcLetterUrl,"
 
-  let {id_personal,idUser,apcReferencesUrl,apcLetterUrl,sponsor,name,fname,fname_2,lname,lname_2,entity_f,estado,email,cellphone,phoneNumber,idUrl,socialSecurityProofUrl,publicGoodProofUrl,workLetterUrl,payStubUrl,origin_idUser,gender,birthDate,contractType,jobSector,occupation,paymentFrecuency,profession,residenceType,civil_status,province,district,salary,quotation,application,sign,loanPP,loanAuto,loanTC,loanHip,cashOnHand,plazo} = request.body
+  sql += " recidenceType,recidenceMonthly,work_name,work_cargo,work_address,work_phone,work_phone_ext,work_month,"
+  sql += " work_prev_name,work_prev_month,barrio_casa_calle,wage,alloance,perDiem"
+
+  sql += ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,now(),now(),?,?,?,?,?,?,?,?,?,?,?"
+  sql += " ?,?,?,?,?,?,?,?,"
+  sql += " ?,?,?,?,?,?"
+  sql += ")"
+
+  let { id_personal,idUser,apcReferencesUrl,apcLetterUrl,sponsor,name,fname,fname_2,lname,lname_2 } = request.body
+  let { entity_f,email,cellphone,phoneNumber,idUrl,socialSecurityProofUrl,publicGoodProofUrl } = request.body
+  let { workLetterUrl,payStubUrl,origin_idUser,gender,birthDate: BDH,contractType,jobSector,occupation,paymentFrecuency } = request.body
+  let { profession,residenceType,civil_status,province,district,sign } = request.body
+  let { loanPP,loanAuto,loanTC,loanHip,cashOnHand,plazo } = request.body
+   
+  let { recidenceType,recidenceMonthly,work_name,work_cargo,work_address,work_phone,work_phone_ext,work_month } = request.body
+  let { work_prev_name,work_prev_month,work_prev_salary,barrio_casa_calle } = request.body
+  let { salary,honorario,viaticos } = request.body
+  let { weight, weightUnit, height, heightUnit } = request.body
 
   estado = 1 // Nuevo registro queda con estatus de nuevo
 
-  if(paymentFrecuency === undefined) paymentFrecuency = 0
-  if(cellphone === undefined) cellphone = 'N/A'
-  
-  birthDate = birthDate.slice(0,10)
-  const params = [id_personal,sponsor,idUser,name,fname,fname_2,lname,lname_2,entity_f,estado,email,cellphone,phoneNumber,idUrl,socialSecurityProofUrl,publicGoodProofUrl,workLetterUrl,payStubUrl,origin_idUser,gender,birthDate,contractType,jobSector,occupation,paymentFrecuency,profession,residenceType,civil_status,province,district,salary,quotation,application,sign,loanPP,loanAuto,loanTC,loanHip,cashOnHand,plazo,apcReferencesUrl,apcLetterUrl]
+  const birthDate = BDH.slice(0,10)
+  const params = [
+    id_personal,sponsor,idUser,name,fname,fname_2,lname,lname_2,entity_f,estado,email,cellphone,
+    phoneNumber,idUrl,socialSecurityProofUrl,publicGoodProofUrl,workLetterUrl,payStubUrl,origin_idUser,gender,
+    birthDate,contractType,jobSector,occupation,paymentFrecuency,profession,residenceType,civil_status,province,
+    district,sign,loanPP,loanAuto,loanTC,loanHip,cashOnHand,plazo,apcReferencesUrl,apcLetterUrl,
+    recidenceType,recidenceMonthly,work_name,work_cargo,work_address,work_phone,work_phone_ext,work_mont,
+    work_prev_name,work_prev_month,work_prev_salary,barrio_casa_calle,
+    salary,honorario,viaticos,
+    weight, weightUnit, height, heightUnit
+  ]
 
   console.log(request.body);
   console.log(params);
@@ -184,6 +99,7 @@ admRoutes.post('/prospects', (request, response) => {
       logger.error('Error SQL:', error.sqlMessage)
       response.status(500)
     } 
+    console.log('results',results)
     response.send('Ok!')
   })
 })
