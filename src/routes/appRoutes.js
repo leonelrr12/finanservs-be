@@ -19,11 +19,14 @@ appRoutes.get('/today-is', (request, response) => {
 
 appRoutes.post('/clientify-token', async (req, res) => {
 
+  // API Clientify
+  // 0cfbe97a236f2c62a97db9fe50b2367c63c33d08
+
   axios({
     method: "post",
     url: "https://api.clientify.net/v1/api-auth/obtain_token/", 
     data: {
-      "username": "rsanchez2565@gmail.com",
+      "username": "rsanchez@finanservs.com",
       "password": "Acsorat25"
     },
     headers: {
@@ -99,124 +102,10 @@ appRoutes.post('/email', async (req, res) => {
 
 })
 
-
 appRoutes.post('/clientify', async (req, res) => {
   const { body } = req
-  const { token, Tracking, entidad_seleccionada, prestamo_opciones,  
-          first_name, last_name, email, phone, fecha_nacimiento, contrato_laboral, 
-          meses_trabajo_actual, meses_trabajo_anterior, Salario, Sector, acepta_terminos_condiciones, 
-          Institucion, Ocupacion, Profesion, Planilla, Genero, tipo_residencia, mensualidad_casa } = body
 
-  const wDate = date => (date.getFullYear()+ "-" + (date.getMonth() + 1)  + "-" +  date.getDate())
-  const wCapit = text => (text.toLowerCase().split(' ').map(w => w[0].toUpperCase() + w.substr(1)).join(' '))
-
-  let Monto = 0, Letra = 0, Plazo = 0, Efectivo = 0
-
-  const opciones = JSON.parse(prestamo_opciones)
-  if(opciones.length) {
-    const opcion = opciones.filter((item) => item.bank === entidad_seleccionada)
-    Monto = opcion[0].loan
-    Letra = opcion[0].monthlyFee
-    Plazo = opcion[0].term
-    Efectivo = opcion[0].cashOnHand
-  }
-
-  let wbanco = 'N/A'
-  await axios.get(`http://localhost:3001/api/entities_f/${entidad_seleccionada}`)
-  .then(res => {
-    const result = res.data
-    wbanco = result[0].name
-  }).catch(() => {
-    wbanco = 'N/A'
-  })
-  if(wbanco == undefined) wbanco = 'N/A'
-
-  let wprof = 'N/A'
-  await axios.get(`http://localhost:3001/api/profesions/${Profesion}`)
-  .then(res => {
-    const result = res.data
-    wprof = result[0].profesion
-  }).catch(() => {
-    wprof = 'N/A'
-  })
-  if(wprof == undefined) wprof = 'N/A'
-
-  let wocup = 'N/A'
-  let URL = ""
-  if(Profesion === '2') URL =  `http://localhost:3001/api/profesions_lw/${Ocupacion}`
-  else if(Profesion === '4') URL = `http://localhost:3001/api/institutions/${Institucion}`
-  else if(Profesion === '5') URL = `http://localhost:3001/api/profesions_acp/${Ocupacion}`
-  else if(Profesion === '6') URL = `http://localhost:3001/api/ranges_pol/${Ocupacion}`
-  else if(Profesion === '7') URL = `http://localhost:3001/api/planillas_j/${Planilla}`
-  
-  if(URL.length) {
-    await axios.get(URL)
-    .then(res => {
-      const result = res.data
-      wocup = result[0].ocupacion
-    }).catch(() => {
-      wocup = 'N/A'
-    })
-  }
-  if(wocup == undefined) wocup = 'N/A'
-
-  raw = JSON.stringify({
-    first_name, 
-    last_name, 
-    email, 
-    phone, 
-    "birthday": wDate(new Date(fecha_nacimiento)),
-    "google_id": "google_id",
-    "facebook_id": "facebook_id",
-    "custom_fields": [
-      {"field": "Tracking", "value": Tracking}, 
-      {"field": "contrato_laboral", "value": contrato_laboral}, 
-      {"field": "meses_trabajo_actual", "value": Number(meses_trabajo_actual)},
-      {"field": "meses_trabajo_anterior", "value": Number(meses_trabajo_anterior)},
-      {"field": "Salario", "value": Number(Salario)},
-      {"field": "Sector", "value": Sector}, 
-      {"field": "Profesion", "value": wprof}, 
-      {"field": "Ocupacion", "value": wocup}, 
-      {"field": "Genero", "value": Genero},
-      {"field": "acepta_terminos_condiciones", "value": acepta_terminos_condiciones},
-      {"field": "tipo_residencia", "value": tipo_residencia === '1' ? "Casa Propia": 
-                                            tipo_residencia === '2' ? "Padres o Familiares": 
-                                            tipo_residencia === '3' ? "Casa Hipotecada": "Casa Alquilada"},
-      {"field": "mensualidad_casa", "value": Number(mensualidad_casa)},
-      {"field": "entidad_seleccionada", "value": wbanco},
-
-      {"field": "Monto", "value": Number(Monto)},
-      {"field": "Letra", "value": Number(Letra)},
-      {"field": "Plazo", "value": Number(Plazo)}
-    ]
-  })
-
-  const url = "https://api.clientify.net/v1/contacts/"
-  const headers = {
-    "Authorization": `Token ${token}`,
-    "Content-Type": "application/json"
-  }
-
-  // console.log(raw)
-
-  axios({
-    method: "POST",
-    url, 
-    data: raw,
-    headers: headers,
-    redirect: 'follow'
-  })
-  .then(result => res.json(result.data))
-  // .then(result => console.log(result.data))
-  .catch(error => console.log('error', error))
-
-})
-
-
-appRoutes.put('/clientify', async (req, res) => {
-  const { body } = req
-
-  const { token, ID, Tracking, entidad_seleccionada, prestamo_opciones,
+  let { token, ID, Tracking, entidad_seleccionada, prestamo_opciones,
           first_name, last_name, email, phone, fecha_nacimiento, contrato_laboral, 
           meses_trabajo_actual, meses_trabajo_anterior, Salario, Sector, acepta_terminos_condiciones, 
           Institucion, Ocupacion, Profesion, Planilla, Genero, tipo_residencia, mensualidad_casa,
@@ -235,10 +124,12 @@ appRoutes.put('/clientify', async (req, res) => {
   const opciones = JSON.parse(prestamo_opciones)
   if(opciones.length) {
     const opcion = opciones.filter((item) => item.bank === entidad_seleccionada)
-    Monto = opcion[0].loan
-    Letra = opcion[0].monthlyFee
-    Plazo = opcion[0].term
-    Efectivo = opcion[0].cashOnHand
+    if(opcion.length) {
+      Monto = opcion[0].loan
+      Letra = opcion[0].monthlyFee
+      Plazo = opcion[0].term
+      Efectivo = opcion[0].cashOnHand
+    }
   }
 
   let wbanco = 'N/A'
@@ -300,12 +191,16 @@ appRoutes.put('/clientify', async (req, res) => {
   })
   if(wdist == undefined) wdist = 'N/A'
 
+  if(!img_autoriza_apc) img_autoriza_apc = "N/A"
+  if(!img_referencias_apc) img_referencias_apc = "N/A"
 
   raw = JSON.stringify({
     first_name, 
     last_name, 
     email, 
     phone, 
+    "title": Puesto,
+    "company": donde_trabaja,
     "birthday": wDate(new Date(fecha_nacimiento)),
     "google_id": "google_id",
     "facebook_id": "facebook_id",
@@ -352,16 +247,32 @@ appRoutes.put('/clientify', async (req, res) => {
     ]
   })
 
-  // console.log(raw)
 
-  const url = `https://api.clientify.net/v1/contacts/${ID}`
   const headers = {
     "Authorization": `Token ${token}`,
     "Content-Type": "application/json"
   }
 
+  // let ID = null
+  // let url = `https://api.clientify.net/v1/contacts/?query=${first_name}`
+  // axios({
+  //   method: "GET",
+  //   url, 
+  //   headers: headers,
+  //   redirect: 'follow'
+  // })
+  // .then(result => {
+  //   console.log(result.data.results)
+  //   ID = result.data.results
+  // })
+  // .catch(error => console.log('error', error))
+
+  let post = "POST"
+  if(ID) post = "PUT"
+
+  const url = `https://api.clientify.net/v1/contacts/${ID}`
   axios({
-    method: "PUT",
+    method: post,
     url, 
     data: raw,
     headers: headers,
@@ -375,38 +286,6 @@ appRoutes.put('/clientify', async (req, res) => {
 
 appRoutes.post('/clientify-rechazo', async (req, res) => {
   const { body } = req
-  const { token, Tracking } = body
-
-  raw = JSON.stringify({
-    "custom_fields": [
-      {"field": "Tracking", "value": Tracking}
-    ]
-  })
-
-  const url = "https://api.clientify.net/v1/contacts/"
-  const headers = {
-    "Authorization": `Token ${token}`,
-    "Content-Type": "application/json"
-  }
-
-  // console.log(raw)
-
-  axios({
-    method: "POST",
-    url, 
-    data: raw,
-    headers: headers,
-    redirect: 'follow'
-  })
-  .then(result => res.json(result.data))
-  // .then(result => console.log(result.data))
-  .catch(error => console.log('error', error))
-
-})
-
-
-appRoutes.put('/clientify-rechazo', async (req, res) => {
-  const { body } = req
   const { token, ID = 0, Tracking } = body
 
   raw = JSON.stringify({
@@ -415,7 +294,7 @@ appRoutes.put('/clientify-rechazo', async (req, res) => {
     ]
   })
 
-  const url = `https://api.clientify.net/v1/contacts/${ID}`
+  const url = `https://api.clientify.net/v1/contacts/${ID}/`
   const headers = {
     "Authorization": `Token ${token}`,
     "Content-Type": "application/json"
@@ -432,6 +311,95 @@ appRoutes.put('/clientify-rechazo', async (req, res) => {
   // .then(result => console.log(result.data))
   .catch(error => console.log('error', error))
 
+})
+
+appRoutes.post('/apc-historial', async (req, res) => {
+
+  await mongoose.connect(config.MONGODB_URI, {
+    useNewUrlParser: true, 
+    useUnifiedTopology: true
+  })
+    .then(() => console.log('MongoDB Connected...'))
+    .catch((err) => console.log(err))
+
+    const {
+      Nombre,
+      Apellido_Paterno,
+      Email,
+    } = req.body
+
+  const newProspect =  new Prospect({
+    Email,
+    Nombre,
+    Apellido_Paterno,
+  })
+
+  await newProspect.save()
+  let ID = newProspect._id
+  console.log(ID)
+
+  res.send(ID)
+})
+appRoutes.get('/tracking/:email', cors(), (req, res) => {
+
+  const { email } = req.params
+
+  mongoose.connect(config.MONGODB_URI, {
+    useNewUrlParser: true, useUnifiedTopology: true
+  })
+ 
+  Prospect.find({ "Email": email }, '_id', function (err, data) {
+    if (err) return handleError(err);
+    res.send(data)
+  })
+})
+appRoutes.get('/tracking/id/:id', (req, res) => {
+
+  const { id } = req.params
+
+  mongoose.connect(config.MONGODB_URI, {
+    useNewUrlParser: true, useUnifiedTopology: true
+  })
+ 
+  Prospect.findById({ "_id": id }, function(err, data) {
+    if(err){
+        console.log(err)
+    }
+    else{
+        res.send(data)
+    }
+  }) 
+})
+appRoutes.get('/tracking/delete/:id', (req, res) => {
+
+  const { id } = req.params
+
+  mongoose.connect(config.MONGODB_URI, {
+    useNewUrlParser: true, useUnifiedTopology: true
+  })
+ 
+  Prospect.findByIdAndRemove({ "_id": id }, function(err, result) {
+    if(err){
+        console.log(err)
+    }
+    else{
+        res.send("Ok")
+    }
+  }) 
+})
+appRoutes.get('/tracking', (req, res) => {
+  mongoose.connect(config.MONGODB_URI, {
+    useNewUrlParser: true, useUnifiedTopology: true
+  })
+ 
+  Prospect.find(function(err, data) {
+      if(err){
+          console.log(err)
+      }
+      else{
+          res.send(data)
+      }
+  }) 
 })
 
 
@@ -908,6 +876,7 @@ appRoutes.get('/laboral_sector_entity_f', (request, response) => {
   sql += " salario_min,"
   sql += " tasa_servicio,"
   sql += " seg_vida,"
+  sql += " factor_SV,"
   sql += " feci,"
   sql += " itbms,"
   sql += " notaria,"

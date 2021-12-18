@@ -1,19 +1,22 @@
 {
   "files": {
     "main.css": "/static/css/main.e145806f.chunk.css",
-    "main.js": "/static/js/main.7cb5a7bf.chunk.js",
-    "main.js.map": "/static/js/main.7cb5a7bf.chunk.js.map",
+    "main.js": "/static/js/main.713c8a63.chunk.js",
+    "main.js.map": "/static/js/main.713c8a63.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.9f94ff00.js",
     "runtime-main.js.map": "/static/js/runtime-main.9f94ff00.js.map",
-    "static/js/2.a7fa49d9.chunk.js": "/static/js/2.a7fa49d9.chunk.js",
-    "static/js/2.a7fa49d9.chunk.js.map": "/static/js/2.a7fa49d9.chunk.js.map",
+    "static/js/2.dcc145b6.chunk.js": "/static/js/2.dcc145b6.chunk.js",
+    "static/js/2.dcc145b6.chunk.js.map": "/static/js/2.dcc145b6.chunk.js.map",
     "index.html": "/index.html",
-    "precache-manifest.74903070682111ce13be653155b812f7.js": "/precache-manifest.74903070682111ce13be653155b812f7.js",
+    "precache-manifest.eabacfcc0df4180cf3155c1cf8c55733.js": "/precache-manifest.eabacfcc0df4180cf3155c1cf8c55733.js",
     "service-worker.js": "/service-worker.js",
     "static/css/main.e145806f.chunk.css.map": "/static/css/main.e145806f.chunk.css.map",
-    "static/js/2.a7fa49d9.chunk.js.LICENSE.txt": "/static/js/2.a7fa49d9.chunk.js.LICENSE.txt",
-    "static/media/banisi-logo-desaturated.png": "/static/media/banisi-logo-desaturated.3e8df241.png",
+    "static/js/2.dcc145b6.chunk.js.LICENSE.txt": "/static/js/2.dcc145b6.chunk.js.LICENSE.txt",
+    "static/media/banisi-logo-desaturated.png": "/static/media/banisi-logo-desaturated.bb843cf4.png",
     "static/media/banisi-logo.png": "/static/media/banisi-logo.3e8df241.png",
+    "static/media/finacredit-logo-desaturated.png": "/static/media/finacredit-logo-desaturated.f639b39f.png",
+    "static/media/finacredit-logo.png": "/static/media/finacredit-logo.f639b39f.png",
+    "static/media/financomer-logo-desaturated.png": "/static/media/financomer-logo-desaturated.ed2d33b5.png",
     "static/media/global-bank-logo-desaturated.png": "/static/media/global-bank-logo-desaturated.60c32fb1.png",
     "static/media/global-bank-logo.png": "/static/media/global-bank-logo.631abb1f.png",
     "static/media/home-step-1.png": "/static/media/home-step-1.62b21fac.png",
@@ -33,8 +36,8 @@
   },
   "entrypoints": [
     "static/js/runtime-main.9f94ff00.js",
-    "static/js/2.a7fa49d9.chunk.js",
+    "static/js/2.dcc145b6.chunk.js",
     "static/css/main.e145806f.chunk.css",
-    "static/js/main.7cb5a7bf.chunk.js"
+    "static/js/main.713c8a63.chunk.js"
   ]
 }
