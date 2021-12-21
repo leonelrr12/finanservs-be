@@ -1,17 +1,17 @@
 {
   "files": {
     "main.css": "/static/css/main.e145806f.chunk.css",
-    "main.js": "/static/js/main.713c8a63.chunk.js",
-    "main.js.map": "/static/js/main.713c8a63.chunk.js.map",
+    "main.js": "/static/js/main.ed4e7d60.chunk.js",
+    "main.js.map": "/static/js/main.ed4e7d60.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.9f94ff00.js",
     "runtime-main.js.map": "/static/js/runtime-main.9f94ff00.js.map",
-    "static/js/2.dcc145b6.chunk.js": "/static/js/2.dcc145b6.chunk.js",
-    "static/js/2.dcc145b6.chunk.js.map": "/static/js/2.dcc145b6.chunk.js.map",
+    "static/js/2.354b95f1.chunk.js": "/static/js/2.354b95f1.chunk.js",
+    "static/js/2.354b95f1.chunk.js.map": "/static/js/2.354b95f1.chunk.js.map",
     "index.html": "/index.html",
-    "precache-manifest.eabacfcc0df4180cf3155c1cf8c55733.js": "/precache-manifest.eabacfcc0df4180cf3155c1cf8c55733.js",
+    "precache-manifest.29e10d5885775d6eb8f61fdbb61bca6a.js": "/precache-manifest.29e10d5885775d6eb8f61fdbb61bca6a.js",
     "service-worker.js": "/service-worker.js",
     "static/css/main.e145806f.chunk.css.map": "/static/css/main.e145806f.chunk.css.map",
-    "static/js/2.dcc145b6.chunk.js.LICENSE.txt": "/static/js/2.dcc145b6.chunk.js.LICENSE.txt",
+    "static/js/2.354b95f1.chunk.js.LICENSE.txt": "/static/js/2.354b95f1.chunk.js.LICENSE.txt",
     "static/media/banisi-logo-desaturated.png": "/static/media/banisi-logo-desaturated.bb843cf4.png",
     "static/media/banisi-logo.png": "/static/media/banisi-logo.3e8df241.png",
     "static/media/finacredit-logo-desaturated.png": "/static/media/finacredit-logo-desaturated.f639b39f.png",
@@ -36,8 +36,8 @@
   },
   "entrypoints": [
     "static/js/runtime-main.9f94ff00.js",
-    "static/js/2.dcc145b6.chunk.js",
+    "static/js/2.354b95f1.chunk.js",
     "static/css/main.e145806f.chunk.css",
-    "static/js/main.713c8a63.chunk.js"
+    "static/js/main.ed4e7d60.chunk.js"
   ]
 }
