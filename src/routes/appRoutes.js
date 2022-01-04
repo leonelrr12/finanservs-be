@@ -17,6 +17,26 @@ appRoutes.get('/today-is', (request, response) => {
   response.json({ hoyes: dt2 })
 })
 
+appRoutes.get('/prospects', (request, response) => {
+  let sql = "select	sign"
+  sql += " FROM prospects a"
+  sql += " WHERE id_personal = '3-722-1667'"
+
+  const params = [request.params.id_personal];
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) {
+      logger.error('Error SQL:', error.sqlMessage)
+      response.status(500)
+    } 
+    if (results.length > 0) {
+      const firma = results[0].sign.toString()
+      response.json({sign: firma})
+    } else {
+      response.send('Not results!')
+    }
+  })
+})
+
 appRoutes.post('/clientify-token', async (req, res) => {
 
   // API Clientify
