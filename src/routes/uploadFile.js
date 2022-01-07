@@ -390,7 +390,7 @@ fileRoutes.post('/authApcPDF', async (req, res) => {
       }
     };
 
-    let fileName = path.join(`./pdfs/tmp-pdf-${Date.now()}.pdf`)
+    let fileName = path.join(`./pdfs/tmp-pdf2-${Date.now()}.pdf`)
 
     const printer = new pdfPrinter(fonts)
     var pdfDoc = printer.createPdfKitDocument(dd);
