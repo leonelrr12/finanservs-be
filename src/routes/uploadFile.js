@@ -36,7 +36,6 @@ fileRoutes.post('/file', upload.single('idUrl'), async (req, res) => {
   console.log(entity_f, nameImage)
   const file = req.file
   const result = await uploadFile(file, entity_f, nameImage, prospect)
-  console.log(result)
   try {
     fs.unlinkSync(file.path)
   } catch(err) {
@@ -49,7 +48,7 @@ fileRoutes.post('/file2', upload2.single('idUrl'), async (req, res) => {
   const { fileName, entity_f, nameImage, prospect } = req.body
   console.log(fileName, entity_f, nameImage)
   const result = await uploadFile2(fileName, entity_f, nameImage, prospect)
-  console.log(result)
+  console.log('uploadFile2', result)
   try {
     fs.unlinkSync(fileName)
   } catch(err) {
@@ -57,6 +56,8 @@ fileRoutes.post('/file2', upload2.single('idUrl'), async (req, res) => {
   }
   res.send(result)
 })
+
+
 
 fileRoutes.get('/list', async (request, response) => {
   const { bucket, entity_f } = request.body

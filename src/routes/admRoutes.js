@@ -59,7 +59,7 @@ admRoutes.post('/prospects', (request, response) => {
       response.status(500)
     } 
     // console.log('results', results, results.insertId)
-    console.log({ newId: results.insertId })
+    // console.log({ newId: results.insertId })
     response.json({ newId: results.insertId })
   })
 })
