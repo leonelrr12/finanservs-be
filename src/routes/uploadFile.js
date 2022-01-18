@@ -11,6 +11,8 @@ const pdfFonts = require('pdfmake/build/vfs_fonts');
 const fs = require('fs')
 const path = require('path');
 
+const AWS = require('aws-sdk')
+
 fileRoutes.get('/prueba', async (req, res) => {
   res.sendFile(path.join(__dirname+'/upload.html'))
 })
@@ -60,34 +62,40 @@ fileRoutes.post('/file2', upload2.single('idUrl'), async (req, res) => {
 
 
 fileRoutes.get('/list', async (request, response) => {
-  const { bucket, entity_f } = request.body
-  console.log(bucket, entity_f);
+  const {entity_f } = request.body
 
-  AWS.config.update({region: 'us-east-1'})
+  const { AWS_Access_key_ID, AWS_Secret_access_key, AWS_BUCKET_NAME, AWS_BUCKET_REGION } = config
 
-  const s3 = new AWS.S3({apiVersion: '2021-09-22'})
-
+  const s3 = new AWS.S3({
+    region: AWS_BUCKET_REGION,
+    accessKeyId: AWS_Access_key_ID,
+    secretAccessKey: AWS_Secret_access_key
+  })
+  
   const params = {
-    Bucket: bucket
+    Bucket: AWS_BUCKET_NAME,
+    Delimiter: '',
+    Prefix: '200' //entity_f
   }
-
 
   s3.listObjects(params, (err, data) => {
     if(err) throw err
 
-    const newD = []
-    data.Contents.map(item=>{
-      console.log(item.Key)
-      const x = item.Key.split('/')
-      console.log(x.lengt, x[0], entity_f)
-      if(x.length > 1) {
-        if(x[0] === entity_f && x[1].length > 0) {
-          newD.push({ETag: item.ETag, file: x[1]})
-        }
-      }
-    })
-    console.log(newD)
-    response.status(200).json(newD)
+    // const newD = []
+    // data.Contents.map(item=>{
+    //   console.log(item.Key)
+    //   const x = item.Key.split('/')
+    //   console.log(x.lengt, x[0], entity_f)
+    //   if(x.length > 1) {
+    //     if(x[0] === entity_f && x[1].length > 0) {
+    //       newD.push({ETag: item.ETag, file: x[1]})
+    //     }
+    //   }
+    // })
+    // console.log(newD)
+
+    // console.log(data)
+    response.status(200).json(data)
   })
 })
 

@@ -1,10 +1,12 @@
+require('dotenv').config()
 const aws = require("aws-sdk")
 const fs = require('fs')
+const config = require('./config')
 
-const { AWS_Access_key_ID, AWS_Secret_access_key, AWS_BUCKET_NAME, AWS_REGION } = process.env
+const { AWS_Access_key_ID, AWS_Secret_access_key, AWS_BUCKET_NAME, AWS_BUCKET_REGION } = config
 
 const s3 = new aws.S3({
-  region: AWS_REGION,
+  region: AWS_BUCKET_REGION,
   accessKeyId: AWS_Access_key_ID,
   secretAccessKey: AWS_Secret_access_key
 })

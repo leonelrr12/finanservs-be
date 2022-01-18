@@ -4,6 +4,9 @@ const mysql = require('mysql2')
 
 const PORT = process.env.PORT || 3001
 const HOST = process.env.HOST
+
+const AWS_BUCKET_NAME = process.env.AWS_BUCKET_NAME
+const AWS_BUCKET_REGION = process.env.AWS_BUCKET_REGION
 const AWS_Access_key_ID = process.env.AWS_Access_key_ID
 const AWS_Secret_access_key = process.env.AWS_Secret_access_key
 
@@ -54,6 +57,8 @@ const cnn = mysql.createPool({
 });
 
 module.exports = {
+  AWS_BUCKET_NAME,
+  AWS_BUCKET_REGION,
   AWS_Access_key_ID,
   AWS_Secret_access_key,
   PORT,

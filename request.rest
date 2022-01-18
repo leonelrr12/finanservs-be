@@ -224,6 +224,9 @@ POST http://localhost:3001/upload/subirArchivo
 
 
 ###
+GET http://localhost:3001/upload/list
+
+###
 POST http://localhost:3001/api/clientify
 
 

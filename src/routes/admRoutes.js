@@ -2,8 +2,6 @@ const admRoutes = require('express').Router()
 const bcrypt = require('bcryptjs')
 const config = require('../utils/config')
 const logger = require('../utils/logger')
-const mongoose = require('mongoose')
-const Prospect = require('../models/Prospect')
 
 
 admRoutes.get('/', (request, response) => {
