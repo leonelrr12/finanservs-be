@@ -33,7 +33,7 @@ admRoutes.post('/prospects', (request, response) => {
   let { loanPP,loanAuto,loanTC,loanHip,cashOnHand,plazo } = request.body
    
   let { residenceType,residenceMonthly,work_name,work_cargo,work_address,work_phone,work_phone_ext,work_month } = request.body
-  let { work_prev_name,work_prev_month,work_prev_salary=0,barrio_casa_calle } = request.body
+  let { work_prev_name='N/A',work_prev_month=0,work_prev_salary=0,barrio_casa_calle } = request.body
   let { salary,honorarios=0,viaticos=0,termConds,nationality=0 } = request.body
   let { weight, weightUnit, height, heightUnit, aceptaAPC: aceptaApc } = request.body
 
