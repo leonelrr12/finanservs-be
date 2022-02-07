@@ -74,10 +74,10 @@ admRoutes.post('/ref_personales', (request, response) => {
   sql += " name,id_prospect,apellido,parentesco,cellphone,phonenumber,work_name,work_phonenumber,work_phone_ext"
   sql += ") VALUES (?,?,?,?,?,?,?,?,?)"
 
-  if(parentesco === "undefined") parentesco = ""
-  if(work_phone_ext === "undefined") work_phone_ext = ""
-
-  const params = [name,id_prospect,apellido,parentesco,cellphone,phonenumber,work_name,work_phonenumber,work_phone_ext]
+  const params = [
+    name,id_prospect,apellido,parentesco,cellphone,
+    phonenumber,work_name,work_phonenumber,work_phone_ext
+  ]
 
   config.cnn.query(sql, params, (error, results, next) => {
     if (error) {
