@@ -1,11 +1,18 @@
 const appRoutes = require('express').Router()
 const axios = require('axios')
+const cors = require('cors')
 const mongoose = require('mongoose')
-var cors = require('cors')
-const nodemailer = require('nodemailer')
-
 const Prospect = require('../models/Prospect')
+const nodemailer = require('nodemailer')
+const { google } = require('googleapis')
 const config = require('../utils/config')
+const OAuth2 = google.auth.OAuth2
+
+// const { sendEmail: key } = config
+const { sendGEmail: key } = config
+const OAuth2Client = new OAuth2(key.clientId, key.clientSecret, key.redirectUri)
+OAuth2Client.setCredentials({ refresh_token: key.refreshToken })
+
 
 appRoutes.get('/', (request, response) => {
   response.send('Hola Mundo!!!')
@@ -57,8 +64,78 @@ appRoutes.post('/clientify-token', async (req, res) => {
   .catch(error => console.log('error', error))
 })
 
-
 appRoutes.post('/email', async (req, res) => {
+
+  const { email: euser, asunto, mensaje, telefono, monto, nombre, banco } = req.body
+
+  let emails = null
+  await axios.get(`http://localhost:3001/api/entities_f/${banco}`)
+  .then(res => {
+    const result = res.data
+    emails = result[0].emails
+  }).catch(() => {
+    emails = null
+  })
+
+
+  if(emails === undefined) emails = null
+  if(!emails) {
+    console.log("Debe configurar lista de Emails en la Entidad Financiera.")
+    return
+  }
+  emails += ", rsanchez2565@gmail.com, guasimo01@gmail.com"
+
+  const htmlEmail = `
+    <h3>Nuevo Prospecto desde Finanservs.com</h3>
+    <ul>
+      <li>Email: ${euser}</li>
+      <li>Nombre: ${nombre}</li>
+      <li>Teléfono: ${telefono}</li>
+      <li>Monto Solicitado: ${monto}</li>
+    </ul>
+    <h3>Mensaje</h3>
+    <p>${mensaje}</p>
+  `
+
+  const send_mail = async () => {
+    const accessToken = await OAuth2Client.getAccessToken()
+    try {
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          type: 'OAuth2',
+          user: key.EMAIL_USER, 
+          clientId: key.clientId, 
+          clientSecret: key.clientSecret,
+          refreshToken: key.refreshToken,
+          accessToken: accessToken
+        },
+        tls: {
+          rejectUnauthorized: false
+        }
+      })
+  
+      const mailOptions = {
+        from: key.EMAIL_FROM,
+        to: emails,
+        subject: asunto,
+        text: mensaje,
+        html: htmlEmail
+      }
+  
+      const result = await transporter.sendMail(mailOptions)
+      transporter.close()
+      // console.log(result)
+      return result
+    } catch (err) {
+      console.log('Estamos aqui: ', err)
+    }
+  }
+  send_mail()
+    .then( r => res.status(200).send('Enviado!') )
+    .catch( e => console.log(e.message) )
+})
+appRoutes.post('/email-bk', async (req, res) => {
 
   const { email: euser, asunto, mensaje, telefono, monto, nombre, banco } = req.body
 
@@ -93,10 +170,10 @@ appRoutes.post('/email', async (req, res) => {
   
     let transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
-      port: config.EMAIL_PORT,
+      port: key.EMAIL_PORT,
       auth: {
-        user: config.EMAIL_USER, 
-        pass: config.EMAIL_PASS
+        user: key.EMAIL_USER, 
+        pass: key.EMAIL_PASS
       },
       tls: {
         rejectUnauthorized: false
@@ -104,7 +181,7 @@ appRoutes.post('/email', async (req, res) => {
     })
 
     let mailOptions = {
-      from: config.EMAIL_FROM,
+      from: key.EMAIL_FROM,
       to: emails,
       subject: asunto,
       text: mensaje,

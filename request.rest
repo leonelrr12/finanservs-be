@@ -257,6 +257,7 @@ content-type: application/json
     "banco": "700"
 }
 
+
 ###
 GET http://localhost:3001/api/entities_f/700
 
