@@ -246,7 +246,7 @@ GET http://localhost:3001/api/tracking/delete/618b3239ebbe75d92e4028e5
 ###
 GET http://localhost:3001/api/tracking/guasimo12@gmail.com
 ###
-GET http://localhost:3001/api/tracking/cedula/7-94-785
+GET http://localhost:3001/api/tracking/cedula/8-724-2315
 
 ###
 POST http://localhost:3001/api/apc-historial

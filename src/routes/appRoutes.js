@@ -1,11 +1,20 @@
 const appRoutes = require('express').Router()
 const axios = require('axios')
+const cors = require('cors')
 const mongoose = require('mongoose')
-var cors = require('cors')
-const nodemailer = require('nodemailer')
-
 const Prospect = require('../models/Prospect')
+const nodemailer = require('nodemailer')
+const { google } = require('googleapis')
 const config = require('../utils/config')
+const OAuth2 = google.auth.OAuth2
+
+// const { sendEmail: key } = config
+const { sendGEmail: key } = config
+const OAuth2Client = new OAuth2(key.clientId, key.clientSecret, key.redirectUri)
+OAuth2Client.setCredentials({ refresh_token: key.refreshToken })
+
+// const { usuarioApc, claveApc } = config.APC
+const { user: usuarioApc, pass: claveApc } = config.APC
 
 appRoutes.get('/', (request, response) => {
   response.send('Hola Mundo!!!')
@@ -71,55 +80,63 @@ appRoutes.post('/email', async (req, res) => {
     emails = null
   })
 
+
   if(emails === undefined) emails = null
   if(!emails) {
     console.log("Debe configurar lista de Emails en la Entidad Financiera.")
     return
   }
-  emails += ",rsanchez2565@gmail.com"
+  emails += ", rsanchez2565@gmail.com, guasimo01@gmail.com"
 
-  nodemailer.createTestAccount(( err, account ) => {
-    const htmlEmail = `
-      <h3>Nuevo Prospecto desde Finanservs.com</h3>
-      <ul>
-        <li>Email: ${euser}</li>
-        <li>Nombre: ${nombre}</li>
-        <li>Teléfono: ${telefono}</li>
-        <li>Monto Solicitado: ${monto}</li>
-      </ul>
-      <h3>Mensaje</h3>
-      <p>${mensaje}</p>
-    `
+  const htmlEmail = `
+    <h3>Nuevo Prospecto desde Finanservs.com</h3>
+    <ul>
+      <li>Email: ${euser}</li>
+      <li>Nombre: ${nombre}</li>
+      <li>Teléfono: ${telefono}</li>
+      <li>Monto Solicitado: ${monto}</li>
+    </ul>
+    <h3>Mensaje</h3>
+    <p>${mensaje}</p>
+  `
+
+  const send_mail = async () => {
+    const accessToken = await OAuth2Client.getAccessToken()
+    try {
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          type: 'OAuth2',
+          user: key.EMAIL_USER, 
+          clientId: key.clientId, 
+          clientSecret: key.clientSecret,
+          refreshToken: key.refreshToken,
+          accessToken: accessToken
+        },
+        tls: {
+          rejectUnauthorized: false
+        }
+      })
   
-    let transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: config.EMAIL_PORT,
-      auth: {
-        user: config.EMAIL_USER, 
-        pass: config.EMAIL_PASS
-      },
-      tls: {
-        rejectUnauthorized: false
+      const mailOptions = {
+        from: key.EMAIL_FROM,
+        to: emails,
+        subject: asunto,
+        text: mensaje,
+        html: htmlEmail
       }
-    })
-
-    let mailOptions = {
-      from: config.EMAIL_FROM,
-      to: emails,
-      subject: asunto,
-      text: mensaje,
-      html: htmlEmail
+  
+      const result = await transporter.sendMail(mailOptions)
+      transporter.close()
+      // console.log(result)
+      return result
+    } catch (err) {
+      console.log('Estamos aqui: ', err)
     }
-
-    transporter.sendMail(mailOptions, ( err, info ) => {
-      if(err) {
-        return console.error("Estamos aqui", err)
-      }
-      console.log("Mensaje enviado: %s", info.envelope)
-      console.log("Url del mensaje: %s", nodemailer.getTestMessageUrl(info))
-    })
-  })
-
+  }
+  send_mail()
+    .then( r => res.status(200).send('Enviado!') )
+    .catch( e => console.log(e.message) )
 })
 
 appRoutes.post('/clientify', async (req, res) => {
@@ -334,9 +351,28 @@ appRoutes.post('/clientify-rechazo', async (req, res) => {
 })
 
 
+appRoutes.get('/tracking/cedula/:cedula', (req, res) => {
+
+  const { cedula } = req.params
+
+  mongoose.connect(config.MONGODB_URI, {
+    useNewUrlParser: true, 
+    useUnifiedTopology: true
+  })
+ 
+  Prospect.find({ "Cedula": cedula }, function(err, data) {
+    if(err){
+        console.log(err)
+    }
+    else{
+        res.send(data)
+    }
+  }) 
+})
 appRoutes.get('/tracking/id/:id', (req, res) => {
 
   const { id } = req.params
+  console.log("3333333", { "_id": id })
 
   mongoose.connect(config.MONGODB_URI, {
     useNewUrlParser: true, useUnifiedTopology: true
@@ -395,7 +431,11 @@ appRoutes.post('/leerAPC', (request, response) => {
   .catch((err) => console.log(err))
 
   Prospect.find({ "Cedula": cedula }, {}, function (err, data) {
-    formatData(data, response)
+    let result = {}
+    if(data.length) {
+      result = data[0].APC
+    }
+    formatData(result, response)
   })
 })
 appRoutes.post('/APC', async (request, response) => {
@@ -405,23 +445,11 @@ appRoutes.post('/APC', async (request, response) => {
     useNewUrlParser: true, 
     useUnifiedTopology: true
   })
-  .then(() => console.log('MongoDB Connected...1'))
+  .then(() => console.log('MongoDB Connected...1-a'))
   .catch((err) => console.log(err))
 
   let datos = {}
   let antigRef = 0
-  // Prospect.find({ "Cedula": cedula }, {}, function (err, data) {
-  //   if (data.length) {
-  //     const created = data[0].Created
-  //     const today = new Date()
-  //     antigRef = Math.round((today.getTime() - created.getTime())/(24*60*60*1000))
-
-  //     datos = data[0].APC
-  //     leerRefAPC(datos, antigRef, request, response)
-  //   } else {
-  //     leerRefAPC(datos, antigRef, request, response)
-  //   }
-  // })
 
   try {
     const data = await Prospect.find({ "Cedula": cedula }, {})
@@ -431,35 +459,37 @@ appRoutes.post('/APC', async (request, response) => {
       const today = new Date()
       antigRef = Math.round((today.getTime() - created.getTime())/(24*60*60*1000))
 
-      datos = data[0].APC
-      leerRefAPC(datos, antigRef, request, response)
+      if(antigRef < 91) {
+        datos = data[0].APC
+      }
+    }
+    if(!Object.keys(datos).length) {
+      await leerRefAPC(request, response)
     } else {
-      leerRefAPC(datos, antigRef, request, response)
+      formatData(datos, response)
     }
   } catch(err)  {
-    leerRefAPC(datos, antigRef, request, response)
+    formatData(datos, response)
   }
 })
-const leerRefAPC = (datos, antigRef, request, response) => {
-  console.log('BBBBBB', datos, antigRef)
-  if(datos && antigRef < 91) {
-    console.log('datos.length && antigRef < 9')
-    formatData(datos, response)
-  } else {
-    const { usuarioApc, claveApc, id, tipoCliente, productoApc } = request.body
 
-    const URL = "https://apirestapc20210918231653.azurewebsites.net/api/APCScore"
-  
-    let datos = []
-    axios.post(URL,{"usuarioconsulta": usuarioApc, "claveConsulta": claveApc, "IdentCliente": id, "TipoCliente": tipoCliente, "Producto": productoApc})
-    .then(async (res) => {
-        const result = res.data
-        datos = await guardarRef(result, id)
-        formatData(datos, response)
-    }).catch((error) => {
-        formatData(datos, response)
-    });
-  }
+const leerRefAPC = async (request, response) => {
+  const { id, tipoCliente, productoApc } = request.body
+  const URL = "https://apirestapc20210918231653.azurewebsites.net/api/APCScore"
+
+  let idMongo = ""
+  axios.post(URL,{"usuarioconsulta": usuarioApc, "claveConsulta": claveApc, "IdentCliente": id, "TipoCliente": tipoCliente, "Producto": productoApc})
+  .then(async (res) => {
+    console.log('BBBBBB-333')
+    const result = res.data
+    idMongo = await guardarRef(result, id)
+    datos = await leerRefMongo(idMongo)
+    console.log('await leerRefMongo(idMongo)', datos)
+    formatData(datos, response)
+  }).catch((error) => {
+    console.log('BBBBBB-444', error)
+  });
+  return idMongo
 }
 const guardarRef = async (refApc, id) => {
 
@@ -641,21 +671,44 @@ const guardarRef = async (refApc, id) => {
   .then(() => console.log('MongoDB Connected...2'))
   .catch((err) => console.log(err))
 
+  let idMongo = ""
   try {
-    await Prospect.updateOne(
-        {Cedula: id},
-        udtDatos, 
-        {upsert: true}
-      )
+    const xxx = await Prospect.updateOne(
+      {Cedula: id},
+      udtDatos, 
+      {upsert: true}
+    )
+    idMongo = JSON.stringify(xxx.upsertedId)
+    idMongo = idMongo.replace('"','')
+    idMongo = idMongo.replace('"','')
   } catch(err)  {
     console.log(err)
   }
-  return udtDatos
+  return idMongo
+}
+const leerRefMongo = async (id) => {
+  mongoose.connect(config.MONGODB_URI, {
+    useNewUrlParser: true, 
+    useUnifiedTopology: true
+  })
+  .then(() => console.log('MongoDB Connected...1-b'))
+  .catch((err) => console.log(err))
+
+  try {
+    const data = await Prospect.findById( { "_id": id }, {})
+    console.log('CCCCCCCC-9999', data)
+    if (Object.keys(data).length) {
+      return data.APC
+    }
+  } catch (err) {
+    console.log (err)
+    return {}
+  }
 }
 const formatData = (result, response) => {
   let datos = []
   console.log('AAAAAAAAAAAAAAAAAA',result)
-  if (result) {
+  if (Object.keys(result).length) {
     let SCORE = "0"
     let PI = "0"
     let EXCLUSION = "0"
