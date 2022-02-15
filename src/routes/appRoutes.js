@@ -265,7 +265,7 @@ appRoutes.post('/clientify', async (req, res) => {
       {"field": "img_carta_trabajo", "value": img_carta_trabajo},
       {"field": "img_comprobante_pago", "value": img_comprobante_pago},
       {"field": "img_autoriza_apc", "value": img_autoriza_apc},
-      {"field": "img_referencias_apc", "value": img_referencias_apc},
+      {"field": "img_referencias_apc2", "value": img_referencias_apc},
 
       {"field": "contrato_laboral", "value": contrato_laboral}, 
       {"field": "meses_trabajo_actual", "value": Number(meses_trabajo_actual)},
@@ -284,25 +284,10 @@ appRoutes.post('/clientify', async (req, res) => {
     ]
   })
 
-
   const headers = {
     "Authorization": `Token ${token}`,
     "Content-Type": "application/json"
   }
-
-  // let ID = null
-  // let url = `https://api.clientify.net/v1/contacts/?query=${first_name}`
-  // axios({
-  //   method: "GET",
-  //   url, 
-  //   headers: headers,
-  //   redirect: 'follow'
-  // })
-  // .then(result => {
-  //   console.log(result.data.results)
-  //   ID = result.data.results
-  // })
-  // .catch(error => console.log('error', error))
 
   let post = "POST"
   if(ID) post = "PUT"
@@ -316,9 +301,7 @@ appRoutes.post('/clientify', async (req, res) => {
     redirect: 'follow'
   })
   .then(result => res.json(result.data))
-  // .then(result => console.log(result.data))
   .catch(error => console.log('error', error))
-
 })
 
 appRoutes.post('/clientify-rechazo', async (req, res) => {
@@ -372,7 +355,6 @@ appRoutes.get('/tracking/cedula/:cedula', (req, res) => {
 appRoutes.get('/tracking/id/:id', (req, res) => {
 
   const { id } = req.params
-  console.log("3333333", { "_id": id })
 
   mongoose.connect(config.MONGODB_URI, {
     useNewUrlParser: true, useUnifiedTopology: true
@@ -397,10 +379,10 @@ appRoutes.get('/tracking/delete/:id', (req, res) => {
  
   Prospect.findByIdAndRemove({ "_id": id }, function(err, result) {
     if(err){
-        console.log(err)
+      console.log(err)
     }
     else{
-        res.send("Ok")
+      res.send("Ok")
     }
   }) 
 })
@@ -411,10 +393,10 @@ appRoutes.get('/tracking', (req, res) => {
  
   Prospect.find(function(err, data) {
       if(err){
-          console.log(err)
+        console.log(err)
       }
       else{
-          res.send(data)
+        res.send(data)
       }
   }) 
 })
@@ -453,7 +435,6 @@ appRoutes.post('/APC', async (request, response) => {
 
   try {
     const data = await Prospect.find({ "Cedula": cedula }, {})
-    console.log('CCCCCCCC', data)
     if (data.length) {
       const created = data[0].Created
       const today = new Date()
@@ -472,7 +453,6 @@ appRoutes.post('/APC', async (request, response) => {
     formatData(datos, response)
   }
 })
-
 const leerRefAPC = async (request, response) => {
   const { id, tipoCliente, productoApc } = request.body
   const URL = "https://apirestapc20210918231653.azurewebsites.net/api/APCScore"
@@ -480,11 +460,9 @@ const leerRefAPC = async (request, response) => {
   let idMongo = ""
   axios.post(URL,{"usuarioconsulta": usuarioApc, "claveConsulta": claveApc, "IdentCliente": id, "TipoCliente": tipoCliente, "Producto": productoApc})
   .then(async (res) => {
-    console.log('BBBBBB-333')
     const result = res.data
     idMongo = await guardarRef(result, id)
     datos = await leerRefMongo(idMongo)
-    console.log('await leerRefMongo(idMongo)', datos)
     formatData(datos, response)
   }).catch((error) => {
     console.log('BBBBBB-444', error)
@@ -696,7 +674,6 @@ const leerRefMongo = async (id) => {
 
   try {
     const data = await Prospect.findById( { "_id": id }, {})
-    console.log('CCCCCCCC-9999', data)
     if (Object.keys(data).length) {
       return data.APC
     }
@@ -707,7 +684,6 @@ const leerRefMongo = async (id) => {
 }
 const formatData = (result, response) => {
   let datos = []
-  console.log('AAAAAAAAAAAAAAAAAA',result)
   if (Object.keys(result).length) {
     let SCORE = "0"
     let PI = "0"
@@ -731,7 +707,6 @@ const formatData = (result, response) => {
   } else {
     datos.push({"status": false, "message": "WS-APC No disponible."})
   }  
-  console.log('HHHHHHHH', datos)
   response.json(datos)
 }
 
@@ -945,7 +920,6 @@ appRoutes.get('/laboral_sector', (request, response) => {
 })
 
 appRoutes.get('/laboral_sector_entity_f', (request, response) => {
-  // let sql = "select a.id_code, b.id, short_name as sector, c.id, c.name as name,"
   let sql = "select id_ruta as ruta, id_sector, id_profesion,"
   sql += " descto_ship as discount_capacity,"
   sql += " descto_chip as discount_capacity_mortgage,"
@@ -966,6 +940,7 @@ appRoutes.get('/laboral_sector_entity_f', (request, response) => {
   sql += " gastoLegal,"
   sql += " timbres,"
   sql += " servicioDescto,"
+  sql += " d.type,"
   sql += " mount_min,"
   sql += " mount_max, min_antiguedad"
   sql += " from entity_params a"
