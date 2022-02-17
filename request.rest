@@ -201,8 +201,12 @@ content-type: application/json
 GET http://localhost:3001/api/APC
 
 ###
-GET http://localhost:3001/api/APC
+POST http://localhost:3001/api/leerAPC
+content-type: application/json
 
+{
+    "id": "8-724-2315"
+}
 
 ###
 POST http://localhost:3001/api/APC
@@ -241,8 +245,19 @@ GET http://localhost:3001/api/tracking/delete/618b3239ebbe75d92e4028e5
 
 ###
 GET http://localhost:3001/api/tracking/guasimo12@gmail.com
+###
+GET http://localhost:3001/api/tracking/cedula/8-724-2315
 
+###
+POST http://localhost:3001/api/apc-historial
+content-type: application/json
 
+{
+      "Cedula": "7-94-785",
+      "Email": "hola",
+      "Nombre": "hola",
+      "Apellido_Paterno": "hola"
+}
 ###
 POST http://localhost:3001/api/email
 content-type: application/json

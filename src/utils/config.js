@@ -74,8 +74,13 @@ const cnn = mysql.createPool({
   queueLimit: 0
 });
 
+const APC = {
+  user: process.env.APC_USER,
+  pass: process.env.APC_PASS
+}
 
 module.exports = {
+  APC,
   AWS_BUCKET_NAME,
   AWS_BUCKET_REGION,
   AWS_Access_key_ID,

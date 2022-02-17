@@ -99,37 +99,36 @@ fileRoutes.get('/list', async (request, response) => {
   })
 })
 
+const separator = (numb) => {
+  var str = numb.toString().split(".");
+  if(str.length > 1) {
+    str[1] = str[1].padEnd(2, '0')
+  } else {
+    str[1]='00'
+  }
+  str[0] = str[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return str.join(".");
+}
 
 fileRoutes.post('/createPDF', async (req, res) => {
 
-  const { idMongo } = req.body
+  const { cedula } = req.body
 
   await mongoose.connect(config.MONGODB_URI, {
     useNewUrlParser: true, 
     useUnifiedTopology: true
   })
-  .then(() => console.log('MongoDB Connected...'))
+  .then(() => console.log('MongoDB Connected...PDF'))
   .catch((err) => console.log(err))
 
   try {
-    // PONER A LEER POR EMAIL
-    result = await Prospect.findById(idMongo)
+    result = await Prospect.find({ "Cedula": cedula }, {})
 
-    const separator = (numb) => {
-      var str = numb.toString().split(".");
-      if(str.length > 1) {
-        str[1] = str[1].padEnd(2, '0')
-      } else {
-        str[1]='00'
-      }
-      str[0] = str[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      return str.join(".");
-    }
-
+    const APC = await result[0].APC
     const hoyes = new Date().toLocaleString()
-    const gen = result.APC.Generales
-    const ref = result.APC.Referencias
-    const refC = result.APC.Ref_Canceladas
+    const gen = APC.Generales
+    const ref = APC.Referencias
+    const refC = APC.Ref_Canceladas
 
     // Como crear una linea
     // {canvas: [{type: 'line', x1: 0, y1: 0, x2: 515, y2: 0, lineWidth: 1}]},
@@ -183,7 +182,7 @@ fileRoutes.post('/createPDF', async (req, res) => {
           table: {
             widths: [100, 150, 90, 70, 110],
             body: [  
-              [{ style: 'blueWhite', text: 'Nombre:' }, { text: gen.Nombre, style: 'small1' }, { border: [false, false, false, false], text: '' }, { style: ['blueWhite', 'right'], text: 'Fecha: ' }, { style: 'small1', text: hoyes }],
+              [{ style: 'blueWhite', text: 'Nombre:' }, { text: gen.Nombre + ' ' + gen.Apellido, style: 'small1' }, { border: [false, false, false, false], text: '' }, { style: ['blueWhite', 'right'], text: 'Fecha: ' }, { style: 'small1', text: hoyes }],
               [{ style: 'blueWhite', text: 'Identificación:' }, { text: gen.Id, style: 'small1' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }],
               [{ style: 'blueWhite', text: 'Usuario Consulta:' }, { text: gen.Usuario, style: 'small1' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }],
               [{ style: 'blueWhite', text: 'Asociado:' }, { text: gen.Asociado, style: 'small1' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }],

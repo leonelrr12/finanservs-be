@@ -13,6 +13,8 @@ const { sendGEmail: key } = config
 const OAuth2Client = new OAuth2(key.clientId, key.clientSecret, key.redirectUri)
 OAuth2Client.setCredentials({ refresh_token: key.refreshToken })
 
+// const { usuarioApc, claveApc } = config.APC
+const { user: usuarioApc, pass: claveApc } = config.APC
 
 appRoutes.get('/', (request, response) => {
   response.send('Hola Mundo!!!')
@@ -63,6 +65,7 @@ appRoutes.post('/clientify-token', async (req, res) => {
   .then(result => res.json(result.data))
   .catch(error => console.log('error', error))
 })
+
 
 appRoutes.post('/email', async (req, res) => {
 
@@ -135,69 +138,6 @@ appRoutes.post('/email', async (req, res) => {
     .then( r => res.status(200).send('Enviado!') )
     .catch( e => console.log(e.message) )
 })
-appRoutes.post('/email-bk', async (req, res) => {
-
-  const { email: euser, asunto, mensaje, telefono, monto, nombre, banco } = req.body
-
-  let emails = null
-  await axios.get(`http://localhost:3001/api/entities_f/${banco}`)
-  .then(res => {
-    const result = res.data
-    emails = result[0].emails
-  }).catch(() => {
-    emails = null
-  })
-
-  if(emails === undefined) emails = null
-  if(!emails) {
-    console.log("Debe configurar lista de Emails en la Entidad Financiera.")
-    return
-  }
-  emails += ",rsanchez2565@gmail.com"
-
-  nodemailer.createTestAccount(( err, account ) => {
-    const htmlEmail = `
-      <h3>Nuevo Prospecto desde Finanservs.com</h3>
-      <ul>
-        <li>Email: ${euser}</li>
-        <li>Nombre: ${nombre}</li>
-        <li>Teléfono: ${telefono}</li>
-        <li>Monto Solicitado: ${monto}</li>
-      </ul>
-      <h3>Mensaje</h3>
-      <p>${mensaje}</p>
-    `
-  
-    let transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: key.EMAIL_PORT,
-      auth: {
-        user: key.EMAIL_USER, 
-        pass: key.EMAIL_PASS
-      },
-      tls: {
-        rejectUnauthorized: false
-      }
-    })
-
-    let mailOptions = {
-      from: key.EMAIL_FROM,
-      to: emails,
-      subject: asunto,
-      text: mensaje,
-      html: htmlEmail
-    }
-
-    transporter.sendMail(mailOptions, ( err, info ) => {
-      if(err) {
-        return console.error("Estamos aqui", err)
-      }
-      console.log("Mensaje enviado: %s", info.envelope)
-      console.log("Url del mensaje: %s", nodemailer.getTestMessageUrl(info))
-    })
-  })
-
-})
 
 appRoutes.post('/clientify', async (req, res) => {
   const { body } = req
@@ -209,8 +149,8 @@ appRoutes.post('/clientify', async (req, res) => {
 
           donde_trabaja = 'N/A', Puesto = 'N/A', Cedula = 'N/A', 
           img_cedula = 'N/A',  img_ficha_css = 'N/A', img_servicio_publico = 'N/A', img_carta_trabajo = 'N/A', 
-          img_comprobante_pago = 'N/A', img_autoriza_apc = 'N/A', img_referencias_apc = 'N/A', province, district, county, street = 'N/A'
-        
+          img_comprobante_pago = 'N/A', img_autoriza_apc = 'N/A', img_referencias_apc = 'N/A', 
+          province, district, county, street = 'N/A'
         } = body
 
   const wDate = date => (date.getFullYear()+ "-" + (date.getMonth() + 1)  + "-" +  date.getDate())
@@ -325,7 +265,7 @@ appRoutes.post('/clientify', async (req, res) => {
       {"field": "img_carta_trabajo", "value": img_carta_trabajo},
       {"field": "img_comprobante_pago", "value": img_comprobante_pago},
       {"field": "img_autoriza_apc", "value": img_autoriza_apc},
-      {"field": "img_referencias_apc", "value": img_referencias_apc},
+      {"field": "img_referencias_apc2", "value": img_referencias_apc},
 
       {"field": "contrato_laboral", "value": contrato_laboral}, 
       {"field": "meses_trabajo_actual", "value": Number(meses_trabajo_actual)},
@@ -344,25 +284,10 @@ appRoutes.post('/clientify', async (req, res) => {
     ]
   })
 
-
   const headers = {
     "Authorization": `Token ${token}`,
     "Content-Type": "application/json"
   }
-
-  // let ID = null
-  // let url = `https://api.clientify.net/v1/contacts/?query=${first_name}`
-  // axios({
-  //   method: "GET",
-  //   url, 
-  //   headers: headers,
-  //   redirect: 'follow'
-  // })
-  // .then(result => {
-  //   console.log(result.data.results)
-  //   ID = result.data.results
-  // })
-  // .catch(error => console.log('error', error))
 
   let post = "POST"
   if(ID) post = "PUT"
@@ -376,9 +301,7 @@ appRoutes.post('/clientify', async (req, res) => {
     redirect: 'follow'
   })
   .then(result => res.json(result.data))
-  // .then(result => console.log(result.data))
   .catch(error => console.log('error', error))
-
 })
 
 appRoutes.post('/clientify-rechazo', async (req, res) => {
@@ -410,45 +333,24 @@ appRoutes.post('/clientify-rechazo', async (req, res) => {
 
 })
 
-appRoutes.post('/apc-historial', async (req, res) => {
 
-  await mongoose.connect(config.MONGODB_URI, {
+appRoutes.get('/tracking/cedula/:cedula', (req, res) => {
+
+  const { cedula } = req.params
+
+  mongoose.connect(config.MONGODB_URI, {
     useNewUrlParser: true, 
     useUnifiedTopology: true
   })
-    .then(() => console.log('MongoDB Connected...'))
-    .catch((err) => console.log(err))
-
-    const {
-      Nombre,
-      Apellido_Paterno,
-      Email,
-    } = req.body
-
-  const newProspect =  new Prospect({
-    Email,
-    Nombre,
-    Apellido_Paterno,
-  })
-
-  await newProspect.save()
-  let ID = newProspect._id
-  console.log(ID)
-
-  res.send(ID)
-})
-appRoutes.get('/tracking/:email', cors(), (req, res) => {
-
-  const { email } = req.params
-
-  mongoose.connect(config.MONGODB_URI, {
-    useNewUrlParser: true, useUnifiedTopology: true
-  })
  
-  Prospect.find({ "Email": email }, '_id', function (err, data) {
-    if (err) return handleError(err);
-    res.send(data)
-  })
+  Prospect.find({ "Cedula": cedula }, function(err, data) {
+    if(err){
+        console.log(err)
+    }
+    else{
+        res.send(data)
+    }
+  }) 
 })
 appRoutes.get('/tracking/id/:id', (req, res) => {
 
@@ -477,10 +379,10 @@ appRoutes.get('/tracking/delete/:id', (req, res) => {
  
   Prospect.findByIdAndRemove({ "_id": id }, function(err, result) {
     if(err){
-        console.log(err)
+      console.log(err)
     }
     else{
-        res.send("Ok")
+      res.send("Ok")
     }
   }) 
 })
@@ -491,78 +393,89 @@ appRoutes.get('/tracking', (req, res) => {
  
   Prospect.find(function(err, data) {
       if(err){
-          console.log(err)
+        console.log(err)
       }
       else{
-          res.send(data)
+        res.send(data)
       }
   }) 
 })
 
 
-appRoutes.post('/APC', (request, response) => {
+appRoutes.post('/leerAPC', (request, response) => {
+  const { id: cedula } = request.body
 
-  const { usuarioApc, claveApc, id, tipoCliente, productoApc, idMongo } = request.body
+  mongoose.connect(config.MONGODB_URI, {
+    useNewUrlParser: true, 
+    useUnifiedTopology: true
+  })
+  .then(() => console.log('MongoDB Connected...3'))
+  .catch((err) => console.log(err))
 
-  const URL = "https://apirestapc20210918231653.azurewebsites.net/api/APCScore"
-  // const URL = "http://localhost:5000/api/APCScore"
-
-  const datos = []
-  axios.post(URL,{"usuarioconsulta": usuarioApc, "claveConsulta": claveApc, "IdentCliente": id, "TipoCliente": tipoCliente, "Producto": productoApc})
-  .then((res) => {
-      const result = res.data
-      const copia = {...result}
-
-      if(result["estatus"] === "0") {
-        datos.push({"status": false, "message": "Sin Referencias de Crédito!"})
-        response.json(datos)
-        return
-      }
-
-      let SCORE = "0"
-      let PI = "0"
-      let EXCLUSION = "0"
-      if(result["sc"] !== null) {
-        SCORE = result["sc"]["score"]
-        PI = result["sc"]["pi"]
-        EXCLUSION = result["sc"]["exclusion"]
-      }
-
-      Object.entries(result["det"]).forEach(([key, value]) => {
-        if(value !== null) {
-          value.status = true
-          value.message = "Ok"
-          value.score = SCORE
-          value.pi = PI
-          value.exclusion = EXCLUSION
-          // delete value['montO_CODIFICADO']
-          // delete value['coD_GRUPO_ECON']
-          // delete value['tipO_ASOC']
-          // delete value['montO_CODIFICADO']
-          // delete value['feC_INICIO_REL']
-          // delete value['feC_FIN_REL']
-          // delete value['feC_ACTUALIZACION']
-          datos.push(value)
-        }
-      });
-
-      guardarRef(copia, idMongo)
-      response.json(datos)
-  }).catch((error) => {
-      console.log(error)
-      datos.push({"status": false, "message": "WS-APC No disponible."})
-      response.json(datos)
-  });
+  Prospect.find({ "Cedula": cedula }, {}, function (err, data) {
+    let result = {}
+    if(data.length) {
+      result = data[0].APC
+    }
+    formatData(result, response)
+  })
 })
+appRoutes.post('/APC', async (request, response) => {
+  const {id: cedula } = request.body
 
+  mongoose.connect(config.MONGODB_URI, {
+    useNewUrlParser: true, 
+    useUnifiedTopology: true
+  })
+  .then(() => console.log('MongoDB Connected...1-a'))
+  .catch((err) => console.log(err))
 
-const guardarRef = async (refApc, idMongo) => {
+  let datos = {}
+  let antigRef = 0
 
-  // console.log(refApc)
+  try {
+    const data = await Prospect.find({ "Cedula": cedula }, {})
+    if (data.length) {
+      const created = data[0].Created
+      const today = new Date()
+      antigRef = Math.round((today.getTime() - created.getTime())/(24*60*60*1000))
+
+      if(antigRef < 91) {
+        datos = data[0].APC
+      }
+    }
+    if(!Object.keys(datos).length) {
+      await leerRefAPC(request, response)
+    } else {
+      formatData(datos, response)
+    }
+  } catch(err)  {
+    formatData(datos, response)
+  }
+})
+const leerRefAPC = async (request, response) => {
+  const { id, tipoCliente, productoApc } = request.body
+  const URL = "https://apirestapc20210918231653.azurewebsites.net/api/APCScore"
+
+  let idMongo = ""
+  axios.post(URL,{"usuarioconsulta": usuarioApc, "claveConsulta": claveApc, "IdentCliente": id, "TipoCliente": tipoCliente, "Producto": productoApc})
+  .then(async (res) => {
+    const result = res.data
+    idMongo = await guardarRef(result, id)
+    datos = await leerRefMongo(idMongo)
+    formatData(datos, response)
+  }).catch((error) => {
+    console.log('BBBBBB-444', error)
+  });
+  return idMongo
+}
+const guardarRef = async (refApc, id) => {
+
   const { nombre, apellido, idenT_CLIE, noM_ASOC, } = refApc.gen
 
   const Generales = {
-    "Nombre": nombre + " " + apellido,
+    "Nombre": nombre,
+    "Apellido": apellido,
     "Id": idenT_CLIE,
     "Usuario": "WSACSORAT001",
     "Asociado": noM_ASOC
@@ -718,13 +631,8 @@ const guardarRef = async (refApc, idMongo) => {
     Score.Exclusion = refApc["sc"]["exclusion"]
   }
 
-  // console.log(Generales)
-  // console.log(Resumen)
-  // console.log(Referencias)
-  // console.log(Ref_Canceladas)
-  // console.log(Score)
-
   const udtDatos = {
+    Cedula: id,
     APC: {
       Generales,
       Resumen,
@@ -738,16 +646,68 @@ const guardarRef = async (refApc, idMongo) => {
     useNewUrlParser: true, 
     useUnifiedTopology: true
   })
-  .then(() => console.log('MongoDB Connected...'))
+  .then(() => console.log('MongoDB Connected...2'))
   .catch((err) => console.log(err))
 
+  let idMongo = ""
   try {
-    await Prospect.findByIdAndUpdate(idMongo, udtDatos, {new: true})
+    const xxx = await Prospect.updateOne(
+      {Cedula: id},
+      udtDatos, 
+      {upsert: true}
+    )
+    idMongo = JSON.stringify(xxx.upsertedId)
+    idMongo = idMongo.replace('"','')
+    idMongo = idMongo.replace('"','')
   } catch(err)  {
     console.log(err)
   }
+  return idMongo
+}
+const leerRefMongo = async (id) => {
+  mongoose.connect(config.MONGODB_URI, {
+    useNewUrlParser: true, 
+    useUnifiedTopology: true
+  })
+  .then(() => console.log('MongoDB Connected...1-b'))
+  .catch((err) => console.log(err))
 
-  return udtDatos
+  try {
+    const data = await Prospect.findById( { "_id": id }, {})
+    if (Object.keys(data).length) {
+      return data.APC
+    }
+  } catch (err) {
+    console.log (err)
+    return {}
+  }
+}
+const formatData = (result, response) => {
+  let datos = []
+  if (Object.keys(result).length) {
+    let SCORE = "0"
+    let PI = "0"
+    let EXCLUSION = "0"
+    if(result["Score"] !== null) {
+      SCORE = result["Score"]["Score"]
+      PI = result["Score"]["PI"]
+      EXCLUSION = result["Score"]["Exclusion"]
+    }
+
+    Object.entries(result["Referencias"]).forEach(([key, value]) => {
+      if(value !== null) {
+        value.status = true
+        value.message = "Ok"
+        value.score = SCORE
+        value.pi = PI
+        value.exclusion = EXCLUSION
+        datos.push(value)
+      }
+    });
+  } else {
+    datos.push({"status": false, "message": "WS-APC No disponible."})
+  }  
+  response.json(datos)
 }
 
 
@@ -763,7 +723,6 @@ appRoutes.get('/sectors', (request, response) => {
     }
   })
 })
-
 appRoutes.get('/profesions', (request, response) => {
   const sql = "SELECT * FROM profesions"
 
@@ -961,7 +920,6 @@ appRoutes.get('/laboral_sector', (request, response) => {
 })
 
 appRoutes.get('/laboral_sector_entity_f', (request, response) => {
-  // let sql = "select a.id_code, b.id, short_name as sector, c.id, c.name as name,"
   let sql = "select id_ruta as ruta, id_sector, id_profesion,"
   sql += " descto_ship as discount_capacity,"
   sql += " descto_chip as discount_capacity_mortgage,"
@@ -982,6 +940,7 @@ appRoutes.get('/laboral_sector_entity_f', (request, response) => {
   sql += " gastoLegal,"
   sql += " timbres,"
   sql += " servicioDescto,"
+  sql += " d.type,"
   sql += " mount_min,"
   sql += " mount_max, min_antiguedad"
   sql += " from entity_params a"
