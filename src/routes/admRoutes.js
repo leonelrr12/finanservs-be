@@ -15,25 +15,27 @@ admRoutes.post('/prospects', (request, response) => {
   sql += " entity_f,estado,email,cellphone,phoneNumber,idUrl,socialSecurityProofUrl,"
   sql += " publicGoodProofUrl,workLetterUrl,payStubUrl,origin_idUser,gender,birthDate,"
   sql += " contractType,jobSector,occupation,paymentFrecuency,profession,"
-  sql += " civil_status,province,district,sign,"
+  sql += " civil_status,province,district,county,sign,"
   sql += " loanPP,loanAuto,loanTC,loanHip,cashOnHand,plazo,apcReferenceUrl,apcLetterUrl,"
 
   sql += " residenceType,residenceMonthly,work_name,work_cargo,work_address,work_phone,work_phone_ext,work_month,"
-  sql += " work_prev_name,work_prev_month,work_prev_salary,barrio_casa_calle,"
+  sql += " work_prev_name,work_prev_month,work_prev_salary,"
   sql += " salary,honorarios,viaticos,termConds,"
-  sql += " weight, weightUnit, height, heightUnit, aceptaApc, nationality"
+  sql += " weight, weightUnit, height, heightUnit, aceptaApc, nationality,"
+  sql += " calle, barriada_edificio, no_casa_piso_apto"
 
   sql += ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,"
-  sql += "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+  sql += "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 
   let { id_personal,idUser,apcReferencesUrl,apcLetterUrl,sponsor,name,fname,fname_2,lname,lname_2 } = request.body
   let { entity_f,email,cellphone,phoneNumber,idUrl,socialSecurityProofUrl,publicGoodProofUrl } = request.body
   let { workLetterUrl,payStubUrl,origin_idUser,gender,birthDate: BDH,contractType,jobSector,occupation,paymentFrecuency } = request.body
-  let { profession,civil_status,province,district,sign } = request.body
+  let { profession,civil_status,province,district,county,sign } = request.body
+  let { street: calle, barriada_edificio, no_casa_piso_apto } = request.body
   let { loanPP,loanAuto,loanTC,loanHip,cashOnHand,plazo } = request.body
    
   let { residenceType,residenceMonthly,work_name,work_cargo,work_address,work_phone,work_phone_ext,work_month } = request.body
-  let { work_prev_name='N/A',work_prev_month=0,work_prev_salary=0,barrio_casa_calle } = request.body
+  let { work_prev_name='N/A',work_prev_month=0,work_prev_salary=0 } = request.body
   let { salary,honorarios=0,viaticos=0,termConds,nationality=0 } = request.body
   let { weight, weightUnit, height, heightUnit, aceptaAPC: aceptaApc } = request.body
 
@@ -44,11 +46,12 @@ admRoutes.post('/prospects', (request, response) => {
     id_personal,sponsor,idUser,name,fname,fname_2,lname,lname_2,entity_f,estado,email,cellphone,
     phoneNumber,idUrl,socialSecurityProofUrl,publicGoodProofUrl,workLetterUrl,payStubUrl,origin_idUser,gender,
     birthDate,contractType,jobSector,occupation,paymentFrecuency,profession,civil_status,province,
-    district,sign,loanPP,loanAuto,loanTC,loanHip,cashOnHand,plazo,apcReferencesUrl,apcLetterUrl,
+    district,county,sign,loanPP,loanAuto,loanTC,loanHip,cashOnHand,plazo,apcReferencesUrl,apcLetterUrl,
     residenceType,residenceMonthly,work_name,work_cargo,work_address,work_phone,work_phone_ext,work_month,
-    work_prev_name,work_prev_month,work_prev_salary,barrio_casa_calle,
+    work_prev_name,work_prev_month,work_prev_salary,
     salary,honorarios,viaticos,termConds,
-    weight, weightUnit, height, heightUnit, aceptaApc, nationality
+    weight, weightUnit, height, heightUnit, aceptaApc, nationality,
+    calle, barriada_edificio, no_casa_piso_apto
   ]
 
   config.cnn.query(sql, params, (error, results, next) => {

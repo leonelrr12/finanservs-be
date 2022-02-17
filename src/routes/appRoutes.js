@@ -149,8 +149,8 @@ appRoutes.post('/clientify', async (req, res) => {
 
           donde_trabaja = 'N/A', Puesto = 'N/A', Cedula = 'N/A', 
           img_cedula = 'N/A',  img_ficha_css = 'N/A', img_servicio_publico = 'N/A', img_carta_trabajo = 'N/A', 
-          img_comprobante_pago = 'N/A', img_autoriza_apc = 'N/A', img_referencias_apc = 'N/A', province, district, county, street = 'N/A'
-        
+          img_comprobante_pago = 'N/A', img_autoriza_apc = 'N/A', img_referencias_apc = 'N/A', 
+          province, district, county, street = 'N/A'
         } = body
 
   const wDate = date => (date.getFullYear()+ "-" + (date.getMonth() + 1)  + "-" +  date.getDate())

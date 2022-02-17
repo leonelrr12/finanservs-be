@@ -52,7 +52,7 @@ fileRoutes.post('/file2', upload2.single('idUrl'), async (req, res) => {
   const result = await uploadFile2(fileName, entity_f, nameImage, prospect)
   console.log('uploadFile2', result)
   try {
-    // fs.unlinkSync(fileName)
+    fs.unlinkSync(fileName)
   } catch(err) {
     console.error('Something wrong happened removing the file', err)
   }
