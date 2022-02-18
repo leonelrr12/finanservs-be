@@ -124,6 +124,10 @@ fileRoutes.post('/createPDF', async (req, res) => {
   try {
     result = await Prospect.find({ "Cedula": cedula }, {})
 
+    console.log(result)
+    if(!result.length) {
+      return
+    }
     const APC = await result[0].APC
     const hoyes = new Date().toLocaleString()
     const gen = APC.Generales

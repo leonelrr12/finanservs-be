@@ -437,6 +437,7 @@ appRoutes.post('/APC', async (request, response) => {
   try {
     const data = await Prospect.find({ "Cedula": cedula }, {})
     if (data.length) {
+      console.log('Hola por aqui-2222')
       const created = data[0].Created
       const today = new Date()
       antigRef = Math.round((today.getTime() - created.getTime())/(24*60*60*1000))
@@ -446,12 +447,15 @@ appRoutes.post('/APC', async (request, response) => {
       }
     }
     if(!Object.keys(datos).length) {
+      console.log('Hola por aqui-1111')
       await leerRefAPC(request, response)
     } else {
       formatData(datos, response)
+      console.log('Hola por aqui-3333')
     }
   } catch(err)  {
     formatData(datos, response)
+    console.log('Hola por aqui-4444')
   }
 })
 const leerRefAPC = async (request, response) => {
@@ -467,7 +471,6 @@ const leerRefAPC = async (request, response) => {
     formatData(datos, response)
   }).catch((error) => {
     formatData([], response)
-    console.log('BBBBBB-444', error)
   });
   return idMongo
 }
@@ -658,9 +661,8 @@ const guardarRef = async (refApc, id) => {
       udtDatos, 
       {upsert: true}
     )
-    idMongo = JSON.stringify(xxx.upsertedId)
-    idMongo = idMongo.replace('"','')
-    idMongo = idMongo.replace('"','')
+    idMongo = JSON.stringify(xxx.upsertedId).replace('"','').replace('"','')
+    console.log('idMongo',idMongo)
   } catch(err)  {
     console.log(err)
   }
