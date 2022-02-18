@@ -466,6 +466,7 @@ const leerRefAPC = async (request, response) => {
     datos = await leerRefMongo(idMongo)
     formatData(datos, response)
   }).catch((error) => {
+    formatData([], response)
     console.log('BBBBBB-444', error)
   });
   return idMongo
