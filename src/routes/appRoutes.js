@@ -46,27 +46,6 @@ appRoutes.get('/prospects', (request, response) => {
   })
 })
 
-appRoutes.post('/clientify-token', async (req, res) => {
-
-  // API Clientify
-  // 0cfbe97a236f2c62a97db9fe50b2367c63c33d08
-
-  axios({
-    method: "post",
-    url: "https://api.clientify.net/v1/api-auth/obtain_token/", 
-    data: {
-      "username": "rsanchez@finanservs.com",
-      "password": "Acsorat25"
-    },
-    headers: {
-      "Content-Type": "application/json"
-    }
-  })
-  .then(result => res.json(result.data))
-  .catch(error => console.log('error', error))
-})
-
-
 appRoutes.post('/email', async (req, res) => {
 
   const { email: euser, asunto, mensaje, telefono, monto, nombre, banco } = req.body
@@ -137,6 +116,27 @@ appRoutes.post('/email', async (req, res) => {
   send_mail()
     .then( r => res.status(200).send('Enviado!') )
     .catch( e => console.log(e.message) )
+})
+
+
+appRoutes.post('/clientify-token', async (req, res) => {
+
+  // API Clientify
+  // 0cfbe97a236f2c62a97db9fe50b2367c63c33d08
+
+  axios({
+    method: "post",
+    url: "https://api.clientify.net/v1/api-auth/obtain_token/", 
+    data: {
+      "username": "rsanchez@finanservs.com",
+      "password": "Acsorat25"
+    },
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+  .then(result => res.json(result.data))
+  .catch(error => console.log('error', error))
 })
 
 appRoutes.post('/clientify', async (req, res) => {
@@ -280,7 +280,8 @@ appRoutes.post('/clientify', async (req, res) => {
       {"field": "entidad_seleccionada", "value": wbanco},
       {"field": "Monto", "value": Monto},
       {"field": "Letra", "value": Letra},
-      {"field": "Plazo", "value": Plazo}
+      {"field": "Plazo", "value": Plazo},
+      {"field": "ORIGEN", "value": config.ORIGEN}
     ]
   })
 

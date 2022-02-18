@@ -79,6 +79,8 @@ const APC = {
   pass: process.env.APC_PASS
 }
 
+const ORIGEN = process.env.ORIGEN
+
 module.exports = {
   APC,
   AWS_BUCKET_NAME,
@@ -90,5 +92,6 @@ module.exports = {
   cnn,
   MONGODB_URI,
   sendEmail,
-  sendGEmail
+  sendGEmail,
+  ORIGEN
 }
