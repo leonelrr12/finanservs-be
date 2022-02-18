@@ -79,7 +79,10 @@ const APC = {
   pass: process.env.APC_PASS
 }
 
-const ORIGEN = process.env.ORIGEN
+const ORIGEN = {
+  nombre: process.env.NOMBRE,
+  agente: process.env.AGENTE
+}
 
 module.exports = {
   APC,

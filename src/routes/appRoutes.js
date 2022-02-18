@@ -281,7 +281,7 @@ appRoutes.post('/clientify', async (req, res) => {
       {"field": "Monto", "value": Monto},
       {"field": "Letra", "value": Letra},
       {"field": "Plazo", "value": Plazo},
-      {"field": "ORIGEN", "value": config.ORIGEN}
+      {"field": "ORIGEN", "value": config.ORIGEN.nombre}
     ]
   })
 

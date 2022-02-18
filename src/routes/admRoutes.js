@@ -22,10 +22,10 @@ admRoutes.post('/prospects', (request, response) => {
   sql += " work_prev_name,work_prev_month,work_prev_salary,"
   sql += " salary,honorarios,viaticos,termConds,"
   sql += " weight, weightUnit, height, heightUnit, aceptaApc, nationality,"
-  sql += " calle, barriada_edificio, no_casa_piso_apto"
+  sql += " calle,barriada_edificio,no_casa_piso_apto,id_agente"
 
   sql += ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,"
-  sql += "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+  sql += "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 
   let { id_personal,idUser,apcReferencesUrl,apcLetterUrl,sponsor,name,fname,fname_2,lname,lname_2 } = request.body
   let { entity_f,email,cellphone,phoneNumber,idUrl,socialSecurityProofUrl,publicGoodProofUrl } = request.body
@@ -51,7 +51,7 @@ admRoutes.post('/prospects', (request, response) => {
     work_prev_name,work_prev_month,work_prev_salary,
     salary,honorarios,viaticos,termConds,
     weight, weightUnit, height, heightUnit, aceptaApc, nationality,
-    calle, barriada_edificio, no_casa_piso_apto
+    calle, barriada_edificio, no_casa_piso_apto,config.ORIGEN.agente
   ]
 
   config.cnn.query(sql, params, (error, results, next) => {
