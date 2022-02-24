@@ -463,26 +463,35 @@ const leerRefAPC = async (request, response) => {
   const URL = "https://apirestapc20210918231653.azurewebsites.net/api/APCScore"
 
   let idMongo = ""
-  axios.post(URL,{"usuarioconsulta": usuarioApc, "claveConsulta": claveApc, "IdentCliente": id, "TipoCliente": tipoCliente, "Producto": productoApc})
+  axios.post(URL, {
+    "usuarioconsulta": usuarioApc, "claveConsulta": claveApc, 
+    "IdentCliente": id, "TipoCliente": tipoCliente, "Producto": productoApc})
   .then(async (res) => {
     const result = res.data
-    idMongo = await guardarRef(result, id)
-    datos = await leerRefMongo(idMongo)
-    formatData(datos, response)
+    console.log('Hola estoy por aqui-AAAAA')
+    if(result.mensaje === 'Ok') {
+      idMongo = await guardarRef(result, id)
+      datos = await leerRefMongo(idMongo)
+      formatData(datos, response)
+    } else {
+      formatData([], response)
+    }
   }).catch((error) => {
+    console.log('Hola estoy por aqui-BBBB')
     formatData([], response)
   });
   return idMongo
 }
 const guardarRef = async (refApc, id) => {
 
+  console.log('refApc', refApc)
   const { nombre, apellido, idenT_CLIE, noM_ASOC, } = refApc.gen
 
   const Generales = {
     "Nombre": nombre,
     "Apellido": apellido,
     "Id": idenT_CLIE,
-    "Usuario": "WSACSORAT001",
+    "Usuario": usuarioApc,
     "Asociado": noM_ASOC
   }
 
