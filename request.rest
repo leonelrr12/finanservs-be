@@ -283,3 +283,13 @@ GET http://localhost:3001/adm/mongoDBtoMySql
 
 ###
 GET http://localhost:3001/api/prospects
+
+
+
+###
+POST http://localhost:3001/upload/solicPrestBanisi
+content-type: application/json
+
+{
+    "id": 177
+}

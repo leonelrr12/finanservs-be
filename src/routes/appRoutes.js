@@ -723,7 +723,6 @@ const formatData = (result, response) => {
   response.json(datos)
 }
 
-
 appRoutes.get('/sectors', (request, response) => {
   const sql = "SELECT * FROM sectors"
 
