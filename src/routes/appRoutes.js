@@ -67,7 +67,7 @@ appRoutes.get('/prospects', (request, response) => {
 
 appRoutes.post('/email', async (req, res) => {
 
-  const { email: euser, asunto, mensaje, telefono, monto, nombre, banco, id = 199 } = req.body
+  const { email: euser, asunto, mensaje, telefono, monto, nombre, banco, cedula } = req.body
 
   let emails = null
   await axios.get(`http://localhost:3001/api/entities_f/${banco}`)
@@ -78,7 +78,6 @@ appRoutes.post('/email', async (req, res) => {
     emails = null
   })
 
-
   if(emails === undefined) emails = null
   if(!emails) {
     console.log("Debe configurar lista de Emails en la Entidad Financiera.")
@@ -86,12 +85,11 @@ appRoutes.post('/email', async (req, res) => {
   }
   emails += ", rsanchez2565@gmail.com, guasimo01@gmail.com"
 
-  console.log('const htmlEmail-00000')
   let fileAtach = ""
   try {
-    fileAtach = await solicPrestBanisi(id)
+    if(banco === '800')   // Banisi
+      fileAtach = await solicPrestBanisi(cedula)
 
-    console.log('const htmlEmail')
     const htmlEmail = `
       <h3>Nuevo Prospecto desde Finanservs.com</h3>
       <ul>
@@ -140,11 +138,8 @@ appRoutes.post('/email', async (req, res) => {
           ]
         }
     
-        console.log('const htmlEmail-1111')
-
         const result = await transporter.sendMail(mailOptions)
         transporter.close()
-        // console.log(result)
         return result
       } catch (err) {
         console.log('Estamos aqui: ', err)
@@ -1340,7 +1335,6 @@ const solicPrestBanisi = (id) => {
 
   let params = [id];
 
-  console.log('const htmlEmail-333333')
   return new Promise((resolve, reject) => {
     config.cnn.query(sql, params, (error, row) => {
       if (error) throw error
@@ -1348,12 +1342,11 @@ const solicPrestBanisi = (id) => {
         params = [row[0].id, row[0].id];
         config.cnn.query(sql2, params, (error, row2) => {
           if (error) throw error
-          console.log(row[0], row2)
           const fileName = creaPDFBanisi(row[0], row2)
           resolve(fileName)
         })
       } else {
-        console.log('const htmlEmail-44444')
+        console.log('No se generó Solicitud de Banisi.')
         reject("")
       }
     })
@@ -2158,6 +2151,5 @@ const creaPDFBanisi = (row, row2) => {
 
   return fileName
 }
-
 
 module.exports = appRoutes
