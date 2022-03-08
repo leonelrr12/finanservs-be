@@ -8,6 +8,12 @@ const { google } = require('googleapis')
 const config = require('../utils/config')
 const OAuth2 = google.auth.OAuth2
 
+const pdfMake = require('pdfmake/build/pdfmake');
+const pdfPrinter = require('pdfmake/src/printer');
+const pdfFonts = require('pdfmake/build/vfs_fonts');
+const fs = require('fs')
+const path = require('path');
+
 // const { sendEmail: key } = config
 const { sendGEmail: key } = config
 const OAuth2Client = new OAuth2(key.clientId, key.clientSecret, key.redirectUri)
@@ -20,11 +26,23 @@ appRoutes.get('/', (request, response) => {
   response.send('Hola Mundo!!!')
 })
 
+const separator = (numb) => {
+  var str = numb.toString().split(".");
+  if(str.length > 1) {
+    str[1] = str[1].padEnd(2, '0')
+  } else {
+    str[1]='00'
+  }
+  str[0] = str[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return str.join(".");
+}
+
 appRoutes.get('/today-is', (request, response) => {
   const dt1 = new Date()
   const dt2 = new Intl.DateTimeFormat('es-ES',{dateStyle: 'full'}).format(dt1)
   response.json({ hoyes: dt2 })
 })
+
 
 appRoutes.get('/prospects', (request, response) => {
   let sql = "select	sign"
@@ -46,9 +64,10 @@ appRoutes.get('/prospects', (request, response) => {
   })
 })
 
+
 appRoutes.post('/email', async (req, res) => {
 
-  const { email: euser, asunto, mensaje, telefono, monto, nombre, banco } = req.body
+  const { email: euser, asunto, mensaje, telefono, monto, nombre, banco, id = 199 } = req.body
 
   let emails = null
   await axios.get(`http://localhost:3001/api/entities_f/${banco}`)
@@ -76,8 +95,11 @@ appRoutes.post('/email', async (req, res) => {
       <li>Monto Solicitado: ${monto}</li>
     </ul>
     <h3>Mensaje</h3>
+    <h3>${banco === '800' ? 'Adjuntamos solicitud de préstamos para ser completada y firmada.': ''}</h3>
     <p>${mensaje}</p>
   `
+
+  const fileAtach = await solicPrestBanisi(id)
 
   const send_mail = async () => {
     const accessToken = await OAuth2Client.getAccessToken()
@@ -102,7 +124,16 @@ appRoutes.post('/email', async (req, res) => {
         to: emails,
         subject: asunto,
         text: mensaje,
-        html: htmlEmail
+        html: htmlEmail,
+      }
+      if(banco === '800') { // Banisi
+        mailOptions.attachments = [
+          {   // utf-8 string as an attachment
+              filename: 'Solicitud.pdf',
+              path: fileAtach,
+              content: 'Solicitud de Préstamo'
+          },
+        ]
       }
   
       const result = await transporter.sendMail(mailOptions)
@@ -114,7 +145,14 @@ appRoutes.post('/email', async (req, res) => {
     }
   }
   send_mail()
-    .then( r => res.status(200).send('Enviado!') )
+    .then( r => {
+      res.status(200).send('Enviado!')
+      try {
+        fs.unlinkSync(fileAtach)
+      } catch(err) {
+        console.error('Something wrong happened removing the file', err)
+      }
+    })
     .catch( e => console.log(e.message) )
 })
 
@@ -138,7 +176,6 @@ appRoutes.post('/clientify-token', async (req, res) => {
   .then(result => res.json(result.data))
   .catch(error => console.log('error', error))
 })
-
 appRoutes.post('/clientify', async (req, res) => {
   const { body } = req
 
@@ -1262,6 +1299,853 @@ appRoutes.get('/subgrupo_institution', (request, response) => {
     }
   })
 })
+
+
+const solicPrestBanisi = (id) => {
+
+  let sql = ""
+  sql += " SELECT a.id, fname, fname_2, lname, lname_2, id_personal, birthDate, loanPP, birthDate,"
+  sql += " work_name, work_cargo, work_address, work_phone, work_prev_name, work_prev_month,"
+  sql += " case when gender = 'female' then 'F' else 'M' end as gender,"
+  sql += " salary, day(birthDate) as dia, month(birthDate) as mes, year(birthDate) as anio,"
+  sql += " f.name as profesion, g.name as residenceType, residenceMonthly, k.name as civil_status,"
+  sql += " h.name as province, i.name as district, j.name as county,"
+  sql += " concat(barriada_edificio, ' Piso Casa: ', no_casa_piso_apto, ' Calle: ', calle) as barrio"
+  sql += " FROM prospects a"
+  sql += " LEFT JOIN profesions f ON f.id=a.profession"
+  sql += " LEFT JOIN housings g ON g.id=a.residenceType"
+  sql += " LEFT JOIN provinces h ON h.id=a.province"
+  sql += " LEFT JOIN districts i ON i.id=a.district"
+  sql += " LEFT JOIN counties j ON j.id=a.county"
+  sql += " LEFT JOIN civil_status k ON k.id=a.civil_status"
+  sql += " WHERE id_personal = ?"
+
+  let sql2 = ""
+  sql2 += "SELECT 1 as type, concat(name, ' ', apellido) as name, work_name, work_phonenumber, phonenumber, cellphone"
+  sql2 += " FROM ref_person_family"
+  sql2 += " WHERE id_prospect = ?"
+  sql2 += " UNION ALL "
+  sql2 += " SELECT 2 as type, concat(name, ' ', apellido) as name, work_name, work_phonenumber, phonenumber, cellphone"
+  sql2 += " FROM ref_person_no_family"
+  sql2 += " WHERE id_prospect = ?"
+
+  let params = [id];
+
+  return new Promise((resolve, reject) => {
+    config.cnn.query(sql, params, (error, row) => {
+      if (error) throw error
+      if (Object.keys(row).length > 0) {
+        params = [row[0].id, row[0].id];
+        config.cnn.query(sql2, params, (error, row2) => {
+          if (error) throw error
+          const fileName = creaPDFBanisi(row[0], row2)
+          resolve(fileName)
+        })
+      } else {
+        reject("")
+      }
+    })
+  })
+}
+
+const creaPDFBanisi = (row, row2) => {
+
+  let gNames='.', g1Apellido='.', g2Apellido='.', gCedula='.', gNacFdd='.', gNacFmm='.', gNacFaaaa='.', gGenero='.', gEstadoCivil='.', gProfesion='.', gProv='.', gDist='.', gCorr='.', gBarrio='.',
+  gTelRes='.', gCelular='.', gEmail='.', gTipoVivienda='.', gPagoVivienda='.', 
+  gEmpLabora='.', gDirEmpLabora='.', gCargo='.', gTelEmpLab='.', gSalario='.',
+  gEmpAnt='.', gEmpAntDir='', gEmpAntTel='', gEmpAntAnios='', gPais='.', gLoanSol='.', gProposito='.',
+  
+  gNamesC='', g1ApellidoC='', g2ApellidoC='', gCedulaC='', gNacFddC='', gNacFmmC='', gNacFaaaaC=''
+
+  gNames = row.fname + ' ' + row.fname_2
+  g1Apellido = row.lname, g2Apellido = row.lname_2
+  gCedula = row.id_personal
+
+  gGenero = row.gender
+  gNacFdd = row.dia
+  gNacFmm = row.mes
+  gNacFaaaa = row.anio
+  gTipoVivienda = row.residenceType
+  gPagoVivienda = row.residenceMonthly
+
+  gEmpLabora = row.work_name
+  gCargo = row.work_cargo
+  gDirEmpLabora = row.work_address
+  gTelEmpLab = row.work_phone
+  
+  gEmpAnt = row.work_prev_name
+  gEmpAntAnios = row.work_prev_month > 12 ? (row.work_prev_month/12).toFixed(0) : ''
+
+  gEstadoCivil = row.civil_status
+  gPais = row.nationality
+  gProv = row.province
+  gDist = row.district
+  gCorr = row.county,
+
+  gBarrio = row.barrio
+  gSalario = separator(row.salary)
+
+  gLoanSol = separator(row.loanPP)
+  gProposito = row.reason
+
+  let gNameRef1='.', gLTrabajoRef1='.', gTelResRef1='.', gTelOfiRef1='.', gCelRef1='.',
+  gNameRef2='.', gLTrabajoRef2='.', gTelResRef2='.', gTelOfiRef2='.', gCelRef2='.',
+  gNameRef3='.', gLTrabajoRef3='.', gTelResRef3='.', gTelOfiRef3='.', gCelRef3='.',
+  gNameNRef='.', gLTrabajoNRef='.', gTelResNRef='.', gTelOfiNRef='.', gCelNRef='.'
+
+  const refF = row2.filter(row => row.type === 1)
+  const refNF = row2.filter(row => row.type === 2)
+
+  if(refNF.length === 1) {
+      gNameNRef = refNF[0].name, gLTrabajoNRef = refNF[0].work_name, gTelResNRef = refNF[0].phonenumber, gTelOfiNRef = refNF[0].work_phonenumber, gCelNRef = refNF[0].cellphone
+  }
+  if(refF.length === 1) {
+      gNameRef1 = refF[0].name, gLTrabajoRef1 = refF[0].work_name, gTelResRef1 = refF[0].phonenumber, gTelOfiRef1 = refF[0].work_phonenumber, gCelRef1 = refF[0].cellphone
+  }
+  if(refF.length === 2) {
+      gNameRef1 = refF[0].name, gLTrabajoRef1 = refF[0].work_name, gTelResRef1 = refF[0].phonenumber, gTelOfiRef1 = refF[0].work_phonenumber, gCelRef1 = refF[0].cellphone
+      gNameRef1 = refF[1].name, gLTrabajoRef1 = refF[1].work_name, gTelResRef1 = refF[1].phonenumber, gTelOfiRef1 = refF[1].work_phonenumber, gCelRef1 = refF[1].cellphone
+  }
+  if(refF.length === 3) {
+      gNameRef1 = refF[0].name, gLTrabajoRef1 = refF[0].work_name, gTelResRef1 = refF[0].phonenumber, gTelOfiRef1 = refF[0].work_phonenumber, gCelRef1 = refF[0].cellphone
+      gNameRef1 = refF[1].name, gLTrabajoRef1 = refF[1].work_name, gTelResRef1 = refF[1].phonenumber, gTelOfiRef1 = refF[1].work_phonenumber, gCelRef1 = refF[1].cellphone
+      gNameRef1 = refF[2].name, gLTrabajoRef1 = refF[2].work_name, gTelResRef1 = refF[2].phonenumber, gTelOfiRef1 = refF[2].work_phonenumber, gCelRef1 = refF[2].cellphone
+  }
+
+  const dd = {
+    pageSize: 'LETTER',
+    pageMargins: [20, 40, 20, 40],
+
+    content: [
+      {
+        layout: 'noBorders',
+        table: {
+          widths: [130, 300, 50, '*'],
+          body: [
+            [{
+              image: './public/images/banisi.png',
+              width: 100,
+              height: 20,
+            },
+            {
+              text: 'SOLICITUD DE PRÉSTAMO PERSONAL',
+              style: 'header'
+            },
+            {
+              text: 'FECHA: ',
+              style: { fontSize: 6, alignment: 'right' }
+            },
+            {
+              text: (new Date()).toLocaleDateString(),
+              style: 'small1'
+            }]
+          ]
+        }
+      },
+      '\n',
+      {
+        table: {
+          widths: [60, 180, 50, 97, 120],
+          body: [
+            [
+              {
+                text: 'MONTO DESEADO: ',
+                border: [false, false, false, false],
+                style: 'small1'
+              },
+              {
+                text: gLoanSol,
+                border: [false, false, false, true],
+                style: 'small1'
+              },
+              { border: [false, false, false, false], text: '' },
+              {
+                text: 'PROPÓSITO DEL PRÉSTAMO: ',
+                border: [false, false, false, false],
+                style: 'small1'
+              },
+              {
+                text: gProposito,
+                border: [false, false, false, true],
+                style: 'small1'
+              }
+            ]
+          ]
+        }
+      },
+      '\n',
+      {
+        table: {
+          widths: [560],
+          body: [  
+            [{ style: 'blackGray', text: 'DATOS PERSONALES' }],
+          ]
+        }
+      },
+      {
+        table: {
+          widths: [180, 182, 180],
+          body: [  
+            [{ border: [true, false, false, true], style: 'small1hc', text: 'NOMBRES' }, { border: [true, false, false, true], style: 'small1hc', text: '1ER APELLIDO' }, { border: [true, false, true, true], style: 'small1hc', text: '2DO APELLIDO' }],
+            [{ border: [true, false, false, true], style: 'small1c', text: gNames }, { border: [true, false, false, true], style: 'small1c', text: g1Apellido }, { border: [true, false, true, true], style: 'small1c', text: g2Apellido }],
+            ]
+        }
+      },
+      {
+        table: {
+          widths: [80, 91, 78, 95, 80, 23, 25, 25],
+          body: [  
+            [
+              { border: [true, false, false, true], style: 'small1h', text: 'CÉDULA O PASAPORTE' }, { border: [true, false, false, true], style: 'small1c', text: gCedula },
+              { border: [true, false, false, true], style: 'small1h', text: 'PAIS DE NACIMIENTO' }, { border: [true, false, false, true], style: 'small1c', text: gPais },
+              { border: [true, false, false, true], style: 'small1h', text: 'FECHA DE NACIMIENTO' }, { border: [true, false, false, true], style: 'small1c', text: gNacFdd },  { border: [true, false, false, true], style: 'small1c', text: gNacFmm },  { border: [true, false, true, true], style: 'small1c', text: gNacFaaaa }, 
+            ],
+            ]
+        }
+      },
+      {
+        table: {
+          widths: [94, 15, 18, 15, 54, 68, 72, 15, 46, 82],
+          body: [  
+            [
+              { border: [true, false, false, true], style: 'small1h', text: 'AÑOS RESIDE EN PANAMÁ' }, { border: [true, false, false, true], style: 'small1c', text: '' },
+              { border: [true, false, false, true], style: 'small1h', text: 'SEXO' }, { border: [true, false, false, true], style: 'small1c', text: gGenero },
+              { border: [true, false, false, true], style: 'small1h', text: 'ESTADO CIVIL' }, { border: [true, false, false, true], style: 'small1c', text: gEstadoCivil },  
+              { border: [true, false, false, true], style: 'small1h', text: 'NO. DEPENDIENTES' }, { border: [true, false, false, true], style: 'small1c', text: '' },  
+              { border: [true, false, false, true], style: 'small1h', text: 'PROFESIÓN' }, { border: [true, false, true, true], style: 'small1c', text: gProfesion },  
+            ],
+            ]
+        }
+      },
+      {
+        table: {
+          widths: [93, 100, 140, 200],
+          body: [  
+            [{ border: [true, false, false, true], style: 'small1hc', text: 'PROVINCIA' }, { border: [true, false, false, true], style: 'small1hc', text: 'DISTRITO' }, { border: [true, false, false, true], style: 'small1hc', text: 'BARRIO CORREGIMIENTO' }, { border: [true, false, true, true], style: 'small1hc', text: 'DIRECCIÓN RESIDENCIAL' }],
+            [{ border: [true, false, false, true], style: 'small1c', text: gProv }, { border: [true, false, false, true], style: 'small1c', text: gDist }, { border: [true, false, false, true], style: 'small1c', text: gCorr }, { border: [true, false, true, true], style: 'small1c', text: gBarrio }],
+            ]
+        }
+      },
+      {
+        table: {
+          widths: [80, 60, 68, 60, 77, 170],
+          body: [  
+            [
+              { border: [true, false, false, true], style: 'small1h', text: 'TELÉFONO RESIDENCIAL' }, { border: [true, false, false, true], style: 'small1c', text: gTelRes },
+              { border: [true, false, false, true], style: 'small1h', text: 'TELÉFONO CELULAR' }, { border: [true, false, false, true], style: 'small1c', text: gCelular },
+              { border: [true, false, false, true], style: 'small1h', text: 'CORREO ELECTRÓNICO' }, { border: [true, false, true, true], style: 'small1c', text: gEmail },  
+            ],
+            ]
+        }
+      },
+      {
+        table: {
+          widths: [93, 80, 100, 200, 51],
+          body: [  
+            [
+              { border: [true, false, false, true], style: 'small1hc', text: 'TIPO DE VIVIENDA' }, { border: [true, false, false, true], style: 'small1c', text: gTipoVivienda }, { border: [false, false, false, true], style: 'small1', text: 'Mensualidad $ ' + gPagoVivienda }, 
+              { border: [true, false, false, true], style: 'small1hc', text: 'TIEMPO EN RESIDENCIA ACTUAL' }, { border: [true, false, true, true], style: 'small1c', text: '' },
+            ],
+          ]
+        }
+      },
+
+      {
+        table: {
+          widths: [560],
+          body: [  
+            [{ border: [true, false, true, true], style: 'blackGray', text: 'INFORMACIÓN DE SU CONYUGE' }],
+          ]
+        }
+      },
+      {
+        table: {
+          widths: [180, 182, 180],
+          body: [  
+            [{ border: [true, false, false, true], style: 'small1hc', text: 'NOMBRES' }, { border: [true, false, false, true], style: 'small1hc', text: '1ER APELLIDO' }, { border: [true, false, true, true], style: 'small1hc', text: '2DO APELLIDO' }],
+            [{ border: [true, false, false, true], style: 'small1c', text: gNamesC }, { border: [true, false, false, true], style: 'small1c', text: g1ApellidoC }, { border: [true, false, true, true], style: 'small1c', text: g2ApellidoC }],
+            ]
+        }
+      },
+      {
+        table: {
+          widths: [80, 91, 78, 95, 80, 23, 25, 25],
+          body: [  
+            [
+              { border: [true, false, false, true], style: 'small1h', text: 'CÉDULA O PASAPORTE' }, { border: [true, false, false, true], style: 'small1c', text: gCedulaC },
+              { border: [true, false, false, true], style: 'small1h', text: 'PAIS DE NACIMIENTO' }, { border: [true, false, false, true], style: 'small1c', text: '.\n.\n' },
+              { border: [true, false, false, true], style: 'small1h', text: 'FECHA DE NACIMIENTO' }, { border: [true, false, false, true], style: 'small1c', text: 'DIA\n'+gNacFddC },  { border: [true, false, false, true], style: 'small1c', text: 'MES\n'+gNacFmmC },  { border: [true, false, true, true], style: 'small1c', text: 'AÑO\n'+gNacFaaaaC }, 
+            ],
+            ]
+        }
+      },
+      {
+        table: {
+          widths: [118, 125, 140, 150],
+          body: [  
+            [{ border: [true, false, false, true], style: 'small1hc', text: 'LUGAR DE TRABAJO' }, { border: [true, false, false, true], style: 'small1hc', text: 'DIRECCIÓN DE LA EMPRESA' }, { border: [true, false, false, true], style: 'small1hc', text: 'TELÉFONO OFICINA' }, { border: [true, false, true, true], style: 'small1hc', text: 'TELÉFONO o CELULAR' }],
+            [{ border: [true, false, false, true], style: 'small1c', text: '.' }, { border: [true, false, false, true], style: 'small1c', text: '' }, { border: [true, false, false, true], style: 'small1c', text: '' }, { border: [true, false, true, true], style: 'small1c', text: '' }],
+            ]
+        }
+      },
+
+      {
+        table: {
+          widths: [560],
+          body: [  
+            [{ border: [true, false, true, true], style: 'blackGray', text: 'REFERENCIAS PERSONALES' }],
+          ]
+        }
+      },
+      {
+        table: {
+          widths: [560],
+          body: [  
+            [{ border: [true, false, true, true], style: 'small1h', text: 'NO PARIENTES' }],
+          ]
+        }
+      },
+      {
+        table: {
+          widths: [120, 140, 95, 85, 84],
+          body: [  
+            [{ border: [true, false, false, true], style: 'small1hc', text: 'NOMBRE COMPLETO' }, { border: [true, false, false, true], style: 'small1hc', text: 'LUGAR DE TRABAJO' }, { border: [true, false, false, true], style: 'small1hc', text: 'TELÉEFONO RESIDENCIAL' }, { border: [true, false, false, true], style: 'small1hc', text: 'TELÉFONO OFICINA' }, { border: [true, false, true, true], style: 'small1hc', text: 'TELÉFONO CELULAR' }],
+            [{ border: [true, false, false, true], style: 'small1c', text: gNameRef1 }, { border: [true, false, false, true], style: 'small1c', text: gLTrabajoRef1 }, { border: [true, false, false, true], style: 'small1c', text: gTelResRef1 }, { border: [true, false, false, true], style: 'small1c', text: gTelOfiRef1 }, { border: [true, false, true, true], style: 'small1c', text: gCelRef1 }],
+            [{ border: [true, false, false, true], style: 'small1c', text: gNameRef2 }, { border: [true, false, false, true], style: 'small1c', text: gLTrabajoRef2 }, { border: [true, false, false, true], style: 'small1c', text: gTelResRef2 }, { border: [true, false, false, true], style: 'small1c', text: gTelOfiRef2 }, { border: [true, false, true, true], style: 'small1c', text: gCelRef2 }],
+            [{ border: [true, false, false, true], style: 'small1c', text: gNameRef3 }, { border: [true, false, false, true], style: 'small1c', text: gLTrabajoRef3 }, { border: [true, false, false, true], style: 'small1c', text: gTelResRef3 }, { border: [true, false, false, true], style: 'small1c', text: gTelOfiRef3 }, { border: [true, false, true, true], style: 'small1c', text: gCelRef3 }],
+            ]
+        }
+      },
+      {
+        table: {
+          widths: [560],
+          body: [  
+            [{ border: [true, false, true, true], style: 'small1h', text: 'PARIENTE CERCANO QUE NO VIVA CON USTED' }],
+          ]
+        }
+      },
+      {
+        table: {
+          widths: [120, 140, 95, 85, 84],
+          body: [  
+            [{ border: [true, false, false, true], style: 'small1hc', text: 'NOMBRE COMPLETO' }, { border: [true, false, false, true], style: 'small1hc', text: 'LUGAR DE TRABAJO' }, { border: [true, false, false, true], style: 'small1hc', text: 'TELÉEFONO RESIDENCIAL' }, { border: [true, false, false, true], style: 'small1hc', text: 'TELÉFONO OFICINA' }, { border: [true, false, true, true], style: 'small1hc', text: 'TELÉFONO CELULAR' }],
+            [{ border: [true, false, false, true], style: 'small1c', text: gNameNRef }, { border: [true, false, false, true], style: 'small1c', text: gLTrabajoNRef }, { border: [true, false, false, true], style: 'small1c', text: gTelResNRef }, { border: [true, false, false, true], style: 'small1c', text: gTelOfiNRef }, { border: [true, false, true, true], style: 'small1c', text: gCelNRef }],
+            ]
+        }
+      },
+
+      {
+        table: {
+          widths: [560],
+          body: [  
+            [{ border: [true, false, true, true], style: 'blackGray', text: 'INFORMACIÓN LABORAL' }],
+          ]
+        }
+      },
+      {
+        table: {
+          widths: [85, 159, 114, 175],
+          body: [  
+            [
+              { border: [true, false, false, true], style: 'small1h', text: 'EMPRESA DONDE LABORA' }, { border: [true, false, false, true], style: 'small1c', text: gEmpLabora },
+              { border: [true, false, false, true], style: 'small1h', text: 'CIUDAD Y DIRECCIÓN DE LA EMPRESA' }, { border: [true, false, true, true], style: 'small1c', text: gDirEmpLabora },
+            ],
+            ]
+        }
+      },
+      {
+        table: {
+          widths: [80, 90, 62, 80, 60, 45, 40, 40],
+          body: [  
+            [
+              { border: [true, false, false, true], style: 'small1h', text: 'ACTIVIDAD DE LA EMPRESA' }, { border: [true, false, false, true], style: 'small1c', text: '' },
+              { border: [true, false, false, true], style: 'small1h', text: 'CARGO O POSICIÓN' }, { border: [true, false, false, true], style: 'small1c', text: gCargo },
+              { border: [true, false, false, true], style: 'small1h', text: 'FECHA DE INGRESO' }, { border: [true, false, false, true], style: 'small1c', text: '' }, 
+              { border: [true, false, false, true], style: 'small1h', text: 'TELÉFONOS' }, { border: [true, false, true, true], style: 'small1c', text: gTelEmpLab },
+            ],
+            ]
+        }
+      },
+      {
+        table: {
+          widths: [100, 110, 75, 95, 55, 80],
+          body: [  
+            [
+              { border: [true, false, false, true], style: 'small1h', text: 'DEPARTAMENTO DONDE LABORA' }, { border: [true, false, false, true], style: 'small1c', text: '' },
+              { border: [true, false, false, true], style: 'small1h', text: 'INGRESO MENSUAL' }, { border: [true, false, false, true], style: 'small1c', text: gSalario },
+              { border: [true, false, false, true], style: 'small1h', text: 'SALARIO BASE' }, { border: [true, false, true, true], style: 'small1c', text: '' }, 
+            ],
+            ]
+        }
+      },
+      {
+        table: {
+          widths: [347, 95, 100],
+          body: [  
+            [
+              { border: [true, false, false, true], 
+                table: {
+                  widths: [75, 10, 4, 10, 4, 15, 30, '*'],
+                  body: [  
+                    [
+                      { border: [false, false, false, false], style: 'small1h', text: 'TIENES OTROS INGRESOS:' },
+                      { border: [false, false, false, false], style: 'small1h', text: 'SI' },
+                      { style: 'small1', text: '' },
+                      { border: [false, false, false, false], style: 'small1h', text: 'NO' },
+                      { style: 'small1', text: '' },{ border: [false, false, false, false],  text: '' },
+                      { border: [false, false, false, false], style: 'small1h', text: 'DETALLE:' }, { border: [false, false, false, false], style: 'small1', text: '' },
+                    ],
+                  ]
+                }
+              },
+              { border: [true, false, false, true], style: 'small1h', text: 'MONTO DE OTROS INGRESOS' }, { border: [true, false, true, true], style: 'small1c', text: '' },
+            ],
+            ]
+        }
+      },
+      {
+        table: {
+          widths: [228, 115, 110, 80],
+          body: [  
+            [{ border: [true, false, false, true], style: 'small1h', text: 'EMPLEO ANTERIOR (SI TIENE MENOS DE DOS AÑOS EN EL EMPLEO ACTUAL)' }, { border: [true, false, false, true], style: 'small1hc', text: 'DIRECCIÓN DE EMPLEO ANTERIOR' }, { border: [true, false, false, true], style: 'small1hc', text: 'TELÉFONO DE EMPLEO ANTERIOR' }, { border: [true, false, true, true], style: 'small1hc', text: 'AÑOS TRABAJADOS' }],
+            [{ border: [true, false, false, true], style: 'small1c', text: gEmpAnt }, { border: [true, false, false, true], style: 'small1c', text: gEmpAntDir }, { border: [true, false, false, true], style: 'small1c', text: gEmpAntTel }, { border: [true, false, true, true], style: 'small1c', text: gEmpAntAnios }],
+            ]
+        }
+      },
+
+      {
+        table: {
+          widths: [560],
+          body: [  
+            [{ border: [true, false, true, true], style: 'blackGray', text: 'PERSONAS POLITICAMENTE EXPUESTAS (PEP)' }],
+          ]
+        }
+      },
+      {
+        table: {
+          widths: [560],
+          body: [  
+            [{ border: [true, false, true, true], style: 'small1', 
+              table: {
+                widths: ['auto', 10, 4, 10, 4],
+                body: [  
+                  [
+                    { border: [false, false, false, false], style: 'small1h', text: '¿ES USTED O ALGÚN FAMILIAR CERCANO POLÍTICO Y/O DE ALGÚN ÓRGANO DE ESTADO DE SU PAÍS?' },
+                    { border: [false, false, false, false], style: 'small1h', text: 'SI' },
+                    { style: 'small1', text: '' },
+                    { border: [false, false, false, false], style: 'small1h', text: 'NO' },
+                    { style: 'small1', text: '' },
+                  ],
+                ]
+              }
+            }],
+          ]
+        }
+      },
+      {
+        table: {
+          widths: [140, 120, 40, 115, 30, 70],
+          body: [  
+            [
+              { border: [true, false, false, true], style: 'small1h', text: 'SI MARCÓ SI, ESPECIFIQUE CARGO DESEMPEÑADO' }, { border: [true, false, false, true], style: 'small1c', text: '' },
+              { border: [true, false, false, true], style: 'small1h', text: 'INSTITUCIÓN' }, { border: [true, false, false, true], style: 'small1c', text: '' },
+              { border: [true, false, false, true], style: 'small1h', text: 'PERÍODO' }, { border: [true, false, true, true], style: 'small1c', text: '' }, 
+            ],
+            ]
+        }
+      },
+      {
+        table: {
+          widths: [560],
+          heights: [20],
+          body: [  
+            [{ border: [true, false, true, true], style: 'small1h', text: '\n¿ES USTED SOCIO, CÓNYUGE O FAMILIAR CONSANGUÍNEO O POR AFINIDAD HASTA EL CUARTO GRADO DE UN PEP NACIONAL O EXTRANJERO?' }],
+          ]
+        }
+      },
+      {
+        table: {
+          widths: [77, 95, 86, 86, 86, 85],
+          body: [  
+            [
+              { border: [true, false, false, true], style: 'small1h',  text: '\nSi marcó SI,\nindicar parentesco:' },
+              { border: [true, false, false, true], style: 'small1c', 
+                table: {
+                  widths: [3, 81],
+                  body: [  
+                    [
+                      { border: [false, false, false, false], text: '' },
+                      { border: [false, false, false, false], rowSpan: 3, text: 'Familiar consanguíneo (padres, hijos, hermanos, tíos, primos, abuelos, nietos)' } 
+                    ],
+                    [{ style: 'small1', text: '.' }, { border: [false, false, false, false], text: '' }],
+                    [{ border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }],
+                  ]
+                }
+              },
+              { border: [true, false, false, true], style: 'small1c', 
+                table: {
+                  widths: [3, 75],
+                  body: [  
+                    [
+                      { border: [false, false, false, false], text: '' },
+                      { border: [false, false, false, false], rowSpan: 3, text: 'Familiar por afinidad (cónyuge, suegros, cuñados)' } 
+                    ],
+                    [{ text: '.' }, { border: [false, false, false, false], text: '' }],
+                    [{ border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }],
+                  ]
+                }
+              },
+              { border: [true, false, false, true], style: 'small1c', 
+                table: {
+                  widths: [3, 80],
+                  body: [  
+                    [
+                      { border: [false, false, false, false], text: '' },
+                      { border: [false, false, false, false], rowSpan: 3, text: 'Socios comerciales' } 
+                    ],
+                    [{ text: '.' }, { border: [false, false, false, false], text: '' }],
+                    [{ border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }],
+                  ]
+                }
+              },
+              { border: [true, false, false, true], style: 'small1c', 
+                table: {
+                  widths: [3, 70],
+                  body: [  
+                    [
+                      { border: [false, false, false, false], text: '' },
+                      { border: [false, false, false, false], rowSpan: 3, text: 'Negocios/compañías en las cuales posee acciones' } 
+                    ],
+                    [{ text: '.' }, { border: [false, false, false, false], text: '' }],
+                    [{ border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }],
+                  ]
+                }
+              },
+              { border: [true, false, true, true], style: 'small1c', 
+                table: {
+                  widths: [3, 80],
+                  body: [  
+                    [
+                      { border: [false, false, false, false], text: '' },
+                      { border: [false, false, false, false], rowSpan: 3, text: 'Colaboradores\ncercanos' } 
+                    ],
+                    [{ text: '.' }, { border: [false, false, false, false], text: '' }],
+                    [{ border: [false, false, false, false], text: '' }, { border: [false, false, false, false], text: '' }],
+                  ]
+                }
+              },
+            ],
+            ]
+        }
+      },
+      {
+        table: {
+          widths: [167, 175, 200],
+          body: [  
+            [{ border: [true, false, false, true], style: 'small1hc', text: 'NOMBRE DEL PEP CON EL QUE TIENE RELACIÓN' }, { border: [true, false, false, true], style: 'small1hc', text: 'PUESTO A CARGO DEL PEP' }, { border: [true, false, true, true], style: 'small1hc', text: 'INSTITUCIÓN O DEPENDENCIA DONDE LABORA' }],
+            [{ border: [true, false, false, false], style: 'small1c', text: '.' }, { border: [true, false, false, false], style: 'small1c', text: '' }, { border: [true, false, true, false], style: 'small1c', text: '' }],
+            ]
+        }
+      },
+
+      {
+        table: {
+          widths: [560],
+          body: [  
+            [{ pageBreak: 'before', style: 'blackGray', text: 'CERTIFICACIÓN US PERSON' }],
+          ]
+        }
+      },
+      {
+        table: {
+          widths: [280, 271],
+          body: [  
+            [
+              { border: [true, false, true, false], style: 'small1c', 
+                table: {
+                  widths: [140, 140],
+                  body: [  
+                    [
+                      { border: [false, false, false, false], style: 'small1hc', text: '¿TIENE USTED UNA SEGUNDA NACIONALIDAD?' },
+                      { border: [false, false, false, false], style: 'small1h', text: 'En caso afirmativo indique el país:' },
+                    ],
+                  ]
+                }
+              },
+              { border: [true, false, true, false], style: 'small1', 
+                table: {
+                  widths: [180, 15, 4, 15, 4],
+                  body: [  
+                    [
+                      { border: [false, false, false, false], style: 'small1h', text: '¿ES USTED UNA PERSONA DE LOS EE.UU. O US PERSON?' },
+                      { border: [false, false, false, false], style: { fontSize: 6, alignment: 'right' }, text: 'SI' },
+                      { style: 'small1', text: '' },
+                      { border: [false, false, false, false], style: { fontSize: 6, alignment: 'right' }, text: 'NO' },
+                      { style: 'small1', text: '' },
+                    ],
+                  ]
+                }
+              }
+            ],
+            [ 
+              { border: [true, false, true, false], style: 'small1', 
+                table: {
+                  widths: [40, 4, 20, 4, 40, 110],
+                  body: [   
+                    [
+                      { border: [false, false, false, false], style: { fontSize: 6, alignment: 'right' }, text: 'SI' },
+                      { style: 'small1', text: '' },
+                      { border: [false, false, false, false], style: { fontSize: 6, alignment: 'right' }, text: 'NO' },
+                      { style: 'small1', text: '' },
+                      { border: [false, false, false, false], style: 'small1', text: '' },
+                      { border: [false, false, false, true], style: 'small1', text: '' },
+                    ]
+                  ]
+                }
+              },
+              { border: [true, false, true, false], style: 'small1', 
+                table: {
+                  widths: [180, 15, 4, 15, 4],
+                  body: [  
+                    [
+                      { border: [false, false, false, false], style: 'small1h', text: '¿TIENE OBLIGACIÓN TRIBUTARIA EN OTRO PAÍS?' },
+                      { border: [false, false, false, false], style: { fontSize: 6, alignment: 'right' }, text: 'SI' },
+                      { style: 'small1', text: '' },
+                      { border: [false, false, false, false], style: { fontSize: 6, alignment: 'right' }, text: 'NO' },
+                      { style: 'small1', text: '' },
+                    ],
+                  ]
+                }
+              }
+            ],
+            [ 
+              { border: [true, false, true, false], text: '' },
+              { border: [true, false, true, false], style: 'small1', 
+                table: {
+                  widths: [30, 150],
+                  body: [   
+                    [
+                      { border: [false, false, false, false], style: 'small1h', text: '¿CUÁL?' }, 
+                      { border: [false, false, false, true], style: 'small1', text: '' },
+                    ]
+                  ]
+                }
+              }
+            ],
+          ]
+        }
+      },
+      {
+        table: {
+          widths: [280, 271],
+          body: [  
+            [
+              { border: [true, false, true, true], style: 'small1', text: '' },
+              { border: [true, false, true, true], style: 'small1', text: '' }
+            ],
+          ]
+        }
+      },
+
+      {
+        table: {
+          widths: [560],
+          body: [  
+            [{ border: [true, false, true, true], style: 'blackGray', text: 'SOLICITUD Y SUMINISTRO DE INFORMACIÓN' }],
+            [{ border: [true, false, true, true], style: { fontSize: 6, alignment: 'justify' }, text: 'Autorizo(amos) expresamente a BANISI, S.A., sus subsidiarias y/o afiliadas, cesionarios o sucesores, así como a cualquier compañía que por operación de cesión, administración o compra de cartera adquiera los derechos de mi (nuestro) crédito, a que de conformidad con lo expresado en el Artículo 24 y demás disposiciones aplicables de la Ley 24 del 22 de mayo de 2002, en cualquier momento solicite, consulte, recopile, intercambie, actualice y transmita a cualquier agencia de información de datos, bancos, instituciones financieras o agentes económicos, sean locales o del extranjero, públicos (as) o privados (as) informaciones relacionadas con obligaciones o transacciones crediticias que he (mos) mantenido, mantengo(mantenemos) o pudiera (mos) mantener con dicha entidad, BANISI, S.A., sus subsidiarias y/o afiliadas, cesionarios o sucesores sobre mi(nuestro) historial de crédito y relaciones con acreedores. También queda facultado BANISI, S.A. sus subsidiarias y/o afiliadas, cesionarios o sucesores, así como cualquier compañía que por una operación de cesión, administración o compra de cartera, adquiera los derechos de mi (nuestro) crédito, a que solicite y obtenga información de instituciones gubernamentales relacionadas con las obligaciones o transacciones crediticias arriba mencionadas. Así mismo, exonero(amos) de cualquier consecuencia o responsabilidad resultante del ejercicio de solicitar o suministrar información, o por razones de cualquiera autorizaciones contenidas en el presente documento a BANISI, S.A. a sus compañías filiadas, subsidiarias, cesionarias y/o sucesores a sus empleados, ejecutivos, directores, dignatarios o apoderados así como a cualquier compañía que por una operación de cesión administración o compra de cartera adquiera los derechos de mi (nuestro) crédito. QUEDA ENTENDIDO QUE BANISI, S.A. SUMINISTRARÁ A REQUERIMIENTO DEL INTERESADO TODA INFORMACIÓN CREDITICIA RECOPILADA EN BASE A LA PRESENTE AUTORIZACIÓN.' }],
+          ]
+        }
+      },
+
+      {
+        table: {
+          widths: [560],
+          body: [  
+            [{ border: [true, false, true, true],  style: 'blackGray', text: 'AUTORIZACIÓN PARA CONSULTA Y REPORTE DE REFERENCIAS DE CRÉDITO' }],
+            [{ border: [true, false, true, false], style: { fontSize: 6, alignment: 'justify' }, text: 'Por este medio autorizo expresamente a APC BURÓ, S.A., para que, de conformidad con lo expresado en el artículo 24 y demás disposición aplicables de la Ley 24 y 22 de mayo de 2002, solicite, recopile, intercambie y transmita a cualquier agencia de información de datos, bancos o   agentes   económicos   informaciones   relacionadas con obligaciones o transacciones crediticias que mantengo o pudiera mantener con dichos agentes económicos de la localidad, sobre mi historial de crédito así como el de la empresa que represento.' }],
+            [{ border: [true, false, true, false], style: { fontSize: 6, alignment: 'justify' }, text: 'APC BURÓ queda autorizada a incluir en mi reporte de historial de crédito cualquier dato personal para prevenir el fraude de identidad, incluyendo sin limitar, aquellos de los que trata el numeral 6 del Artículo 30 de la Ley 24 de 2002, así como también para aplicar los procedimientos científicos necesarios a las referencias de crédito descritas anteriormente, a fin de proporcionar el score del buró con relación a mis referencias.' }],
+            [{ border: [true, false, true, true],  style: { fontSize: 6, alignment: 'justify' }, text: 'Así mismo, se autoriza a APC BURÓ, S.A. a consultar el Sistema de Verificación de Identidad (SVI) del Tribunal Electoral con el objetivo de validación de mis datos de identificación.' }],
+          ]
+        }
+      },
+
+      {
+        table: {
+          widths: [560],
+          body: [  
+            [{ border: [true, false, true, true], style: 'blackGray', text: 'REGLAMENTO DE SERVICIOS BANCARIOS' }],
+            [{ border: [true, false, true, true], style: { fontSize: 6, alignment: 'justify' }, text: 'Por este medio manifiesto haber leído en su totalidad el REGLAMENTO DE SERVICIOS BANCARIOS que se encuentra expuesto en la Página Web de Banisi, S.A. www.banisipanama.com por el cual estoy obligado a cumplir todos los términos y condiciones acordados en el mismo.' }],
+            [{ border: [true, true, true, true],  style: { fontSize: 6, alignment: 'justify' }, text: 'Acepto que el Banco utilice la información proporcionada en este formulario para afiliarme a los servicios de Banca en Línea, Banca Móvil y los cargos que estos generen.' }],
+          ]
+        }
+      },
+
+      {
+        table: {
+          widths: [560],
+          body: [  
+            [{ border: [true, false, true, true],  style: 'blackGray', text: 'FIRMA DEL SOLICITANTE' }],
+            [{ border: [true, false, true, false], style: { fontSize: 6, alignment: 'justify' }, text: 'Reconozco que los datos obtenidos por cualquier central de información así como los proporcionados por mí en esta Solicitud de Crédito que he presentado, serán certificados y sometidos a la evualuación respectiva, por lo que será potestad exclusiva de BANISI, S.A. la aprobación o negación de la operación solicitada sin que esto dé lugar a reclamo alguno de mi parte. Confirmo haber leído, llenado y aceptado voluntariamente la información contenida en esta Solicitud de Crédito.' }],
+            [{ border: [true, false, true, false], style: { fontSize: 6, alignment: 'justify' }, text: 'Declaro y certifico que los datos que anteceden son verídicos.' }],
+            [{ border: [true, false, true, false],  style: { alignment: 'center' }, 
+              table: {
+                widths: [280, 280],
+                heights: [80],
+                body: [  
+                  [
+                    { border: [false, false, false, false], style: 'small1', text: '.' },
+                    { border: [false, false, false, false], style: 'small1', text: '.' }
+                  ],
+                ]
+              }
+            }],
+            [{ border: [true, false, true, false],  style: { alignment: 'center' }, 
+              table: {
+                widths: [50, 200, 50, 200, 50],
+                heights: [20],
+                body: [  
+                  [
+                    { border: [false, false, false, false], text: '' },
+                    { border: [false, true, false, false], style: 'small1h', text: 'Firma del Solicitante (igual que en la cédula)' },
+                    { border: [false, false, false, false], text: '' },
+                    { border: [false, true, false, false], style: 'small1h', text: 'No. de cédula del Solicitante' },
+                    { border: [false, false, false, false], text: '' },
+                  ],
+                ]
+              }
+            }],
+          ]
+        }
+      },
+
+      {
+        table: {
+          widths: [560],
+          body: [  
+            [{ border: [true, true, true, true], style: 'blackGray', text: 'APERTURA DE CUENTA DE AHORROS (Perfil transaccional hasta B/.10,000.00)' }],
+            [{ border: [true, false, true, false], style: { fontSize: 6, alignment: 'justify' }, text: 'Por este medio autorizo la apertura de una Cuenta de Ahorros Individual, por medio de transferencia local o efectivo. Declaro que los fondos con que se nutrirá la cuenta, serán originados por salario, negocio propio, ahorro, independiente o herencia. También autorizo el Débito Automatico para el pago de préstamos y tarjeta de crédito. Acepto que esta Cuenta de Ahorros venga con una Tarjeta Débito CLAVE y los cargos que esta genere.' }],
+          ]
+        }
+      },
+
+      {
+        table: {
+          widths: [560],
+          body: [  
+            [{ border: [true, true, true, true], style: 'blackGray', text: 'REGISTRO DE FIRMAS (CUENTA DE AHORROS)' }],
+          ]
+        }
+      },
+      {
+        table: {
+          widths: [275, 276],
+          heights: [120],
+          body: [  
+            [
+              { border: [true, false, false, true], text: '.' },
+              { border: [true, false, true, true], text: '.' }
+            ],
+          ]
+        }
+      },
+
+      {
+        table: {
+          widths: [560],
+          body: [  
+            [{ border: [true, false, true, true], style: 'blackGray', text: 'PARA USO EXCLUSIVO DEL BANCO' }],
+          ]
+        }
+      },
+      {
+        table: {
+          widths: [60, 491],
+          heights: [20],
+          body: [  
+            [{ border: [true, false, true, true], style: 'small1c', text: '\nATENDIDO POR' }, {border: [true, false, true, true], text: ''}],
+          ]
+        }
+      },
+    ],
+    styles: {
+      header: {
+        fontSize: 12,
+        bold: true,
+        alignment: 'center',
+        color: 'white',
+        fillColor: '#001c00',
+      },
+      subheader: {
+        fontSize: 10,
+        bold: true
+      },
+      quote: {
+        italics: true
+      },
+      small0: {
+        fontSize: 7,
+        fillColor: '#dddddd',
+      },
+      small1h: {
+        fontSize: 6,
+      },
+      small1hc: {
+        fontSize: 6,
+        alignment: 'center',
+      },
+      small1: {
+        fontSize: 6,
+        bold: true
+      },
+      small1c: {
+        fontSize: 6,
+        alignment: 'center',
+        bold: true
+      },
+      small: {
+        fontSize: 7,
+        fillColor: '#eeeeee',
+      },
+      blueWhite: {
+        fillColor: '#00007b',
+        color: 'white',
+        fontSize: 8,
+        bold: true
+      },
+      blackGray: {
+        fillColor: '#D1D1D1',
+        fontSize: 7,
+
+      },
+      center: {
+        alignment: 'center'
+      },
+      right: {
+        alignment: 'right'
+      }
+    }
+  }
+
+  var fonts = {
+    Roboto: {
+        normal: './public/fonts/Roboto-Regular.ttf',
+        bold: './public/fonts/Roboto-Medium.ttf',
+        italics: './public/fonts/Roboto-Italic.ttf',
+        bolditalics: './public/fonts/Roboto-MediumItalic.ttf'
+    }
+  };
+
+  let fileName = path.join(`./pdfs/tmp-pdf-${Date.now()}.pdf`)
+
+  const printer = new pdfPrinter(fonts)
+  var pdfDoc = printer.createPdfKitDocument(dd);
+  pdfDoc.pipe(fs.createWriteStream(fileName)).on('finish',function(){
+      //success
+  });
+  pdfDoc.end();
+
+  return fileName
+}
 
 
 module.exports = appRoutes

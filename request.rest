@@ -269,7 +269,8 @@ content-type: application/json
     "telefono": "6676-4545",
     "monto": 3500,
     "nombre": "Juan Perez",
-    "banco": "700"
+    "banco": "800",
+    "id": "8-790-921"
 }
 
 
@@ -291,5 +292,5 @@ POST http://localhost:3001/upload/solicPrestBanisi
 content-type: application/json
 
 {
-    "id": 177
+    "id": "8-790-921"
 }
