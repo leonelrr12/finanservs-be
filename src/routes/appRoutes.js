@@ -86,74 +86,83 @@ appRoutes.post('/email', async (req, res) => {
   }
   emails += ", rsanchez2565@gmail.com, guasimo01@gmail.com"
 
-  const htmlEmail = `
-    <h3>Nuevo Prospecto desde Finanservs.com</h3>
-    <ul>
-      <li>Email: ${euser}</li>
-      <li>Nombre: ${nombre}</li>
-      <li>Teléfono: ${telefono}</li>
-      <li>Monto Solicitado: ${monto}</li>
-    </ul>
-    <h3>Mensaje</h3>
-    <h3>${banco === '800' ? 'Adjuntamos solicitud de préstamos para ser completada y firmada.': ''}</h3>
-    <p>${mensaje}</p>
-  `
+  console.log('const htmlEmail-00000')
+  let fileAtach = ""
+  try {
+    fileAtach = await solicPrestBanisi(id)
 
-  const fileAtach = await solicPrestBanisi(id)
+    console.log('const htmlEmail')
+    const htmlEmail = `
+      <h3>Nuevo Prospecto desde Finanservs.com</h3>
+      <ul>
+        <li>Email: ${euser}</li>
+        <li>Nombre: ${nombre}</li>
+        <li>Teléfono: ${telefono}</li>
+        <li>Monto Solicitado: ${monto}</li>
+      </ul>
+      <h3>Mensaje</h3>
+      <h3>${banco === '800' && fileAtach != "" ? 'Adjuntamos solicitud de préstamos para ser completada y firmada.': ''}</h3>
+      <p>${mensaje}</p>
+    `
 
-  const send_mail = async () => {
-    const accessToken = await OAuth2Client.getAccessToken()
-    try {
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          type: 'OAuth2',
-          user: key.EMAIL_USER, 
-          clientId: key.clientId, 
-          clientSecret: key.clientSecret,
-          refreshToken: key.refreshToken,
-          accessToken: accessToken
-        },
-        tls: {
-          rejectUnauthorized: false
+    const send_mail = async () => {
+      const accessToken = await OAuth2Client.getAccessToken()
+      try {
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            type: 'OAuth2',
+            user: key.EMAIL_USER, 
+            clientId: key.clientId, 
+            clientSecret: key.clientSecret,
+            refreshToken: key.refreshToken,
+            accessToken: accessToken
+          },
+          tls: {
+            rejectUnauthorized: false
+          }
+        })
+    
+        const mailOptions = {
+          from: key.EMAIL_FROM,
+          to: emails,
+          subject: asunto,
+          text: mensaje,
+          html: htmlEmail,
+        }
+        if(banco === '800' && fileAtach != "") { // Banisi
+          mailOptions.attachments = [
+            {   // utf-8 string as an attachment
+                filename: 'Solicitud.pdf',
+                path: fileAtach,
+                content: 'Solicitud de Préstamo'
+            },
+          ]
+        }
+    
+        console.log('const htmlEmail-1111')
+
+        const result = await transporter.sendMail(mailOptions)
+        transporter.close()
+        // console.log(result)
+        return result
+      } catch (err) {
+        console.log('Estamos aqui: ', err)
+      }
+    }
+    send_mail()
+      .then( r => {
+        res.status(200).send('Enviado!')
+        try {
+          fs.unlinkSync(fileAtach)
+        } catch(err) {
+          console.error('Something wrong happened removing the file', err)
         }
       })
-  
-      const mailOptions = {
-        from: key.EMAIL_FROM,
-        to: emails,
-        subject: asunto,
-        text: mensaje,
-        html: htmlEmail,
-      }
-      if(banco === '800') { // Banisi
-        mailOptions.attachments = [
-          {   // utf-8 string as an attachment
-              filename: 'Solicitud.pdf',
-              path: fileAtach,
-              content: 'Solicitud de Préstamo'
-          },
-        ]
-      }
-  
-      const result = await transporter.sendMail(mailOptions)
-      transporter.close()
-      // console.log(result)
-      return result
-    } catch (err) {
-      console.log('Estamos aqui: ', err)
-    }
+      .catch( e => console.log(e.message) )
+  } catch (err) {
+    console.log('Estamos aqui 2: ', err)
   }
-  send_mail()
-    .then( r => {
-      res.status(200).send('Enviado!')
-      try {
-        fs.unlinkSync(fileAtach)
-      } catch(err) {
-        console.error('Something wrong happened removing the file', err)
-      }
-    })
-    .catch( e => console.log(e.message) )
 })
 
 
@@ -1331,6 +1340,7 @@ const solicPrestBanisi = (id) => {
 
   let params = [id];
 
+  console.log('const htmlEmail-333333')
   return new Promise((resolve, reject) => {
     config.cnn.query(sql, params, (error, row) => {
       if (error) throw error
@@ -1338,10 +1348,12 @@ const solicPrestBanisi = (id) => {
         params = [row[0].id, row[0].id];
         config.cnn.query(sql2, params, (error, row2) => {
           if (error) throw error
+          console.log(row[0], row2)
           const fileName = creaPDFBanisi(row[0], row2)
           resolve(fileName)
         })
       } else {
+        console.log('const htmlEmail-44444')
         reject("")
       }
     })

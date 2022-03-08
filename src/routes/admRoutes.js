@@ -22,17 +22,17 @@ admRoutes.post('/prospects', (request, response) => {
   sql += " work_prev_name,work_prev_month,work_prev_salary,"
   sql += " salary,honorarios,viaticos,termConds,"
   sql += " weight, weightUnit, height, heightUnit, aceptaApc, nationality,"
-  sql += " calle,barriada_edificio,no_casa_piso_apto,id_agente"
+  sql += " calle, barriada_edificio,no_casa_piso_apto,id_agente,reason"
 
   sql += ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,"
-  sql += "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+  sql += "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 
   let { id_personal,idUser,apcReferencesUrl,apcLetterUrl,sponsor,name,fname,fname_2,lname,lname_2 } = request.body
   let { entity_f,email,cellphone,phoneNumber,idUrl,socialSecurityProofUrl,publicGoodProofUrl } = request.body
   let { workLetterUrl,payStubUrl,origin_idUser,gender,birthDate: BDH,contractType,jobSector,occupation,paymentFrecuency } = request.body
   let { profession,civil_status,province,district,county,sign } = request.body
   let { street: calle, barriada_edificio, no_casa_piso_apto } = request.body
-  let { loanPP,loanAuto,loanTC,loanHip,cashOnHand,plazo } = request.body
+  let { loanPP,loanAuto,loanTC,loanHip,cashOnHand,plazo,reason } = request.body
    
   let { residenceType,residenceMonthly,work_name,work_cargo,work_address,work_phone,work_phone_ext,work_month } = request.body
   let { work_prev_name='N/A',work_prev_month=0,work_prev_salary=0 } = request.body
@@ -51,7 +51,7 @@ admRoutes.post('/prospects', (request, response) => {
     work_prev_name,work_prev_month,work_prev_salary,
     salary,honorarios,viaticos,termConds,
     weight, weightUnit, height, heightUnit, aceptaApc, nationality,
-    calle, barriada_edificio, no_casa_piso_apto,config.ORIGEN.agente
+    calle, barriada_edificio, no_casa_piso_apto,config.ORIGEN.agente,reason
   ]
 
   config.cnn.query(sql, params, (error, results, next) => {
