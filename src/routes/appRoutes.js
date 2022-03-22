@@ -833,8 +833,11 @@ appRoutes.get('/profesions_acp/:id', (request, response) => {
   })
 })
 
+// 1 = Titular
+// 2 = Asistente
 appRoutes.get('/profesions_lw', (request, response) => {
-  const sql = "SELECT id, titulo as name FROM profesions_lw"
+  let sql = "SELECT id, titulo as name, type"
+  sql += " FROM profesions_lw"
 
   config.cnn.query(sql, (error, results) => {
     if (error) throw error
