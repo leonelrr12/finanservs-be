@@ -1,5 +1,3 @@
-
-
 tabla = "profesions_acp"
 host = "localhost"
 user = "root"
@@ -186,6 +184,24 @@ def insert_corr(id, idDist, idProv, name, cnn):
             print("MySQL connection is closed")
 
 
+def planilla_css(cedula, nombre, cargo, salario, inicio, contrato, cnn):
+    try:
+        cursor = cnn.cursor()
+        mySql_insert_query = "INSERT INTO planilla_css (cedula, nombre_completo, cargo, salario_mensual, inicio_labores, contrato) VALUES (%s,%s,%s,%s,%s,%s)"
+
+        record = (cedula, nombre, cargo, salario, inicio, contrato)
+        cursor.execute(mySql_insert_query, record)
+        # cnn.commit()
+        # print("Record inserted!")
+    except mysql.connector.Error as error:
+        print("Failed to insert into MySQL table {}".format(error))
+    
+    finally:
+        if cnn.is_connected():
+            cursor.close()
+            print("MySQL connection is closed")
+
+
 # # librerias para correos
 # import smtplib, ssl
 # import getpass
@@ -216,17 +232,28 @@ def fcnn():
     # password="lr1wapia8dem9cla",
     # port="3306"
 
-    return mysql.connector.connect(
-    host="db-mysql-nyc3-04501-do-user-7220305-0.b.db.ondigitalocean.com",
-    user="dbkotowa",
-    password="tgxs08h92dmgnrcf",
-    database="finanservs",
-    port="25060"
-)
+    mydb = mysql.connector.connect(
+        host="db-mysql-nyc3-04501-do-user-7220305-0.b.db.ondigitalocean.com",
+        user="dbkotowa",
+        password="FtktBOEQa9UHFDPe",
+        database="finanservs",
+        port="25060"
+    )
+
+    print(mydb)
+
+    if(mydb):
+        print("Connection Successful")
+    else:
+        print("Connection is fail")
+
+    return mydb
+
+
 
 # # No. 1
 def acp():
-    fichero = r"D:\Documentos\Desarrollo Web\Finanservs\Profesiones_ACP.xlsx"
+    fichero = r"D:\Documentos\Desarrollo Web\Finanservs\otros\Profesiones_ACP.xlsx"
 
     book = openpyxl.load_workbook(fichero, data_only=True)
     hoja = book.active
@@ -248,7 +275,7 @@ def acp():
 
 # # No. 2
 def lw():
-    fichero = r"D:\Documentos\Desarrollo Web\Finanservs\Profesiones_Linea_Blanca.xlsx"
+    fichero = r"D:\Documentos\Desarrollo Web\Finanservs\otros\Profesiones_Linea_Blanca.xlsx"
 
     book = openpyxl.load_workbook(fichero, data_only=True)
     hoja = book.active
@@ -268,7 +295,7 @@ def lw():
 
 # No. 3
 def inst():
-    fichero = r"D:\Documentos\Desarrollo Web\Finanservs\Instituciones.xlsx"
+    fichero = r"D:\Documentos\Desarrollo Web\Finanservs\otros\Instituciones.xlsx"
 
     book = openpyxl.load_workbook(fichero, data_only=True)
     hoja = book.active
@@ -289,7 +316,7 @@ def inst():
 
 # # No. 4
 def plan():
-    fichero = r"D:\Documentos\Desarrollo Web\Finanservs\Planillas_Jubilados.xlsx"
+    fichero = r"D:\Documentos\Desarrollo Web\Finanservs\otros\Planillas_Jubilados.xlsx"
 
     book = openpyxl.load_workbook(fichero, data_only=True)
     hoja = book.active
@@ -310,7 +337,7 @@ def plan():
 
 # # No. 567
 def pais():
-    fichero = r"D:\Documentos\Desarrollo Web\Finanservs\paises_estandar.xlsx"
+    fichero = r"D:\Documentos\Desarrollo Web\Finanservs\otros\paises_estandar.xlsx"
 
     book = openpyxl.load_workbook(fichero, data_only=True)
     hoja = book.active
@@ -332,7 +359,7 @@ def pais():
 
 # # No. 5
 def prov():
-    fichero = r"D:\Documentos\Desarrollo Web\Finanservs\prov-codigo.xlsx"
+    fichero = r"D:\Documentos\Desarrollo Web\Finanservs\otros\prov-codigo.xlsx"
 
     book = openpyxl.load_workbook(fichero, data_only=True)
     hoja = book.active
@@ -353,7 +380,7 @@ def prov():
 
 # # No. 6
 def dist():
-    fichero = r"D:\Documentos\Desarrollo Web\Finanservs\dist-codigo.xlsx"
+    fichero = r"D:\Documentos\Desarrollo Web\Finanservs\otros\dist-codigo.xlsx"
 
     book = openpyxl.load_workbook(fichero, data_only=True)
     hoja = book.active
@@ -375,7 +402,7 @@ def dist():
 
 # # No. 7
 def corr():
-    fichero = r"D:\Documentos\Desarrollo Web\Finanservs\corr-codigo.xlsx"
+    fichero = r"D:\Documentos\Desarrollo Web\Finanservs\otros\corr-codigo.xlsx"
 
     book = openpyxl.load_workbook(fichero, data_only=True)
     hoja = book.active
@@ -395,12 +422,44 @@ def corr():
         print("MySQL Finish ...")
 
 
+# # No. 8
+def css():
+    fichero = r"D:\Documentos\Desarrollo Web\Finanservs\otros\planilla-institucional-de-la-css-febrero-2022.xlsx"
+
+    book = openpyxl.load_workbook(fichero, data_only=True)
+    hoja = book.active
+
+    # celdas = hoja['A4' : 'H10500']
+    # celdas = hoja['A10501' : 'H20500']
+    celdas = hoja['A20501' : 'H35166']
+    # celdas = hoja['A4' : 'H35']
+
+    cnn = fcnn()
+    mycursor = cnn.cursor()
+
+    # query = "truncate table planilla_css"
+    # mycursor.execute(query)
+
+
+    print("Planilla CSS ...")
+    for fila in celdas:
+        data = [celda.value for celda in fila]
+        # print(data)
+        planilla_css(data[2], data[1], data[3], data[4], data[5], data[7], cnn)
+
+    cnn.commit()
+    if cnn.is_connected():
+        cnn.close()
+        print("MySQL Finish ...")
+
 
 #acp()
 #lw()
 #inst()
 #plan()
-pais()
+#pais()
 #prov()
 #dist()
 #corr()
+# css()
+
