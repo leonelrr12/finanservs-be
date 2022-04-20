@@ -37,29 +37,48 @@ const separator = (numb) => {
   return str.join(".");
 }
 
-appRoutes.get('/today-is', (request, response) => {
+
+appRoutes.get('/today-is', (req, res) => {
   const dt1 = new Date()
   const dt2 = new Intl.DateTimeFormat('es-ES',{dateStyle: 'full'}).format(dt1)
-  response.json({ hoyes: dt2 })
+  res.json({ hoyes: dt2 })
 })
 
 
-appRoutes.get('/prospects', (request, response) => {
+appRoutes.get('/planilla_css/:cedula', (req, res) => {
+  let sql = "SELECT salario_mensual as salario, gasto_mensual as gasto,"
+  sql += " inicio_labores as inicio, 26 as meses_antig, cargo, entidad, contrato"
+  sql += " FROM planilla_css  WHERE cedula = ?"
+
+  const params = [req.params.cedula];
+  config.cnn.query(sql, params, (error, results) => {
+    if (error) throw error
+    if (results.length > 0) {
+      res.json(results)
+    } else {
+      res.json([{ salario: 0, gasto: 0, inicio: '', meses_antig: 0, cargo: '', entidad: '', contrato: '' }])
+    }
+  })
+})
+
+
+
+appRoutes.get('/prospects', (req, res) => {
   let sql = "select	sign"
   sql += " FROM prospects a"
   sql += " WHERE id_personal = '3-722-1667'"
 
-  const params = [request.params.id_personal];
+  const params = [req.params.id_personal];
   config.cnn.query(sql, params, (error, results) => {
     if (error) {
       logger.error('Error SQL:', error.sqlMessage)
-      response.status(500)
+      res.status(500)
     } 
     if (results.length > 0) {
       const firma = results[0].sign.toString()
-      response.json({sign: firma})
+      res.json({sign: firma})
     } else {
-      response.send('Not results!')
+      res.send('Not results!')
     }
   })
 })

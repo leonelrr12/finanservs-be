@@ -184,12 +184,30 @@ def insert_corr(id, idDist, idProv, name, cnn):
             print("MySQL connection is closed")
 
 
-def planilla_css(cedula, nombre, cargo, salario, inicio, contrato, cnn):
+def planilla_css(cedula, nombre, entidad, cargo, salario, inicio, contrato, cnn):
     try:
         cursor = cnn.cursor()
-        mySql_insert_query = "INSERT INTO planilla_css (cedula, nombre_completo, cargo, salario_mensual, inicio_labores, contrato) VALUES (%s,%s,%s,%s,%s,%s)"
+        mySql_insert_query = "INSERT INTO planilla_css (cedula, nombre_completo, entidad, cargo, salario_mensual, inicio_labores, contrato) VALUES (%s,%s,%s,%s,%s,%s,%s)"
 
-        record = (cedula, nombre, cargo, salario, inicio, contrato)
+        record = (cedula, nombre, entidad, cargo, salario, inicio, contrato)
+        cursor.execute(mySql_insert_query, record)
+        # cnn.commit()
+        # print("Record inserted!")
+    except mysql.connector.Error as error:
+        print("Failed to insert into MySQL table {}".format(error))
+    
+    finally:
+        if cnn.is_connected():
+            cursor.close()
+            print("MySQL connection is closed")
+
+
+def planilla_contraloria(cedula, nombre, entidad, cargo, salario, gasto, inicio, contrato, cnn):
+    try:
+        cursor = cnn.cursor()
+        mySql_insert_query = "INSERT INTO planilla_css (cedula, nombre_completo, entidad, cargo, salario_mensual, gasto_mensual, inicio_labores, contrato) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"
+
+        record = (cedula, nombre, entidad, cargo, salario, gasto, inicio, contrato)
         cursor.execute(mySql_insert_query, record)
         # cnn.commit()
         # print("Record inserted!")
@@ -251,7 +269,7 @@ def fcnn():
 
 
 
-# # No. 1
+## No. 1
 def acp():
     fichero = r"D:\Documentos\Desarrollo Web\Finanservs\otros\Profesiones_ACP.xlsx"
 
@@ -273,7 +291,7 @@ def acp():
         cnn.close()
         print("MySQL Finish ...")
 
-# # No. 2
+## No. 2
 def lw():
     fichero = r"D:\Documentos\Desarrollo Web\Finanservs\otros\Profesiones_Linea_Blanca.xlsx"
 
@@ -293,7 +311,7 @@ def lw():
         cnn.close()
         print("MySQL Finish ...")
 
-# No. 3
+## No. 3
 def inst():
     fichero = r"D:\Documentos\Desarrollo Web\Finanservs\otros\Instituciones.xlsx"
 
@@ -314,7 +332,7 @@ def inst():
         cnn.close()
         print("MySQL Finish ...")
 
-# # No. 4
+## No. 4
 def plan():
     fichero = r"D:\Documentos\Desarrollo Web\Finanservs\otros\Planillas_Jubilados.xlsx"
 
@@ -335,7 +353,7 @@ def plan():
         cnn.close()
         print("MySQL Finish ...")
 
-# # No. 567
+## No. 567
 def pais():
     fichero = r"D:\Documentos\Desarrollo Web\Finanservs\otros\paises_estandar.xlsx"
 
@@ -357,7 +375,7 @@ def pais():
         print("MySQL Finish ...")
 
 
-# # No. 5
+## No. 5
 def prov():
     fichero = r"D:\Documentos\Desarrollo Web\Finanservs\otros\prov-codigo.xlsx"
 
@@ -378,7 +396,7 @@ def prov():
         cnn.close()
         print("MySQL Finish ...")
 
-# # No. 6
+## No. 6
 def dist():
     fichero = r"D:\Documentos\Desarrollo Web\Finanservs\otros\dist-codigo.xlsx"
 
@@ -400,7 +418,7 @@ def dist():
         cnn.close()
         print("MySQL Finish ...")
 
-# # No. 7
+## No. 7
 def corr():
     fichero = r"D:\Documentos\Desarrollo Web\Finanservs\otros\corr-codigo.xlsx"
 
@@ -422,30 +440,60 @@ def corr():
         print("MySQL Finish ...")
 
 
-# # No. 8
+## No. 8
 def css():
     fichero = r"D:\Documentos\Desarrollo Web\Finanservs\otros\planilla-institucional-de-la-css-febrero-2022.xlsx"
 
     book = openpyxl.load_workbook(fichero, data_only=True)
     hoja = book.active
-
-    # celdas = hoja['A4' : 'H10500']
-    # celdas = hoja['A10501' : 'H20500']
-    celdas = hoja['A20501' : 'H35166']
-    # celdas = hoja['A4' : 'H35']
+    max_row = hoja.max_row
+    
+    celdas = hoja['A4' : 'H'+str(max_row)]  
 
     cnn = fcnn()
     mycursor = cnn.cursor()
 
-    # query = "truncate table planilla_css"
-    # mycursor.execute(query)
+    query = "delete from planilla_css where entidad = 'CAJA DE SEGURO SOCIAL'"
+    mycursor.execute(query)
 
 
     print("Planilla CSS ...")
     for fila in celdas:
         data = [celda.value for celda in fila]
         # print(data)
-        planilla_css(data[2], data[1], data[3], data[4], data[5], data[7], cnn)
+        planilla_css(data[2], data[1], 'CAJA DE SEGURO SOCIAL', data[3], data[4], data[5], data[7], cnn)
+
+    cnn.commit()
+    if cnn.is_connected():
+        cnn.close()
+        print("MySQL Finish ...")
+
+## No. 9
+def contraloria():
+    fichero = r"D:\Documentos\Desarrollo Web\Finanservs\otros\contraloria.xlsx"
+
+    book = openpyxl.load_workbook(fichero, data_only=True)
+    hoja = book.active
+    max_row = hoja.max_row
+
+    celdas = hoja['A6' : 'H'+str(max_row)]  
+
+    cnn = fcnn()
+    mycursor = cnn.cursor()
+
+    query = "delete from planilla_css where entidad <> 'CAJA DE SEGURO SOCIAL'"
+    mycursor.execute(query)
+
+
+    print("Planillas de Contraloria ...")
+    for fila in celdas:
+        data = [celda.value for celda in fila]
+        nombreCompleto = data[0]+' '+data[1]
+        f1 = data[7].split('/')
+        inicio=f1[2]+'-'+f1[1]+'-'+f1[0]
+        f1 = data[2].split('-')
+        cedula = f1[0]+'-'+str(int(f1[1]))+'-'+str(int(f1[2]))
+        planilla_contraloria(cedula, nombreCompleto, 'TRIBUNAL DE CUENTAS', data[3], data[4], data[5], inicio, data[6], cnn)
 
     cnn.commit()
     if cnn.is_connected():
@@ -462,4 +510,4 @@ def css():
 #dist()
 #corr()
 # css()
-
+contraloria()
