@@ -403,6 +403,8 @@ appRoutes.get('/tracking/cedula/:cedula', (req, res) => {
     useNewUrlParser: true, 
     useUnifiedTopology: true
   })
+  .then(() => console.log('MongoDB Connected... Tracking'))
+  .catch((err) => console.log(err))
  
   Prospect.find({ "Cedula": cedula }, function(err, data) {
     if(err){
@@ -420,6 +422,8 @@ appRoutes.get('/tracking/id/:id', (req, res) => {
   mongoose.connect(config.MONGODB_URI, {
     useNewUrlParser: true, useUnifiedTopology: true
   })
+  .then(() => console.log('MongoDB Connected... Tracking'))
+  .catch((err) => console.log(err))
  
   Prospect.findById({ "_id": id }, function(err, data) {
     if(err){
@@ -437,6 +441,8 @@ appRoutes.get('/tracking/delete/:id', (req, res) => {
   mongoose.connect(config.MONGODB_URI, {
     useNewUrlParser: true, useUnifiedTopology: true
   })
+  .then(() => console.log('MongoDB Connected... Tracking'))
+  .catch((err) => console.log(err))
  
   Prospect.findByIdAndRemove({ "_id": id }, function(err, result) {
     if(err){
@@ -451,7 +457,10 @@ appRoutes.get('/tracking', (req, res) => {
   mongoose.connect(config.MONGODB_URI, {
     useNewUrlParser: true, useUnifiedTopology: true
   })
- 
+  .then(() => console.log('MongoDB Connected... Tracking'))
+  .catch((err) => console.log(err))  
+
+
   Prospect.find(function(err, data) {
       if(err){
         console.log(err)
