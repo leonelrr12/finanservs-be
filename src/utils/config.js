@@ -84,6 +84,11 @@ const ORIGEN = {
   agente: process.env.AGENTE
 }
 
+const CLIENTIFY = {
+  username: process.env.CF_USERNAME,
+  password: process.env.CF_PASSWORD
+}
+
 module.exports = {
   APC,
   AWS_BUCKET_NAME,
@@ -96,5 +101,6 @@ module.exports = {
   MONGODB_URI,
   sendEmail,
   sendGEmail,
-  ORIGEN
+  ORIGEN,
+  CLIENTIFY
 }
