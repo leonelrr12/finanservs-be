@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.a7e52c95.css",
-    "main.js": "/static/js/main.cf9fbd43.js",
+    "main.js": "/static/js/main.f1b00ef1.js",
     "static/media/finacredit-logo-desaturated.png": "/static/media/finacredit-logo-desaturated.af30ec2c8e2d70536481.png",
     "static/media/finacredit-logo.png": "/static/media/finacredit-logo.af30ec2c8e2d70536481.png",
     "static/media/pop-picture-falta-poco.jpg": "/static/media/pop-picture-falta-poco.12155cf594daebf2a0ca.jpg",
@@ -27,6 +27,6 @@
   },
   "entrypoints": [
     "static/css/main.a7e52c95.css",
-    "static/js/main.cf9fbd43.js"
+    "static/js/main.f1b00ef1.js"
   ]
 }
