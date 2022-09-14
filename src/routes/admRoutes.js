@@ -57,7 +57,7 @@ admRoutes.post('/prospects', (request, response) => {
   config.cnn.query(sql, params, (error, results, next) => {
     if (error) {
       logger.error('Error SQL:', error.sqlMessage)
-      response.status(500)
+      return response.status(500)
     } 
     // console.log('results', results, results.insertId)
     // console.log({ newId: results.insertId })
@@ -85,7 +85,7 @@ admRoutes.post('/ref_personales', (request, response) => {
   config.cnn.query(sql, params, (error, results, next) => {
     if (error) {
       logger.error('Error SQL:', error.sqlMessage)
-      response.status(500)
+      return response.status(500)
     } 
     console.log('results',results)
     response.send('Ok!')
@@ -112,7 +112,7 @@ admRoutes.get('/prospects/aproach/:id_personal', (request, response) => {
   config.cnn.query(sql, params, (error, results) => {
     if (error) {
       logger.error('Error SQL:', error.sqlMessage)
-      response.status(500)
+      return response.status(500)
     } 
     if (results.length > 0) {
       response.json(results)

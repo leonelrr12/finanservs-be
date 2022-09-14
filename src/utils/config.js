@@ -76,7 +76,7 @@ const cnn = mysql.createPool({
 
 const APC = {
   user: process.env.APC_USER,
-  pass: process.env.APC_PASS
+  pass: process.env.APC_PASS,
 }
 
 const ORIGEN = {

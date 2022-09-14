@@ -486,8 +486,10 @@ appRoutes.post('/leerAPC', (request, response) => {
     formatData(result, response)
   })
 })
+
 appRoutes.post('/APC', async (request, response) => {
-  const {id: cedula } = request.body
+  let {id: cedula } = request.body
+  // cedula = process.env.APC_Cedula || cedula
 
   mongoose.connect(config.MONGODB_URI, {
     useNewUrlParser: true, 
@@ -507,7 +509,7 @@ appRoutes.post('/APC', async (request, response) => {
       const today = new Date()
       antigRef = Math.round((today.getTime() - created.getTime())/(24*60*60*1000))
 
-      if(antigRef < 91) {
+      if(antigRef < 91 || process.env.APC_NoVence) {
         datos = data[0].APC
       }
     }
@@ -986,7 +988,7 @@ appRoutes.get('/laboral_sector', (request, response) => {
       cnn.connect(error => {
         if (error) {
           logger.error('Error SQL:', error.message)
-          response.status(500)
+          return response.status(500)
         }
         console.log('Database server runnuning!');
       })
@@ -1212,7 +1214,7 @@ appRoutes.get('/type_documents', (request, response) => {
   config.cnn.query(sql, (error, results) => {
     if (error) {
       logger.error('Error SQL:', error.sqlMessage)
-      response.status(500)
+      return response.status(500)
     } 
     if (results.length > 0) {
       response.json(results)
@@ -1229,7 +1231,7 @@ appRoutes.get('/terms_loan', (request, response) => {
   config.cnn.query(sql, (error, results) => {
     if (error) {
       logger.error('Error SQL:', error.sqlMessage)
-      response.status(500)
+      return response.status(500)
     } 
     if (results.length > 0) {
       response.json(results)
@@ -1245,7 +1247,7 @@ appRoutes.get('/nationality', (request, response) => {
   config.cnn.query(sql, (error, results) => {
     if (error) {
       logger.error('Error SQL:', error.sqlMessage)
-      response.status(500)
+      return response.status(500)
     } 
     if (results.length > 0) {
       response.json(results)
@@ -1261,7 +1263,7 @@ appRoutes.get('/entities_f', (request, response) => {
   config.cnn.query(sql, (error, results) => {
     if (error) {
       logger.error('Error SQL:', error.sqlMessage)
-      response.status(500)
+      return response.status(500)
     } 
     if (results.length > 0) {
       response.json(results)
@@ -1297,7 +1299,7 @@ appRoutes.get('/sector_profesion', (request, response) => {
   config.cnn.query(sql, (error, results) => {
     if (error) {
       logger.error('Error SQL:', error.sqlMessage)
-      response.status(500)
+      return response.status(500)
     } 
     if (results.length > 0) {
       response.json(results)
@@ -1321,7 +1323,7 @@ appRoutes.get('/subgrupo_institution', (request, response) => {
   config.cnn.query(sql, (error, results) => {
     if (error) {
       logger.error('Error SQL:', error.sqlMessage)
-      response.status(500)
+      return response.status(500)
     } 
     if (results.length > 0) {
       response.json(results)
