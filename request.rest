@@ -263,14 +263,14 @@ POST http://localhost:3001/api/email
 content-type: application/json
 
 {
-    "email": "guasimo01@gmail.com",
+    "email": "leonellrodriguez@gmail.com",
     "asunto": "Solicitud de Préstamo de:  ",
     "mensaje": "Pruebas con el correo de ADMON",
     "telefono": "6676-4545",
     "monto": 3500,
     "nombre": "Juan Perez",
     "banco": "800",
-    "id": "8-790-921"
+    "cedula": "8-887-1897"
 }
 
 

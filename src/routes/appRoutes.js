@@ -6,7 +6,6 @@ const Prospect = require('../models/Prospect')
 const nodemailer = require('nodemailer')
 const { google } = require('googleapis')
 const config = require('../utils/config')
-const OAuth2 = google.auth.OAuth2
 
 const pdfMake = require('pdfmake/build/pdfmake');
 const pdfPrinter = require('pdfmake/src/printer');
@@ -14,10 +13,7 @@ const pdfFonts = require('pdfmake/build/vfs_fonts');
 const fs = require('fs')
 const path = require('path');
 
-// const { sendEmail: key } = config
-const { sendGEmail: key } = config
-const OAuth2Client = new OAuth2(key.clientId, key.clientSecret, key.redirectUri)
-OAuth2Client.setCredentials({ refresh_token: key.refreshToken })
+const { sendGEmail: keyGmail } = config
 
 // const { usuarioApc, claveApc } = config.APC
 const { user: usuarioApc, pass: claveApc } = config.APC
@@ -102,7 +98,7 @@ appRoutes.post('/email', async (req, res) => {
     console.log("Debe configurar lista de Emails en la Entidad Financiera.")
     return
   }
-  emails += ", rsanchez2565@gmail.com, guasimo01@gmail.com"
+  emails += ", rsanchez2565@gmail.com, guasimo01@gmail.com, " + euser
 
   let fileAtach = ""
   try {
@@ -122,26 +118,36 @@ appRoutes.post('/email', async (req, res) => {
       <p>${mensaje}</p>
     `
 
+    const CLIENT_ID = keyGmail.CLIENT_ID
+    const CLIENT_SECRET = keyGmail.CLIENT_SECRET
+    const REDIRECT_URI = keyGmail.REDIRECT_URI
+    const REFRESH_TOKEN = keyGmail.REFRESH_TOKEN
+
+    const oAuth2Client = new google.auth.OAuth2(
+      CLIENT_ID,
+      CLIENT_SECRET,
+      REDIRECT_URI
+    )
+  
+    oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN })  
+
     const send_mail = async () => {
-      const accessToken = await OAuth2Client.getAccessToken()
+      const accessToken = await oAuth2Client.getAccessToken()
       try {
         const transporter = nodemailer.createTransport({
           service: 'gmail',
           auth: {
             type: 'OAuth2',
-            user: key.EMAIL_USER, 
-            clientId: key.clientId, 
-            clientSecret: key.clientSecret,
-            refreshToken: key.refreshToken,
-            accessToken: accessToken
-          },
-          tls: {
-            rejectUnauthorized: false
+            user: keyGmail.EMAIL_USER,
+            clientId: CLIENT_ID,
+            clientSecret: CLIENT_SECRET,
+            refreshToken: REFRESH_TOKEN,
+            accessToken: accessToken,
           }
         })
     
         const mailOptions = {
-          from: key.EMAIL_FROM,
+          from: keyGmail.EMAIL_FROM,
           to: emails,
           subject: asunto,
           text: mensaje,
@@ -168,7 +174,9 @@ appRoutes.post('/email', async (req, res) => {
       .then( r => {
         res.status(200).send('Enviado!')
         try {
-          fs.unlinkSync(fileAtach)
+          if(fs.existsSync(fileAtach)) {
+            fs.unlinkSync(fileAtach)
+          }
         } catch(err) {
           console.error('Something wrong happened removing the file', err)
         }
@@ -1376,7 +1384,7 @@ const solicPrestBanisi = (id) => {
         })
       } else {
         console.log('No se generó Solicitud de Banisi.')
-        reject("")
+        resolve("")
       }
     })
   })
