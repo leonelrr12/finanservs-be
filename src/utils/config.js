@@ -60,6 +60,23 @@ const CLIENTIFY = {
   password: process.env.CF_PASSWORD
 }
 
+
+const redirectRuta = (entity_f) => {
+  return new Promise(resolve => {
+    cnn.query("SELECT coalesce(redirect, id_ruta) as redirect FROM entities_f where id_ruta = ?", [entity_f], (error, results) => {
+      if (error) {
+        return resolve(entity_f)
+      } 
+      if(results.length) {
+        resolve(results[0].redirect)
+      } else {
+        resolve(entity_f)
+      }
+    })
+  })
+}
+
+
 module.exports = {
   APC,
   AWS_BUCKET_NAME,
@@ -72,5 +89,6 @@ module.exports = {
   MONGODB_URI,
   sendGEmail,
   ORIGEN,
-  CLIENTIFY
+  CLIENTIFY,
+  redirectRuta
 }

@@ -18,8 +18,9 @@ const { sendGEmail: keyGmail } = config
 // const { usuarioApc, claveApc } = config.APC
 const { user: usuarioApc, pass: claveApc } = config.APC
 
-appRoutes.get('/', (request, response) => {
-  response.send('Hola Mundo!!!')
+appRoutes.get('/', async(request, response) => {
+  const ruta = await config.redirectRuta("6300")
+  response.send('Hola Mundo!!! (api) ' + ruta )
 })
 
 const separator = (numb) => {
@@ -82,7 +83,8 @@ appRoutes.get('/prospects', (req, res) => {
 
 appRoutes.post('/email', async (req, res) => {
 
-  const { email: euser, asunto, mensaje, telefono, monto, nombre, banco, cedula } = req.body
+  let { email: euser, asunto, mensaje, telefono, monto, nombre, banco, cedula } = req.body
+  banco = await redirectRuta(banco)
 
   let emails = null
   await axios.get(`http://localhost:3001/api/entities_f/${banco}`)
@@ -1011,6 +1013,7 @@ appRoutes.get('/laboral_sector', (request, response) => {
 
 appRoutes.get('/laboral_sector_entity_f', (request, response) => {
   let sql = "select id_ruta as ruta, id_sector, id_profesion,"
+  sql += " coalesce(d.redirect, id_ruta) as redirect,"
   sql += " descto_ship as discount_capacity,"
   sql += " descto_chip as discount_capacity_mortgage,"
   sql += " deuda_ship as debt_capacity,"

@@ -286,6 +286,12 @@ GET http://localhost:3001/adm/mongoDBtoMySql
 GET http://localhost:3001/api/prospects
 
 
+###
+GET http://localhost:3001/adm
+###
+GET http://localhost:3001/api
+
+
 
 ###
 POST http://localhost:3001/upload/solicPrestBanisi

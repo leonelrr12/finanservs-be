@@ -1,15 +1,15 @@
 const admRoutes = require('express').Router()
-const bcrypt = require('bcryptjs')
 const config = require('../utils/config')
 const logger = require('../utils/logger')
 
 
-admRoutes.get('/', (request, response) => {
-  response.send('Hola Mundo!!! Desde Admin Routes')
+admRoutes.get('/', async(request, response) => {
+  const ruta = await config.redirectRuta("6300")
+  response.send('Hola Mundo!!! (adm) Desde Admin Routes ' + ruta )
 })
 
 
-admRoutes.post('/prospects', (request, response) => {
+admRoutes.post('/prospects', async(request, response) => {
   let sql = "INSERT INTO prospects ("
   sql += " id_personal,id_referido,idUser,name,fname,fname_2,lname,lname_2,"
   sql += " entity_f,estado,email,cellphone,phoneNumber,idUrl,socialSecurityProofUrl,"
@@ -40,6 +40,7 @@ admRoutes.post('/prospects', (request, response) => {
   let { weight, weightUnit, height, heightUnit, aceptaAPC: aceptaApc } = request.body
 
   estado = 1 // Nuevo registro queda con estatus de nuevo
+  entity_f = await redirectRuta(entity_f)
 
   const birthDate = BDH.slice(0,10)
   const params = [
