@@ -84,7 +84,7 @@ appRoutes.get('/prospects', (req, res) => {
 appRoutes.post('/email', async (req, res) => {
 
   let { email: euser, asunto, mensaje, telefono, monto, nombre, banco, cedula } = req.body
-  banco = await redirectRuta(banco)
+  banco = await config.redirectRuta(banco)
 
   let emails = null
   await axios.get(`http://localhost:3001/api/entities_f/${banco}`)

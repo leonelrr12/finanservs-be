@@ -40,7 +40,7 @@ admRoutes.post('/prospects', async(request, response) => {
   let { weight, weightUnit, height, heightUnit, aceptaAPC: aceptaApc } = request.body
 
   estado = 1 // Nuevo registro queda con estatus de nuevo
-  entity_f = await redirectRuta(entity_f)
+  entity_f = await config.redirectRuta(entity_f)
 
   const birthDate = BDH.slice(0,10)
   const params = [
